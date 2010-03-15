@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
 
 	for(; lexer->lexme.type != Lexme::End; lexer->step())
 	{
-		std::cout << "Token " << Lexme::names[lexer->lexme.type] << " (" << string_pool->get(&lexer->lexme)->cstr << ")" << std::endl;
+		std::cout << "Token " << Lexme::names[lexer->lexme.type] << " (" << lexer->lexme.string() << ")" << std::endl;
 	}
 
 	return 0;

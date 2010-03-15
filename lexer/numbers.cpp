@@ -66,7 +66,10 @@ namespace Legion
 		if(input == '.')
 			real();
 		else
+		{
+			lexme.stop = &input;
 			lexme.type = Lexme::Integer;
+		}
 	}
 
 	void Lexer::real()

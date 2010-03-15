@@ -6,7 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 
-#ifdef WINDOWS
+#ifdef WIN32
 	#include "windows.h"
 #endif
 

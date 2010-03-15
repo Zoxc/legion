@@ -142,5 +142,9 @@ namespace Legion
 		lexme.error = false;
 
 		(this->*jump_table[input])();
+
+		#ifdef DEBUG
+			assert(lexme.stop > lexme.start);
+		#endif
 	}
 };

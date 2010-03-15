@@ -20,7 +20,7 @@ namespace Legion
 
 	char_t *MemoryPool::allocate_page()
 	{
-		#ifdef WINDOWS
+		#ifdef WIN32
 			return (char_t *)VirtualAlloc(0, page_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 		#else	
 			return new char_t[page_size];
@@ -29,7 +29,7 @@ namespace Legion
 
 	void MemoryPool::free_page(char_t *page)
 	{
-		#ifdef WINDOWS
+		#ifdef WIN32
 			VirtualFree((void *)page, 0, 0);
 		#else
 			delete[] page;
