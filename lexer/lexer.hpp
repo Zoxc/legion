@@ -1,28 +1,13 @@
 #pragma once
 #include "../common.hpp"
-#include "../memory_pool.hpp"
+#include "../range.hpp"
 #include "input.hpp"
 
 namespace Legion
 {
-	class Compiler;
+	class String;
+	class StringPool;
 	
-	class Range
-	{
-		public:
-			char_t *start;
-			char_t *stop;
-			char_t *line_start;
-			unsigned int line;
-			bool error;
-
-			unsigned int length();
-
-			std::string string();
-
-			void report(const std::string& error);
-	};
-
 	class Lexme:
 		public Range
 	{
@@ -30,16 +15,22 @@ namespace Legion
 			enum LexmeType
 			{
 				None,
+				Ident,	
 				Integer,
 				Octal,
 				Hex,
-				Real,
-				Point,
+				Real,	
+				Point,		
 				End,
 				Types
 			};
 
 			LexmeType type;
+			
+			union
+			{
+				String *value;
+			};
 			
 			static std::string names[Types];
 	};
@@ -49,7 +40,9 @@ namespace Legion
 		private:
 			char_t *input_str;
 			Input input;
-			unsigned int length;
+			size_t length;
+			
+			StringPool *string_pool;
 			
 			static bool jump_table_ready;
 			static void(Lexer::*jump_table[256])();
@@ -63,13 +56,15 @@ namespace Legion
 			void number();
 			void real();
 			void hex();
+			
+			void ident();
 		public:
 			Lexer();
 			
-			Compiler *compiler;
 			Lexme lexme;
 			
-			void setup(char_t *input, unsigned int length);
+			void setup(StringPool *string_pool);
+			void load(char_t *input, unsigned int length);
 			void step();
 	};
 };

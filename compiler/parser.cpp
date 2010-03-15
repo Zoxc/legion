@@ -2,11 +2,12 @@
 
 namespace Legion
 {
-	Compiler::Compiler()
+	Parser::Parser()
 	{
+		lexer.pool = &pool;
 	}
 
-	Compiler::~Compiler()
+	Parser::~Parser()
 	{
 	}
 };

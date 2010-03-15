@@ -1,16 +1,18 @@
 #pragma once
 #include "../common.hpp"
 #include "../memory_pool.hpp"
+#include "../string_pool.hpp"
 
 namespace Legion
 {
-	class Compiler
+	class Parser
 	{
 		private:
 		public:
-			MemoryPool pool;
+			StringPool pool;
+			Lexer lexer;
 			
-			Compiler();
-			~Compiler();
+			Parser();
+			~Parser();
 	};
 };

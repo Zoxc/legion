@@ -1,26 +1,11 @@
 #include "lexer.hpp"
+#include "../string_pool.hpp"
 
 namespace Legion
 {
-	std::string Range::string()
-	{
-		std::string result((char *)start, length());
-
-		return result;
-	}
-
-	unsigned int Range::length()
-	{
-		return stop - start;
-	}
-
-	void Range::report(const std::string& error)
-	{
-		std::cout << "Line " << line + 1 << ": " << error << std::endl;
-	}
-	
 	std::string Lexme::names[Types] = {
 		"none",	
+		"identifier",
 		"integer",
 		"octal",
 		"hex",
@@ -34,6 +19,8 @@ namespace Legion
 
 	void Lexer::white()
 	{
+		input++;
+		
 		while(input.in(1, 9) || input.in(11, 12) || input.in(14, 32))
 			input++;
 
@@ -42,6 +29,8 @@ namespace Legion
 
 	void Lexer::unknown()
 	{
+		input++;
+		
 		while(jump_table[input] == &Lexer::unknown)
 			input++;
 
@@ -58,8 +47,27 @@ namespace Legion
 
 	void Lexer::null()
 	{
+		if((size_t)(&input - input_str) >= length)
+		{
+			lexme.stop = &input;
+			lexme.type = Lexme::End;
+		}
+		else
+		{
+			unknown();
+		}
+	}
+
+	void Lexer::ident()
+	{
+		input++;
+		
+		while(input.in('a', 'z') || input.in('A', 'Z') || input.in('0', '9') || input == '_')
+			input++;
+
 		lexme.stop = &input;
-		lexme.type = Lexme::End;
+		lexme.type = Lexme::Ident;
+		lexme.value = string_pool->get(&lexme);
 	}
 
 	void Lexer::setup_jump_table()
@@ -75,6 +83,14 @@ namespace Legion
 
 		// Stop please
 		jump_table[0] = &Lexer::null;
+
+		// Identifiers
+		forchar(c, 'a', 'z')
+			jump_table[c] = &Lexer::ident;
+
+		// Identifiers
+		forchar(c, 'A', 'Z')
+			jump_table[c] = &Lexer::ident;
 
 		// Numbers
 		jump_table['0'] = &Lexer::zero;
@@ -102,7 +118,12 @@ namespace Legion
 		setup_jump_table();
 	}
 	
-	void Lexer::setup(char_t *input, unsigned int length)
+	void Lexer::setup(StringPool *string_pool)
+	{
+		this->string_pool = string_pool;
+	}
+	
+	void Lexer::load(char_t *input, unsigned int length)
 	{
 		this->input_str = input;
 		this->input.set(input);

@@ -1,5 +1,5 @@
 #include "common.hpp"
-#include "lexer/lexer.hpp"
+#include "compiler.hpp"
 
 using namespace Legion;
 
@@ -7,16 +7,18 @@ int main(int argc, char *argv[])
 {
 	std::cout << "Legion - a compiler that targets Galaxy" << std::endl;
 
-	Lexer lexer;
+	Compiler compiler;
 	
 	char str[101];
 	std::cin.getline(str, 101);
 	
-	lexer.setup((char_t *)str, 101);
+	Lexer *lexer = &compiler.parser.lexer;
+	
+	lexer->load((char_t *)str, strlen(str));
 
-	for(; lexer.lexme.type != Lexme::End; lexer.step())
+	for(; lexer->lexme.type != Lexme::End; lexer->step())
 	{
-		std::cout << "Token " << Lexme::names[lexer.lexme.type] << std::endl;
+		std::cout << "Token " << Lexme::names[lexer->lexme.type] << " (" << string_pool->get(&lexer->lexme)->cstr << ")" << std::endl;
 	}
 
 	return 0;

@@ -24,3 +24,8 @@ namespace Legion
 			void *allocate(size_t bytes);
 	};
 };
+
+void *operator new(size_t bytes, Legion::MemoryPool *memory_pool);
+void operator delete(void *, Legion::MemoryPool *memory_pool);
+void *operator new[](size_t bytes, Legion::MemoryPool *memory_pool);
+void operator delete[](void *, Legion::MemoryPool *memory_pool);

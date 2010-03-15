@@ -6,7 +6,7 @@ require 'reno/toolchains/gnu'
 package = Reno::Application.new do
 	name 'Legion'
 	version '0.1'
-	sources '*.cpp', 'lexer/*.cpp', 'compiler/*.cpp'
+	sources '*.cpp', 'lexer/*.cpp', 'parser/*.cpp'
 	default :lang => 'C++'
 end
 
