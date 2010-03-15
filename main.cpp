@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 
 	Compiler compiler;
 	
-	char str[101];
+	char *str = (char *)compiler.memory_pool.allocate(101);
 	std::cin.getline(str, 101);
 	
 	Lexer *lexer = &compiler.parser.lexer;

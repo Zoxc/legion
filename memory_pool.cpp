@@ -1,5 +1,9 @@
 #include "memory_pool.hpp"
 
+#ifdef VALGRIND
+	#include <malloc.h>
+#endif
+
 namespace Legion
 {
 	const unsigned int page_size = 0x1000 * 4;
@@ -23,7 +27,7 @@ namespace Legion
 		#ifdef WIN32
 			return (char_t *)VirtualAlloc(0, page_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 		#else	
-			return new char_t[page_size];
+			return (char_t *)malloc(page_size);
 		#endif
 	}
 
@@ -32,7 +36,7 @@ namespace Legion
 		#ifdef WIN32
 			VirtualFree((void *)page, 0, 0);
 		#else
-			delete[] page;
+			free(page);
 		#endif
 	}
 
@@ -51,13 +55,22 @@ namespace Legion
 
 	void *MemoryPool::allocate(size_t bytes)
 	{
-		char_t *result = current;
-		char_t *next = result + bytes;
-		
-		if(next > max)
-			return get_page(bytes);
+		char_t *result;
 
-		current = result;
+		#ifdef VALGRIND
+			result = (char_t *)malloc(bytes);
+
+			pages.push_back(result);
+		#else
+			result = current;
+
+			char_t *next = result + bytes;
+		
+			if(next > max)
+				return get_page(bytes);
+
+			current = result;
+		#endif
 
 		return (void *)result;
 	}
@@ -70,7 +83,6 @@ void *operator new(size_t bytes, Legion::MemoryPool *memory_pool)
 
 void operator delete(void *, Legion::MemoryPool *memory_pool)
 {
-
 }
 
 void *operator new[](size_t bytes, Legion::MemoryPool *memory_pool)
@@ -81,3 +93,4 @@ void *operator new[](size_t bytes, Legion::MemoryPool *memory_pool)
 void operator delete[](void *, Legion::MemoryPool *memory_pool)
 {
 }
+
