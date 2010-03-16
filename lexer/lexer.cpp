@@ -3,71 +3,120 @@
 
 namespace Legion
 {
-	std::string Lexme::names[Types] = {
+	std::string Lexeme::names[TYPES] = {
 		"none",	
 		"identifier",
+		"string",
 		"integer",
 		"octal",
 		"hex",
 		"real",
-		"point",
-		"end"
+		".",
+		"->",
+		";",
+		",",
+		"+",
+		"-",
+		"*",
+		"/",
+		"%",
+		"|",
+		"^",
+		"&",
+		"~",
+		"<<",
+		">>",
+		"||",
+		"&&",
+		"!",
+		"=",
+		"+=",
+		"-=",
+		"*=",
+		"/=",
+		"%=",
+		"|=",
+		"^=",
+		"&=",
+		"~=",
+		"<<=",
+		">>=",
+		"||=",
+		"&&=",
+		"==",
+		"!=",
+		"<",
+		"<=",
+		">",
+		">=",
+		"{",
+		"}",
+		"(",
+		")",
+		"[",
+		"]",
+		"end of file"
 	};
 	
 	bool Lexer::jump_table_ready = 0;
-	void(Lexer::*Lexer::jump_table[256])();
-
-	void Lexer::white()
+	void(Lexer::*Lexer::jump_table[sizeof(char_t) << 8])();
+	
+	template<Lexeme::LexmeType type> void Lexer::single()
 	{
 		input++;
 		
-		while(input.in(1, 9) || input.in(11, 12) || input.in(14, 32))
-			input++;
-
-		step();
+		lexeme.stop = &input;
+		lexeme.type = type;
 	}
 
-	void Lexer::unknown()
+	template<Lexeme::LexmeType type, Lexeme::LexmeType assign_type> void Lexer::assign()
 	{
 		input++;
 		
-		while(jump_table[input] == &Lexer::unknown)
-			input++;
-
-		lexme.stop = &input;
-		lexme.type = Lexme::None;
-
-		if (lexme.length() == 1)
-			lexme.report("Invalid character '" + lexme.string() + "'");
-		else
-			lexme.report("Invalid characters '" + lexme.string() + "'");
-
-		step();
-	}
-
-	void Lexer::null()
-	{
-		if((size_t)(&input - input_str) >= length)
+		if(input == '=')
 		{
-			lexme.stop = &input;
-			lexme.type = Lexme::End;
+			input++;
+			lexeme.stop = &input;
+			lexeme.type = assign_type;
 		}
 		else
 		{
-			unknown();
+			lexeme.stop = &input;
+			lexeme.type = type;
 		}
 	}
 
-	void Lexer::ident()
+	template<Lexeme::LexmeType type, Lexeme::LexmeType assign_type, char_t match, Lexeme::LexmeType match_type, Lexeme::LexmeType match_assign> void Lexer::assign()
 	{
 		input++;
 		
-		while(input.in('a', 'z') || input.in('A', 'Z') || input.in('0', '9') || input == '_')
-			input++;
-
-		lexme.stop = &input;
-		lexme.type = Lexme::Ident;
-		lexme.value = string_pool->get(&lexme);
+		switch(input)
+		{
+			case match:
+				input++;
+				if(input == '=')
+				{
+					input++;
+					lexeme.stop = &input;
+					lexeme.type = match_assign;
+				}
+				else
+				{
+					lexeme.stop = &input;
+					lexeme.type = match_type;
+				}
+				break;
+				
+			case '=':
+				input++;
+				lexeme.stop = &input;
+				lexeme.type = assign_type;
+				break;
+				
+			default:
+				lexeme.stop = &input;
+				lexeme.type = type;
+		}
 	}
 
 	void Lexer::setup_jump_table()
@@ -88,14 +137,16 @@ namespace Legion
 		forchar(c, 'a', 'z')
 			jump_table[c] = &Lexer::ident;
 
-		// Identifiers
 		forchar(c, 'A', 'Z')
 			jump_table[c] = &Lexer::ident;
+
+		// String
+		jump_table['"'] = &Lexer::string;
+
 
 		// Numbers
 		jump_table['0'] = &Lexer::zero;
 		jump_table['.'] = &Lexer::real;
-		jump_table['$'] = &Lexer::hex;
 
 		forchar(c, '1', '9')
 			jump_table[c] = &Lexer::number;
@@ -110,6 +161,45 @@ namespace Legion
 		jump_table[11] = &Lexer::white;
 		jump_table[12] = &Lexer::white;
 		
+		// Newlines
+		jump_table['\n'] = &Lexer::newline;
+		jump_table['\r'] = &Lexer::carrige_return;
+		
+		// Arithmetic
+		jump_table['+'] = &Lexer::assign<Lexeme::ADD, Lexeme::ASSIGN_ADD>;
+		jump_table['-'] = &Lexer::sub;
+		jump_table['*'] = &Lexer::assign<Lexeme::MUL, Lexeme::ASSIGN_MUL>;
+		jump_table['%'] = &Lexer::assign<Lexeme::MOD, Lexeme::ASSIGN_MOD>;
+		jump_table['/'] = &Lexer::div;
+		
+		// Bitwise operators
+		jump_table['^'] = &Lexer::assign<Lexeme::BITWISE_XOR, Lexeme::ASSIGN_BITWISE_XOR>;
+		jump_table['&'] = &Lexer::assign<Lexeme::BITWISE_AND, Lexeme::ASSIGN_BITWISE_AND, '&', Lexeme::LOGICAL_AND, Lexeme::ASSIGN_LOGICAL_AND>;
+		jump_table['|'] = &Lexer::assign<Lexeme::BITWISE_OR, Lexeme::ASSIGN_BITWISE_OR, '|', Lexeme::LOGICAL_OR, Lexeme::ASSIGN_LOGICAL_OR>;
+		jump_table['~'] = &Lexer::assign<Lexeme::BITWISE_NOT, Lexeme::ASSIGN_BITWISE_NOT>;
+		
+		// Logical operators
+		jump_table['!'] = &Lexer::assign<Lexeme::LOGICAL_NOT, Lexeme::NOT_EQUAL>;
+		
+		// Misc
+		jump_table['='] = &Lexer::assign<Lexeme::ASSIGN, Lexeme::EQUAL>;
+		
+		jump_table['<'] = &Lexer::assign<Lexeme::LESS, Lexeme::LESS_OR_EQUAL, '<', Lexeme::LEFT_SHIFT, Lexeme::ASSIGN_LEFT_SHIFT>;
+		jump_table['>'] = &Lexer::assign<Lexeme::GREATER, Lexeme::GREATER_OR_EQUAL, '>', Lexeme::RIGHT_SHIFT, Lexeme::ASSIGN_RIGHT_SHIFT>;
+		
+		jump_table[';'] = &Lexer::single<Lexeme::SEMICOLON>;
+		jump_table[','] = &Lexer::single<Lexeme::COMMA>;
+		
+		// Bracets
+		jump_table['{'] = &Lexer::single<Lexeme::BRACET_OPEN>;
+		jump_table['}'] = &Lexer::single<Lexeme::BRACET_CLOSE>;
+		
+		jump_table['('] = &Lexer::single<Lexeme::PARENT_OPEN>;
+		jump_table[')'] = &Lexer::single<Lexeme::PARENT_CLOSE>;
+		
+		jump_table['['] = &Lexer::single<Lexeme::SQR_BRACET_OPEN>;
+		jump_table[']'] = &Lexer::single<Lexeme::SQR_BRACET_CLOSE>;
+		
 		jump_table_ready = true;
 	}
 
@@ -118,33 +208,34 @@ namespace Legion
 		setup_jump_table();
 	}
 	
-	void Lexer::setup(StringPool *string_pool)
+	void Lexer::setup(StringPool *string_pool, MemoryPool *memory_pool)
 	{
 		this->string_pool = string_pool;
+		this->memory_pool = memory_pool;
 	}
 	
-	void Lexer::load(char_t *input, unsigned int length)
+	void Lexer::load(char_t *input, size_t length)
 	{
 		this->input_str = input;
 		this->input.set(input);
 		this->length = length;
 		
-		lexme.start = input;
-		lexme.line_start = input;
-		lexme.line = 0;
+		lexeme.start = input;
+		lexeme.line_start = input;
+		lexeme.line = 0;
 		
 		step();
 	}
 	
 	void Lexer::step()
 	{
-		lexme.start = &input;
-		lexme.error = false;
+		lexeme.start = &input;
+		lexeme.error = false;
 
 		(this->*jump_table[input])();
 
 		#ifdef DEBUG
-			assert(lexme.stop > lexme.start);
+			assert(lexeme.stop >= lexeme.start);
 		#endif
 	}
 };

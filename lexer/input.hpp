@@ -6,7 +6,7 @@ namespace Legion
 	class Input
 	{
 		private:
-			char_t *input;
+			const char_t *input;
 
 		public:
 			enum Characters
@@ -16,7 +16,7 @@ namespace Legion
 				NewLine = 0x10
 			};
 	
-			void set(char_t *input)
+			void set(const char_t *input)
 			{
 				this->input = input;
 			}
@@ -26,12 +26,12 @@ namespace Legion
 				return *input >= start && *input <= stop;
 			}
 
-			char_t *operator &()
+			const char_t *operator &()
 			{
 				return input;
 			}
 
-			operator char_t()
+			operator const char_t()
 			{
 				return *input;
 			}

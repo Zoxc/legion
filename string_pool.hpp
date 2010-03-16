@@ -4,14 +4,12 @@
 
 namespace Legion
 {
-	class MemoryPool;
-	
 	class String
 	{
 		public:
 			String *next;
 			size_t length;
-			char_t *cstr;
+			const char_t *c_str;
 	};
 	
 	class StringPool
@@ -26,6 +24,8 @@ namespace Legion
 			~StringPool();
 			
 			String *get(Range *range);
+			String *get(const char_t *string, size_t length);
+			String *get(const char_t *start, const char_t *stop);
 			
 			void setup(MemoryPool *memory_pool);
 	};

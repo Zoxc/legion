@@ -6,20 +6,20 @@ namespace Legion
 	class Range
 	{
 		public:
-			char_t *start;
-			char_t *stop;
-			char_t *line_start;
-			unsigned int line;
+			const char_t *start;
+			const char_t *stop;
+			const char_t *line_start;
+			size_t line;
 			bool error;
 
 			std::string string()
 			{
-				std::string result((char *)start, length());
+				std::string result((const char *)start, length());
 
 				return result;
 			}
 
-			unsigned int length()
+			size_t length()
 			{
 				return stop - start;
 			}

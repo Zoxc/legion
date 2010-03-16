@@ -66,10 +66,10 @@ namespace Legion
 
 			char_t *next = result + bytes;
 		
-			if(next > max)
+			if(next >= max)
 				return get_page(bytes);
 
-			current = result;
+			current = next;
 		#endif
 
 		return (void *)result;

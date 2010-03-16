@@ -15,6 +15,6 @@ namespace Legion
 			
 			Lexer lexer;
 				
-			void setup(StringPool *string_pool);
+			void setup(StringPool *string_pool, MemoryPool *memory_pool);
 	};
 };

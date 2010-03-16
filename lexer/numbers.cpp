@@ -36,22 +36,22 @@ namespace Legion
 						while(input.in('0', '9'))
 							input++;
 
-						lexme.type = Lexme::Integer;
-						lexme.stop = &input;
+						lexeme.type = Lexeme::INTEGER;
+						lexeme.stop = &input;
 
-						lexme.report("Invalid octal number '" + lexme.string() + "'");
+						lexeme.report("Invalid octal number '" + lexeme.string() + "'");
 					}
 					else
 					{
-						lexme.type = Lexme::Octal;
-						lexme.stop = &input;
+						lexeme.type = Lexeme::OCTAL;
+						lexeme.stop = &input;
 					}
 				}
 				break;
 
 			default: // Single 0
-				lexme.type = Lexme::Integer;
-				lexme.stop = &input;
+				lexeme.type = Lexeme::INTEGER;
+				lexeme.stop = &input;
 				break;
 		}
 	}
@@ -67,8 +67,8 @@ namespace Legion
 			real();
 		else
 		{
-			lexme.stop = &input;
-			lexme.type = Lexme::Integer;
+			lexeme.stop = &input;
+			lexeme.type = Lexeme::INTEGER;
 		}
 	}
 
@@ -81,13 +81,13 @@ namespace Legion
 			while(input.in('0', '9'))
 				input++;
 
-			lexme.stop = &input;
-			lexme.type = Lexme::Real;
+			lexeme.stop = &input;
+			lexeme.type = Lexeme::REAL;
 		}
 		else
 		{
-			lexme.stop = &input;
-			lexme.type = Lexme::Point;
+			lexeme.stop = &input;
+			lexeme.type = Lexeme::MEMBER;
 		}
 	}
 
@@ -100,15 +100,15 @@ namespace Legion
 			while(input.in('0', '9') || input.in('A', 'F'))
 				input++;
 
-			lexme.stop = &input;
-			lexme.type = Lexme::Hex;
+			lexeme.stop = &input;
+			lexeme.type = Lexeme::HEX;
 		}
 		else
 		{
-			lexme.stop = &input;
-			lexme.type = Lexme::Hex;
+			lexeme.stop = &input;
+			lexeme.type = Lexeme::HEX;
 
-			lexme.report("Invalid hex number: '" + lexme.string() + "'");
+			lexeme.report("Invalid hex number: '" + lexeme.string() + "'");
 		}
 	}
 };

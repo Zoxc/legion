@@ -10,8 +10,8 @@ namespace Legion
 	{
 	}
 	
-	void Parser::setup(StringPool *string_pool)
+	void Parser::setup(StringPool *string_pool, MemoryPool *memory_pool)
 	{
-		lexer.setup(string_pool);
+		lexer.setup(string_pool, memory_pool);
 	}
 };

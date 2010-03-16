@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <string.h>
+#include <assert.h>
 #include <stdio.h>
 
 #ifdef WIN32
