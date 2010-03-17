@@ -79,6 +79,14 @@ namespace Legion
 			static std::string names[TYPES];
 	};
 	
+	class Keywords
+	{
+		public:
+			String *include;
+			
+			void setup(StringPool *pool);
+	};
+	
 	class Lexer
 	{
 		private:
@@ -123,6 +131,7 @@ namespace Legion
 			Lexer();
 			
 			Lexeme lexeme;
+			Keywords keywords;
 			
 			void setup(StringPool *string_pool, MemoryPool *memory_pool);
 			void load(const char_t *input, size_t length);

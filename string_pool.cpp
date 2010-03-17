@@ -15,6 +15,11 @@ namespace Legion
 	{
 		this->memory_pool = memory_pool;
 	}
+	
+	String *StringPool::get(const char *string)
+	{
+		return get((const char_t *)string, strlen(string));
+	}
 
 	String *StringPool::get(const char_t *string, size_t length)
 	{

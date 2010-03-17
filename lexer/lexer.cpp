@@ -58,6 +58,11 @@ namespace Legion
 		"end of file"
 	};
 	
+	void Keywords::setup(StringPool *pool)
+	{
+		include = pool->get("include");
+	}
+	
 	bool Lexer::jump_table_ready = 0;
 	void(Lexer::*Lexer::jump_table[sizeof(char_t) << 8])();
 	

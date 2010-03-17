@@ -14,6 +14,8 @@ namespace Legion
 			~Parser();
 			
 			Lexer lexer;
+			
+			void parse();
 				
 			void setup(StringPool *string_pool, MemoryPool *memory_pool);
 	};
