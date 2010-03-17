@@ -202,6 +202,15 @@ namespace Legion
 		
 		jump_table_ready = true;
 	}
+	
+	void Lexer::report_null()
+	{
+		const char_t *start = lexeme.start;
+		lexeme.start = &input - 1;
+		lexeme.stop = &input;
+		lexeme.report("Unexpected null terminator");
+		lexeme.start = start;
+	}
 
 	Lexer::Lexer()
 	{
@@ -214,7 +223,7 @@ namespace Legion
 		this->memory_pool = memory_pool;
 	}
 	
-	void Lexer::load(char_t *input, size_t length)
+	void Lexer::load(const char_t *input, size_t length)
 	{
 		this->input_str = input;
 		this->input.set(input);

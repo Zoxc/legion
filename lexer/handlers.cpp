@@ -56,22 +56,25 @@ namespace Legion
 	}
 		
 		
-	bool Lexer::process_null(const char_t *input)
+	bool Lexer::process_null(const char_t *input, bool expected)
 	{
-		return (size_t)(input - input_str) >= length;
+		bool result = (size_t)(input - input_str) >= length;
+		
+		if(result && !expected)
+			report_null();
+			
+		return result;
 	}
 
 	void Lexer::null()
 	{
-		if(process_null(&input))
+		if(process_null(&input, true))
 		{
 			lexeme.stop = &input;
 			lexeme.type = Lexeme::END;
 		}
 		else
-		{
 			unknown();
-		}
 	}
 
 	void Lexer::newline()

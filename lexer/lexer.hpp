@@ -82,7 +82,7 @@ namespace Legion
 	class Lexer
 	{
 		private:
-			char_t *input_str;
+			const char_t *input_str;
 			Input input;
 			size_t length;
 			
@@ -93,9 +93,10 @@ namespace Legion
 			static void(Lexer::*jump_table[sizeof(char_t) << 8])();
 			static void setup_jump_table();
 
-			bool process_null(const char_t *input);
+			bool process_null(const char_t *input, bool expected = false);
 			void build_string(const char_t *start, char_t *str);
 			
+			void report_null();
 			
 			template<Lexeme::LexmeType type> void single();
 			template<Lexeme::LexmeType type, Lexeme::LexmeType assign_type> void assign();
@@ -124,7 +125,7 @@ namespace Legion
 			Lexeme lexeme;
 			
 			void setup(StringPool *string_pool, MemoryPool *memory_pool);
-			void load(char_t *input, size_t length);
+			void load(const char_t *input, size_t length);
 			void step();
 	};
 };

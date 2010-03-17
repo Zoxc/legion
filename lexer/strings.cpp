@@ -73,6 +73,7 @@ namespace Legion
 							*writer++ = '\\';
 							*writer++ = *input++;
 					}
+					break;
 					
 				case 0:
 					if(process_null(input))
@@ -138,12 +139,14 @@ namespace Legion
 						case 0:
 							if(process_null(&input))
 							{
-								overhead++;
 								lexeme.stop = &input;
 								lexeme.report("Unterminated string");
 								goto done;
 							}
-	
+							else
+								input++;
+							break;
+							
 						default:
 							const char_t *start = lexeme.start;
 							lexeme.start = &input - 1;
@@ -151,6 +154,7 @@ namespace Legion
 							lexeme.report("Invalid escape string");
 							lexeme.start = start;
 					}
+					break;
 
 				case 0:
 					if(process_null(&input))
@@ -159,6 +163,8 @@ namespace Legion
 						lexeme.report("Unterminated string");
 						goto done;
 					}
+					else
+						report_null();
 				
 				default:
 					input++;		

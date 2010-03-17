@@ -57,12 +57,12 @@ namespace Legion
 		
 		while(str)
 		{
-			if(str->length != length)
-				continue;
-				
-			if(memcmp(str->c_str, start, length) == 0)
-				return str;
-				
+			if(str->length == length)
+			{
+				if(memcmp(str->c_str, start, length) == 0)
+					return str;		
+			}
+			
 			tail = str;
 			str = str->next;
 		}

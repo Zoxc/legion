@@ -225,6 +225,14 @@
 			>
 		</File>
 		<File
+			RelativePath=".\document.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\document.hpp"
+			>
+		</File>
+		<File
 			RelativePath=".\legion.hpp"
 			>
 		</File>
