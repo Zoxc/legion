@@ -4,7 +4,7 @@
 
 using namespace Legion;
 
-int __cdecl main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	std::cout << "Legion - a compiler that targets Galaxy" << std::endl;
 
