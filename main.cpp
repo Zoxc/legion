@@ -12,7 +12,7 @@ int __cdecl main(int argc, char *argv[])
 	
 	Document doc(&compiler, "MapScript.galaxy");
 	
-	doc.lex();
+	doc.parser.parse();
 	
 	return 0;
 }

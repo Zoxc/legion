@@ -2,87 +2,19 @@
 #include "../common.hpp"
 #include "../range.hpp"
 #include "input.hpp"
+#include "lexeme.hpp"
 
 namespace Legion
 {
 	class String;
 	class StringPool;
 
-	class Lexeme:
-		public Range
-	{
-		public:
-			enum LexmeType
-			{
-				NONE,
-				IDENT,	
-				STRING,
-				INTEGER,
-				OCTAL,
-				HEX,
-				REAL,	
-				MEMBER,	
-				MEMBER_PTR,
-				SEMICOLON,
-				COMMA,
-				ADD,
-				SUB,
-				MUL,
-				DIV,
-				MOD,	
-				BITWISE_OR,
-				BITWISE_XOR,
-				BITWISE_AND,
-				BITWISE_NOT,
-				LEFT_SHIFT,
-				RIGHT_SHIFT,
-				LOGICAL_OR,
-				LOGICAL_AND,
-				LOGICAL_NOT,
-				ASSIGN,
-				ASSIGN_ADD,
-				ASSIGN_SUB,
-				ASSIGN_MUL,
-				ASSIGN_DIV,
-				ASSIGN_MOD,
-				ASSIGN_BITWISE_OR,
-				ASSIGN_BITWISE_XOR,
-				ASSIGN_BITWISE_AND,
-				ASSIGN_BITWISE_NOT,
-				ASSIGN_LEFT_SHIFT,
-				ASSIGN_RIGHT_SHIFT,
-				ASSIGN_LOGICAL_OR,
-				ASSIGN_LOGICAL_AND,
-				EQUAL,
-				NOT_EQUAL,
-				LESS,
-				LESS_OR_EQUAL,
-				GREATER,
-				GREATER_OR_EQUAL,
-				BRACET_OPEN,
-				BRACET_CLOSE,
-				PARENT_OPEN,
-				PARENT_CLOSE,
-				SQR_BRACET_OPEN,
-				SQR_BRACET_CLOSE,
-				END,
-				TYPES
-			};
-
-			LexmeType type;
-			
-			union
-			{
-				String *value;
-			};
-			
-			static std::string names[TYPES];
-	};
-	
 	class Keywords
 	{
 		public:
 			String *include;
+			
+			std::map<String *, Lexeme::LexemeType> mapping;
 			
 			void setup(StringPool *pool);
 	};
@@ -106,9 +38,9 @@ namespace Legion
 			
 			void report_null();
 			
-			template<Lexeme::LexmeType type> void single();
-			template<Lexeme::LexmeType type, Lexeme::LexmeType assign_type> void assign();
-			template<Lexeme::LexmeType type, Lexeme::LexmeType assign_type, char_t match, Lexeme::LexmeType match_type, Lexeme::LexmeType match_assign> void assign();
+			template<Lexeme::LexemeType type> void single();
+			template<Lexeme::LexemeType type, Lexeme::LexemeType assign_type> void assign();
+			template<Lexeme::LexemeType type, Lexeme::LexemeType assign_type, char_t match, Lexeme::LexemeType match_type, Lexeme::LexemeType match_assign> void assign();
 
 			void eol();
 			void white();
@@ -136,5 +68,6 @@ namespace Legion
 			void setup(StringPool *string_pool, MemoryPool *memory_pool);
 			void load(const char_t *input, size_t length);
 			void step();
+			void identify_keywords();
 	};
 };

@@ -196,6 +196,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\lexer\lexeme.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\lexer\lexeme.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\lexer\lexer.cpp"
 				>
 			</File>
@@ -209,6 +217,18 @@
 			</File>
 			<File
 				RelativePath=".\lexer\strings.cpp"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="tree"
+			>
+			<File
+				RelativePath=".\tree\scope.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tree\scope.hpp"
 				>
 			</File>
 		</Filter>

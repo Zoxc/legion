@@ -3,70 +3,17 @@
 
 namespace Legion
 {
-	std::string Lexeme::names[TYPES] = {
-		"none",	
-		"identifier",
-		"string",
-		"integer",
-		"octal",
-		"hex",
-		"real",
-		".",
-		"->",
-		";",
-		",",
-		"+",
-		"-",
-		"*",
-		"/",
-		"%",
-		"|",
-		"^",
-		"&",
-		"~",
-		"<<",
-		">>",
-		"||",
-		"&&",
-		"!",
-		"=",
-		"+=",
-		"-=",
-		"*=",
-		"/=",
-		"%=",
-		"|=",
-		"^=",
-		"&=",
-		"~=",
-		"<<=",
-		">>=",
-		"||=",
-		"&&=",
-		"==",
-		"!=",
-		"<",
-		"<=",
-		">",
-		">=",
-		"{",
-		"}",
-		"(",
-		")",
-		"[",
-		"]",
-		"end of file"
-	};
-	
 	void Keywords::setup(StringPool *pool)
 	{
 		include = pool->get("include");
+		
+		mapping.insert(std::pair<String *, Lexeme::LexemeType>(include, Lexeme::INCLUDE)); 
 	}
 	
 	bool Lexer::jump_table_ready = 0;
 	void(Lexer::*Lexer::jump_table[sizeof(char_t) << 8])();
 	
-	template<Lexeme::LexmeType type> void Lexer::single()
+	template<Lexeme::LexemeType type> void Lexer::single()
 	{
 		input++;
 		
@@ -74,7 +21,7 @@ namespace Legion
 		lexeme.type = type;
 	}
 
-	template<Lexeme::LexmeType type, Lexeme::LexmeType assign_type> void Lexer::assign()
+	template<Lexeme::LexemeType type, Lexeme::LexemeType assign_type> void Lexer::assign()
 	{
 		input++;
 		
@@ -91,7 +38,7 @@ namespace Legion
 		}
 	}
 
-	template<Lexeme::LexmeType type, Lexeme::LexmeType assign_type, char_t match, Lexeme::LexmeType match_type, Lexeme::LexmeType match_assign> void Lexer::assign()
+	template<Lexeme::LexemeType type, Lexeme::LexemeType assign_type, char_t match, Lexeme::LexemeType match_type, Lexeme::LexemeType match_assign> void Lexer::assign()
 	{
 		input++;
 		
@@ -226,6 +173,7 @@ namespace Legion
 	{
 		this->string_pool = string_pool;
 		this->memory_pool = memory_pool;
+		keywords.setup(string_pool);
 	}
 	
 	void Lexer::load(const char_t *input, size_t length)
@@ -239,6 +187,14 @@ namespace Legion
 		lexeme.line = 0;
 		
 		step();
+	}
+	
+	void Lexer::identify_keywords()
+	{
+		std::map<String *, Lexeme::LexemeType>::iterator value = keywords.mapping.find(lexeme.value);
+		
+		if(value != keywords.mapping.end())
+			lexeme.type = value->second;
 	}
 	
 	void Lexer::step()
