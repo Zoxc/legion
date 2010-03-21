@@ -7,7 +7,7 @@ namespace Legion
 {
 	class String;
 	class StringPool;
-	class Symbol;
+	struct Symbol;
 	class Parser;
 	class Document;
 	
@@ -24,7 +24,7 @@ namespace Legion
 			bool store(Symbol **table, size_t mask, String *name, Symbol *symbol);
 			void expand();
 		public:
-			Scope(MemoryPool *memory_pool);
+			Scope(Scope *parent, MemoryPool *memory_pool);
 			~Scope();
 			
 			Scope *parent;
@@ -51,14 +51,9 @@ namespace Legion
 				return result;
 			}
 			
-			template<class T>  T *alloc_declare(Document *document, Parser *parser)
+			template<class T>  T *declare(Document *document, Parser *parser)
 			{
-				T *symbol = new (memory_pool) T;
-				
-				symbol->type = symbol->symbol_type();
-				
-				return declare<T>(document, parser, symbol);
+				return declare<T>(document, parser, new (memory_pool) T);
 			}
-			
 	};
 };

@@ -6,34 +6,35 @@ namespace Legion
 	class String;
 	class Type;
 	
-	class TypeSymbol;
+	struct TypeSymbol;
 	
-	class Symbol
+	struct Symbol
 	{
-		public:
-			enum Type {
-				NONE,
-				TYPE,
-				FUNCTION,
-				VARIABLE
-			};
-			
-			Type type;
-			String *name;
-			Symbol *next;
+		enum Type {
+			NONE,
+			TYPE,
+			FUNCTION,
+			VARIABLE
+		};
+		
+		Symbol(Type type) : type(type), name(0)
+		{
+		}
+		
+		Type type;
+		String *name;
+		Symbol *next;
 	};
 	
-	template<Symbol::Type type> class SymbolType:
+	template<Symbol::Type type> struct SymbolType:
 		public Symbol
 	{
-		public:
-			Symbol::Type symbol_type()
-			{
-				return type;
-			}
+		SymbolType() : Symbol(type)
+		{
+		}
 	};
 
-	class TypeSymbol:
+	struct TypeSymbol:
 		public SymbolType<Symbol::TYPE>
 	{
 		Type *type_ptr;

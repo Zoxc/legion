@@ -6,7 +6,7 @@
 
 namespace Legion
 {
-	Parser::Parser(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope) : memory_pool(memory_pool), document(document), scope(scope), lexer(string_pool, memory_pool, document)
+	Parser::Parser(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope) : document(document), memory_pool(memory_pool), lexer(string_pool, memory_pool, document), scope(scope)
 	{
 	}
 
@@ -40,7 +40,7 @@ namespace Legion
 			step();
 	}
 	
-	void Parser::parse_include(Node *node)
+	void Parser::parse_include(Node *parent)
 	{
 		step();
 		
@@ -53,11 +53,13 @@ namespace Legion
 		matches(Lexeme::SEMICOLON);
 	}
 	
-	void Parser::parse_struct(Node *node)
+	void Parser::parse_struct(Node *parent)
 	{
 		step();
 		
-		TypeSymbol *type = scope->alloc_declare<TypeSymbol>(document, this);
+		StructNode *node = parent->add<StructNode>(memory_pool);
+		
+		node->symbol = scope->declare<TypeSymbol>(document, this);
 		
 		if(match(Lexeme::BRACET_OPEN))
 		{
@@ -67,7 +69,7 @@ namespace Legion
 		match(Lexeme::SEMICOLON);
 	}
 	
-	void Parser::parse(Node *node)
+	void Parser::parse(Node *parent)
 	{
 		while(true)
 		{
@@ -76,11 +78,11 @@ namespace Legion
 			switch(lexeme())
 			{
 				case Lexeme::INCLUDE:
-					parse_include(node);
+					parse_include(parent);
 					break;
 					
 				case Lexeme::STRUCT:
-					parse_struct(node);
+					parse_struct(parent);
 					break;
 					
 				case Lexeme::END:

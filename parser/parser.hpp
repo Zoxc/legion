@@ -7,7 +7,7 @@ namespace Legion
 	class StringPool;
 	class Document;
 	class Scope;
-	class Node;
+	struct Node;
 	
 	class Parser
 	{
@@ -58,8 +58,8 @@ namespace Legion
 				}
 			}
 			
-			void parse_include(Node *node);	
-			void parse_struct(Node *node);	
+			void parse_include(Node *parent);	
+			void parse_struct(Node *parent);	
 		public:
 			Parser(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope);
 			~Parser();
@@ -72,7 +72,7 @@ namespace Legion
 				lexer.step();
 			}
 			
-			void parse(Node *node);
+			void parse(Node *parent);
 
 			void unexpected(bool skip = true);	
 			void expected(Lexeme::LexemeType what, bool skip = false);
