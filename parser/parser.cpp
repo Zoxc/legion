@@ -1,4 +1,8 @@
 #include "parser.hpp"
+#include "../tree/scope.hpp"
+#include "../tree/types.hpp"
+#include "../tree/symbols.hpp"
+#include "../tree/node.hpp"
 
 namespace Legion
 {
@@ -19,7 +23,7 @@ namespace Legion
 		else
 			message += "'" + Lexeme::names[lexer.lexeme.type] + "'";
 			
-		lexer.lexeme.report(message);
+		lexer.lexeme.report(document, message);
 		
 		if(skip)
 			step();
@@ -28,28 +32,42 @@ namespace Legion
 	void Parser::unexpected(bool skip)
 	{
 		if(lexer.lexeme.has_value())
-			lexer.lexeme.report("Unexpected " + lexer.lexeme.string() + " (" + Lexeme::names[lexer.lexeme.type] + ")");
+			lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.string() + " (" + Lexeme::names[lexer.lexeme.type] + ")");
 		else
-			lexer.lexeme.report("Unexpected '" + Lexeme::names[lexer.lexeme.type] + "'");
+			lexer.lexeme.report(document, "Unexpected '" + Lexeme::names[lexer.lexeme.type] + "'");
 		
 		if(skip)
 			step();
 	}
 	
-	void Parser::include()
+	void Parser::parse_include(Node *node)
 	{
 		step();
 		
-		if(verify(Lexeme::STRING))
+		if(expect(Lexeme::STRING))
 		{
 			std::cout << "Found include " << lexer.lexeme.string() << std::endl;
 			step();
 		}
 		
 		matches(Lexeme::SEMICOLON);
-	}	
+	}
 	
-	void Parser::parse()
+	void Parser::parse_struct(Node *node)
+	{
+		step();
+		
+		TypeSymbol *type = scope->alloc_declare<TypeSymbol>(document, this);
+		
+		if(match(Lexeme::BRACET_OPEN))
+		{
+			match(Lexeme::BRACET_CLOSE);
+		}
+		
+		match(Lexeme::SEMICOLON);
+	}
+	
+	void Parser::parse(Node *node)
 	{
 		while(true)
 		{
@@ -58,7 +76,11 @@ namespace Legion
 			switch(lexeme())
 			{
 				case Lexeme::INCLUDE:
-					include();
+					parse_include(node);
+					break;
+					
+				case Lexeme::STRUCT:
+					parse_struct(node);
 					break;
 					
 				case Lexeme::END:
@@ -69,9 +91,12 @@ namespace Legion
 			}
 		}
 	}
-			
-	void Parser::setup(StringPool *string_pool, MemoryPool *memory_pool)
+	
+	void Parser::setup(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope)
 	{
-		lexer.setup(string_pool, memory_pool);
+		this->memory_pool = memory_pool;
+		this->document = document;
+		this->scope = scope;
+		lexer.setup(string_pool, memory_pool, document);
 	}
 };

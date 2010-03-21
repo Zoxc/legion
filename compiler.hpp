@@ -1,6 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include "string_pool.hpp"
+#include "tree/scope.hpp"
 
 namespace Legion
 {
@@ -10,6 +11,7 @@ namespace Legion
 		public:
 			MemoryPool memory_pool;
 			StringPool string_pool;
+			Scope scope;
 			
 			Compiler();
 			~Compiler();

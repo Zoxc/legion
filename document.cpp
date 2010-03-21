@@ -5,8 +5,11 @@ namespace Legion
 {
 	Document::Document(Compiler *compiler, const char *filename) : input(0)
 	{
-		parser.setup(&compiler->string_pool, &memory_pool);
+		tree.type = Node::TREE;
+		
 		this->filename = filename;
+		
+		parser.setup(&compiler->string_pool, &memory_pool, this, &compiler->scope);
 		
 		if(map())
 			parser.lexer.load(input, length);
@@ -15,28 +18,6 @@ namespace Legion
 	Document::~Document()
 	{
 		free((void *)input);
-	}
-	
-	void Document::lex()
-	{
-		Lexer *lexer = &parser.lexer;
-		
-		for(; lexer->lexeme.type != Lexeme::END; lexer->step())
-		{
-			/*std::cout << "Token ";
-			
-			switch(lexer->lexeme.type)
-			{
-				case Lexeme::STRING:
-					std::cout << '"' << lexer->lexeme.value->c_str << '"';
-					break;
-					
-				default:
-					std::cout << lexer->lexeme.string();
-			}
-			
-			std::cout << " (" << Lexeme::names[lexer->lexeme.type] << ")" << std::endl;*/
-		}
 	}
 	
 	bool Document::map()

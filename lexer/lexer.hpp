@@ -6,14 +6,13 @@
 
 namespace Legion
 {
+	class Document;
 	class String;
 	class StringPool;
 
 	class Keywords
 	{
 		public:
-			String *include;
-			
 			std::map<String *, Lexeme::LexemeType> mapping;
 			
 			void setup(StringPool *pool);
@@ -28,6 +27,7 @@ namespace Legion
 			
 			StringPool *string_pool;
 			MemoryPool *memory_pool;
+			Document *document;
 			
 			static bool jump_table_ready;
 			static void(Lexer::*jump_table[sizeof(char_t) << 8])();
@@ -65,7 +65,7 @@ namespace Legion
 			Lexeme lexeme;
 			Keywords keywords;
 			
-			void setup(StringPool *string_pool, MemoryPool *memory_pool);
+			void setup(StringPool *string_pool, MemoryPool *memory_pool, Document *document);
 			void load(const char_t *input, size_t length);
 			void step();
 			void identify_keywords();

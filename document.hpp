@@ -2,6 +2,7 @@
 #include "common.hpp"
 #include "string_pool.hpp"
 #include "parser/parser.hpp"
+#include "tree/node.hpp"
 
 namespace Legion
 {
@@ -17,10 +18,9 @@ namespace Legion
 			MemoryPool memory_pool;
 			Parser parser;
 			const char *filename;
+			Node tree;
 			
 			Document(Compiler *compiler, const char *filename);
 			~Document();
-			
-			void lex();
 	};
 };

@@ -140,7 +140,7 @@ namespace Legion
 							if(process_null(&input))
 							{
 								lexeme.stop = &input;
-								lexeme.report("Unterminated string");
+								lexeme.report(document, "Unterminated string");
 								goto done;
 							}
 							else
@@ -151,7 +151,7 @@ namespace Legion
 							const char_t *start = lexeme.start;
 							lexeme.start = &input - 1;
 							lexeme.stop = &input + 1;
-							lexeme.report("Invalid escape string");
+							lexeme.report(document, "Invalid escape string");
 							lexeme.start = start;
 					}
 					break;
@@ -160,7 +160,7 @@ namespace Legion
 					if(process_null(&input))
 					{
 						lexeme.stop = &input;
-						lexeme.report("Unterminated string");
+						lexeme.report(document, "Unterminated string");
 						goto done;
 					}
 					else

@@ -1,4 +1,7 @@
 #include "scope.hpp"
+#include "../lexer/lexer.hpp"
+#include "../parser/parser.hpp"
+#include "symbols.hpp"
 
 namespace Legion
 {
@@ -10,15 +13,19 @@ namespace Legion
 	{
 	}
 	
-	void Scope::setup(StringPool *string_pool, MemoryPool *memory_pool)
+	void Scope::setup(MemoryPool *memory_pool)
 	{
-		this->string_pool = string_pool;
 		this->memory_pool = memory_pool;
 		
-		this->size = 3;
-		this->entries = 0;
-		this->mask = (1 << this->size) - 1;
-		this->table = new (this->memory_pool) Symbol *[mask + 1];
+		size = 3;
+		
+		size_t real_size = 1 << size;
+		
+		entries = 0;
+		mask = (1 << size) - 1;
+		table = new (memory_pool) Symbol *[mask + 1];
+		
+		memset(table, 0, real_size * sizeof(Symbol *));
 	}
 	
 	void Scope::expand()
@@ -28,6 +35,8 @@ namespace Legion
 		size_t mask = real_size - 1;
 		Symbol **table = new (this->memory_pool) Symbol *[real_size];
 		Symbol **end = table + real_size;
+		
+		memset(table, 0, real_size * sizeof(Symbol *));
 		
 		for(Symbol **slot = table; slot != end; slot++)
 		{

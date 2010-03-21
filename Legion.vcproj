@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;DEBUG"
+				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;DEBUG;VALGRIND"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -224,11 +224,35 @@
 			Name="tree"
 			>
 			<File
+				RelativePath=".\tree\node.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tree\node.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\tree\scope.cpp"
 				>
 			</File>
 			<File
 				RelativePath=".\tree\scope.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tree\symbols.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tree\symbols.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tree\types.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tree\types.hpp"
 				>
 			</File>
 		</Filter>
@@ -266,6 +290,10 @@
 		</File>
 		<File
 			RelativePath=".\memory_pool.hpp"
+			>
+		</File>
+		<File
+			RelativePath=".\range.cpp"
 			>
 		</File>
 		<File

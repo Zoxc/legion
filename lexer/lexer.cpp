@@ -5,9 +5,8 @@ namespace Legion
 {
 	void Keywords::setup(StringPool *pool)
 	{
-		include = pool->get("include");
-		
-		mapping.insert(std::pair<String *, Lexeme::LexemeType>(include, Lexeme::INCLUDE)); 
+		mapping.insert(std::pair<String *, Lexeme::LexemeType>(pool->get("include"), Lexeme::INCLUDE)); 
+		mapping.insert(std::pair<String *, Lexeme::LexemeType>(pool->get("struct"), Lexeme::STRUCT)); 
 	}
 	
 	bool Lexer::jump_table_ready = 0;
@@ -160,7 +159,7 @@ namespace Legion
 		const char_t *start = lexeme.start;
 		lexeme.start = &input - 1;
 		lexeme.stop = &input;
-		lexeme.report("Unexpected null terminator");
+		lexeme.report(document, "Unexpected null terminator");
 		lexeme.start = start;
 	}
 
@@ -169,10 +168,11 @@ namespace Legion
 		setup_jump_table();
 	}
 	
-	void Lexer::setup(StringPool *string_pool, MemoryPool *memory_pool)
+	void Lexer::setup(StringPool *string_pool, MemoryPool *memory_pool, Document *document)
 	{
 		this->string_pool = string_pool;
 		this->memory_pool = memory_pool;
+		this->document = document;
 		keywords.setup(string_pool);
 	}
 	

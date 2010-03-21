@@ -39,7 +39,7 @@ namespace Legion
 						lexeme.type = Lexeme::INTEGER;
 						lexeme.stop = &input;
 
-						lexeme.report("Invalid octal number '" + lexeme.string() + "'");
+						lexeme.report(document, "Invalid octal number '" + lexeme.string() + "'");
 					}
 					else
 					{
@@ -108,7 +108,7 @@ namespace Legion
 			lexeme.stop = &input;
 			lexeme.type = Lexeme::HEX;
 
-			lexeme.report("Invalid hex number: '" + lexeme.string() + "'");
+			lexeme.report(document, "Invalid hex number: '" + lexeme.string() + "'");
 		}
 	}
 };

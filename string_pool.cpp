@@ -1,4 +1,5 @@
 #include "string_pool.hpp"
+#include "range.hpp"
 
 namespace Legion
 {

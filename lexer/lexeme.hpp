@@ -76,6 +76,7 @@ namespace Legion
 				SQR_BRACET_OPEN,
 				SQR_BRACET_CLOSE,
 				INCLUDE,
+				STRUCT,
 				END,
 				TYPES
 			};
