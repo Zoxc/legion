@@ -24,14 +24,13 @@ namespace Legion
 			bool store(Symbol **table, size_t mask, String *name, Symbol *symbol);
 			void expand();
 		public:
-			Scope();
+			Scope(MemoryPool *memory_pool);
 			~Scope();
 			
 			Scope *parent;
 			
 			Symbol *get(String *name);
 			bool set(String *name, Symbol *symbol);
-			void setup(MemoryPool *memory_pool);
 
 			template<class T>  T *declare(Document *document, Parser *parser, T *type)
 			{
@@ -56,7 +55,7 @@ namespace Legion
 			{
 				T *symbol = new (memory_pool) T;
 				
-				symbol->type = T::symbol_type<T>();
+				symbol->type = symbol->symbol_type();
 				
 				return declare<T>(document, parser, symbol);
 			}

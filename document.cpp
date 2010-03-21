@@ -3,13 +3,9 @@
 
 namespace Legion
 {
-	Document::Document(Compiler *compiler, const char *filename) : input(0)
+	Document::Document(Compiler *compiler, const char *filename) : tree(0, Node::TREE), input(0), parser(&compiler->string_pool, &memory_pool, this, &compiler->scope)
 	{
-		tree.type = Node::TREE;
-		
 		this->filename = filename;
-		
-		parser.setup(&compiler->string_pool, &memory_pool, this, &compiler->scope);
 		
 		if(map())
 			parser.lexer.load(input, length);

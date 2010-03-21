@@ -61,7 +61,7 @@ namespace Legion
 			void parse_include(Node *node);	
 			void parse_struct(Node *node);	
 		public:
-			Parser();
+			Parser(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope);
 			~Parser();
 			
 			Lexer lexer;
@@ -75,8 +75,6 @@ namespace Legion
 			void parse(Node *node);
 
 			void unexpected(bool skip = true);	
-			void expected(Lexeme::LexemeType what, bool skip = false);		
-				
-			void setup(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope);
+			void expected(Lexeme::LexemeType what, bool skip = false);
 	};
 };

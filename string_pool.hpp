@@ -21,14 +21,12 @@ namespace Legion
 			String *table[table_size];
 			
 		public:
-			StringPool();
+			StringPool(MemoryPool *memory_pool);
 			~StringPool();
 			
 			String *get(Range *range);
 			String *get(const char_t *string, size_t length);
 			String *get(const char_t *start, const char_t *stop);
 			String *get(const char *string);
-			
-			void setup(MemoryPool *memory_pool);
 	};
 };

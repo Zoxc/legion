@@ -3,18 +3,13 @@
 
 namespace Legion
 {
-	StringPool::StringPool()
+	StringPool::StringPool(MemoryPool *memory_pool) : memory_pool(memory_pool)
 	{
 		memset(table, 0, sizeof(table));
 	}
 
 	StringPool::~StringPool()
 	{
-	}
-	
-	void StringPool::setup(MemoryPool *memory_pool)
-	{
-		this->memory_pool = memory_pool;
 	}
 	
 	String *StringPool::get(const char *string)

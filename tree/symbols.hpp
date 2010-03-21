@@ -11,23 +11,30 @@ namespace Legion
 	class Symbol
 	{
 		public:
-			enum SymbolType {
+			enum Type {
 				NONE,
 				TYPE,
 				FUNCTION,
 				VARIABLE
 			};
 			
-			template<class T> static SymbolType symbol_type() { return NONE; }
-			template<> static SymbolType symbol_type<TypeSymbol>() { return TYPE; }
-			
-			SymbolType type;
+			Type type;
 			String *name;
 			Symbol *next;
 	};
 	
-	class TypeSymbol:
+	template<Symbol::Type type> class SymbolType:
 		public Symbol
+	{
+		public:
+			Symbol::Type symbol_type()
+			{
+				return type;
+			}
+	};
+
+	class TypeSymbol:
+		public SymbolType<Symbol::TYPE>
 	{
 		Type *type_ptr;
 	};

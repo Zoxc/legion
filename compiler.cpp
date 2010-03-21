@@ -2,10 +2,8 @@
 
 namespace Legion
 {
-	Compiler::Compiler()
+	Compiler::Compiler() : string_pool(&memory_pool), scope(&memory_pool)
 	{
-		string_pool.setup(&memory_pool);
-		scope.setup(&memory_pool);
 	}
 
 	Compiler::~Compiler()

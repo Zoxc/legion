@@ -3,7 +3,7 @@
 
 namespace Legion
 {
-	void Keywords::setup(StringPool *pool)
+	Keywords::Keywords(StringPool *pool)
 	{
 		mapping.insert(std::pair<String *, Lexeme::LexemeType>(pool->get("include"), Lexeme::INCLUDE)); 
 		mapping.insert(std::pair<String *, Lexeme::LexemeType>(pool->get("struct"), Lexeme::STRUCT)); 
@@ -163,17 +163,9 @@ namespace Legion
 		lexeme.start = start;
 	}
 
-	Lexer::Lexer()
+	Lexer::Lexer(StringPool *string_pool, MemoryPool *memory_pool, Document *document) : string_pool(string_pool), memory_pool(memory_pool), document(document), keywords(string_pool)
 	{
 		setup_jump_table();
-	}
-	
-	void Lexer::setup(StringPool *string_pool, MemoryPool *memory_pool, Document *document)
-	{
-		this->string_pool = string_pool;
-		this->memory_pool = memory_pool;
-		this->document = document;
-		keywords.setup(string_pool);
 	}
 	
 	void Lexer::load(const char_t *input, size_t length)

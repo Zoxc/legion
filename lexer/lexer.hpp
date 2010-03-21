@@ -13,9 +13,9 @@ namespace Legion
 	class Keywords
 	{
 		public:
-			std::map<String *, Lexeme::LexemeType> mapping;
+			Keywords(StringPool *pool);
 			
-			void setup(StringPool *pool);
+			std::map<String *, Lexeme::LexemeType> mapping;
 	};
 	
 	class Lexer
@@ -60,12 +60,11 @@ namespace Legion
 			void ident();
 			void string();
 		public:
-			Lexer();
+			Lexer(StringPool *string_pool, MemoryPool *memory_pool, Document *document);
 			
 			Lexeme lexeme;
 			Keywords keywords;
 			
-			void setup(StringPool *string_pool, MemoryPool *memory_pool, Document *document);
 			void load(const char_t *input, size_t length);
 			void step();
 			void identify_keywords();

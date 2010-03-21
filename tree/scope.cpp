@@ -5,18 +5,8 @@
 
 namespace Legion
 {
-	Scope::Scope() : table(0), parent(0)
+	Scope::Scope(MemoryPool *memory_pool) : table(0), parent(0), memory_pool(memory_pool)
 	{
-	}
-
-	Scope::~Scope()
-	{
-	}
-	
-	void Scope::setup(MemoryPool *memory_pool)
-	{
-		this->memory_pool = memory_pool;
-		
 		size = 3;
 		
 		size_t real_size = 1 << size;
@@ -26,6 +16,10 @@ namespace Legion
 		table = new (memory_pool) Symbol *[mask + 1];
 		
 		memset(table, 0, real_size * sizeof(Symbol *));
+	}
+
+	Scope::~Scope()
+	{
 	}
 	
 	void Scope::expand()

@@ -6,7 +6,7 @@
 
 namespace Legion
 {
-	Parser::Parser()
+	Parser::Parser(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope) : memory_pool(memory_pool), document(document), scope(scope), lexer(string_pool, memory_pool, document)
 	{
 	}
 
@@ -90,13 +90,5 @@ namespace Legion
 					unexpected();
 			}
 		}
-	}
-	
-	void Parser::setup(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope)
-	{
-		this->memory_pool = memory_pool;
-		this->document = document;
-		this->scope = scope;
-		lexer.setup(string_pool, memory_pool, document);
 	}
 };
