@@ -7,13 +7,13 @@ namespace Legion
 {
 	Scope::Scope(Scope *parent, MemoryPool *memory_pool) : table(0), memory_pool(memory_pool), parent(parent)
 	{
-		size = 3;
+		size = 4;
 		
 		size_t real_size = 1 << size;
 		
 		entries = 0;
-		mask = (1 << size) - 1;
-		table = new (memory_pool) Symbol *[mask + 1];
+		mask = real_size - 1;
+		table = new (memory_pool) Symbol *[real_size];
 		
 		memset(table, 0, real_size * sizeof(Symbol *));
 	}
@@ -70,6 +70,8 @@ namespace Legion
 			tail->next = symbol;
 		else
 			table[index] = symbol;
+
+		symbol->next = 0;
 		
 		return true;
 	}
@@ -105,3 +107,4 @@ namespace Legion
 		return result;
 	}
 };
+

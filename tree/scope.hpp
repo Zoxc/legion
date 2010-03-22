@@ -60,7 +60,7 @@ namespace Legion
 				result->capture(range);
 				result->name = name;
 				
-				if(!set(name, result))
+				if(name && !set(name, result))
 					range->report(document, "Redeclared identifier '" + name->string() + "'");
 				
 				return result;

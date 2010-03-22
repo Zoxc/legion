@@ -18,9 +18,7 @@ namespace Legion
 			VARIABLE
 		};
 		
-		Symbol(Type type) : type(type), name(0)
-		{
-		}
+		Symbol(Type type) : type(type), name(0) {}
 		
 		Type type;
 		String *name;
@@ -30,9 +28,7 @@ namespace Legion
 	template<Symbol::Type type> struct SymbolType:
 		public Symbol
 	{
-		SymbolType() : Symbol(type)
-		{
-		}
+		SymbolType() : Symbol(type) {}
 	};
 
 	struct TypeSymbol:
