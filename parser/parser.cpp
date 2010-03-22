@@ -16,14 +16,7 @@ namespace Legion
 	
 	void Parser::expected(Lexeme::LexemeType what, bool skip)
 	{
-		std::string message = "Expected " + Lexeme::names[what] + ", but found ";
-		
-		if(lexer.lexeme.has_value())
-			message += lexer.lexeme.string() + " (" + Lexeme::names[lexer.lexeme.type] + ")";
-		else
-			message += "'" + Lexeme::names[lexer.lexeme.type] + "'";
-			
-		lexer.lexeme.report(document, message);
+		lexer.lexeme.report(document, "Expected " + Lexeme::describe_type(what) + ", but found " + lexer.lexeme.describe());
 		
 		if(skip)
 			step();
@@ -31,66 +24,36 @@ namespace Legion
 	
 	void Parser::unexpected(bool skip)
 	{
-		if(lexer.lexeme.has_value())
-			lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.string() + " (" + Lexeme::names[lexer.lexeme.type] + ")");
-		else
-			lexer.lexeme.report(document, "Unexpected '" + Lexeme::names[lexer.lexeme.type] + "'");
-		
+		lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.describe());
+
 		if(skip)
 			step();
 	}
 	
-	void Parser::parse_include(Node *parent)
+	TypeNode *Parser::parse_type()
 	{
-		step();
+		TypeNode *result = 0;
 		
-		if(expect(Lexeme::STRING))
+		if(expect(Lexeme::IDENT))
 		{
-			std::cout << "Found include " << lexer.lexeme.string() << std::endl;
-			step();
-		}
-		
-		matches(Lexeme::SEMICOLON);
-	}
-	
-	void Parser::parse_struct(Node *parent)
-	{
-		step();
-		
-		StructNode *node = parent->add<StructNode>(memory_pool);
-		
-		node->symbol = scope->declare<TypeSymbol>(document, this);
-		
-		if(match(Lexeme::BRACET_OPEN))
-		{
-			match(Lexeme::BRACET_CLOSE);
-		}
-		
-		match(Lexeme::SEMICOLON);
-	}
-	
-	void Parser::parse(Node *parent)
-	{
-		while(true)
-		{
-			lexer.identify_keywords();
+			TypeBaseNode *node = Node::create<TypeBaseNode>(memory_pool, &lexer.lexeme);
 			
-			switch(lexeme())
-			{
-				case Lexeme::INCLUDE:
-					parse_include(parent);
-					break;
-					
-				case Lexeme::STRUCT:
-					parse_struct(parent);
-					break;
-					
-				case Lexeme::END:
-					return;
-				
-				default:
-					unexpected();
-			}
+			node->type = lexer.lexeme.value;
+			step();
+			
+			result = node;
 		}
+		
+		while(lexeme() == Lexeme::MUL)
+		{
+			TypePtrNode *node = Node::create<TypePtrNode>(memory_pool, &lexer.lexeme);
+			step();
+	 
+			node->base = result;
+	 
+			result = node;
+		}
+		
+		return result;
 	}
 };

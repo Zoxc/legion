@@ -1,13 +1,13 @@
 #pragma once
 #include "../common.hpp"
 #include "../lexer/lexer.hpp"
+#include "../tree/node.hpp"
 
 namespace Legion
 {
 	class StringPool;
 	class Document;
 	class Scope;
-	struct Node;
 	
 	class Parser
 	{
@@ -58,8 +58,15 @@ namespace Legion
 				}
 			}
 			
-			void parse_include(Node *parent);	
-			void parse_struct(Node *parent);	
+			void parse_include(NodeList *list);	
+			void parse_struct(NodeList *list);	
+			void parse_typedef(NodeList *list);
+			void parse_global(NodeList *list, bool is_static, bool is_const, bool is_native, PairNode *pair);
+			void parse_function(NodeList *list, bool is_static, bool is_const, bool is_native, PairNode *pair);
+			template<bool prev_static, bool prev_const, bool prev_native> void parse_global_ident(NodeList *list);
+			
+			bool parse_pair(PairNode *node);	
+			TypeNode *parse_type();	
 		public:
 			Parser(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope);
 			~Parser();
@@ -72,7 +79,7 @@ namespace Legion
 				lexer.step();
 			}
 			
-			void parse(Node *parent);
+			void parse(NodeList *list);
 
 			void unexpected(bool skip = true);	
 			void expected(Lexeme::LexemeType what, bool skip = false);

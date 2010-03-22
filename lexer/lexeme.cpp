@@ -55,7 +55,12 @@ namespace Legion
 		")",
 		"[",
 		"]",
-		"keyword", // include
+		"include",
+		"struct",
+		"typedef",
+		"static",
+		"const",
+		"native",
 		"end of file"
 	};
 };

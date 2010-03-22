@@ -8,7 +8,8 @@ namespace Legion
 	
 	struct TypeSymbol;
 	
-	struct Symbol
+	struct Symbol:
+		public Range
 	{
 		enum Type {
 			NONE,
@@ -38,5 +39,17 @@ namespace Legion
 		public SymbolType<Symbol::TYPE>
 	{
 		Type *type_ptr;
+	};
+
+	struct VarSymbol:
+		public SymbolType<Symbol::VARIABLE>
+	{
+		Type *type_ptr;
+	};
+	
+	struct FuncSymbol:
+		public SymbolType<Symbol::VARIABLE>
+	{
+		Type *returns;
 	};
 };

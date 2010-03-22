@@ -11,6 +11,13 @@ namespace Legion
 			String *next;
 			size_t length;
 			const char_t *c_str;
+			
+			std::string string()
+			{
+				std::string result((const char *)c_str, length);
+
+				return result;
+			}
 	};
 	
 	class StringPool

@@ -7,24 +7,48 @@ namespace Legion
 	class String;
 	class Type;
 	
+	struct TypeSymbol;
+	struct VarSymbol;
+	struct FuncSymbol;
+	
 	struct Node:
 		public Range
 	{
-		enum Type {
-			NONE,
-			TREE,
-			STRUCT,
-			FUNCTION,
-			VARIABLE
-		};
+		Node *next;
 		
-		Node(Type type) : type(type), first_child(0), last_child(0), next(0)
+		template<class T> static T *create(MemoryPool *memory_pool, Range *range)
 		{
+			T *node = new (memory_pool) T;
+			
+			node->capture(range);
+			
+			return node;
 		}
+		
+		template<class T> static T *create(MemoryPool *memory_pool)
+		{
+			return new (memory_pool) T;
+		}
+	};
+	
+	struct NodeList
+	{
+		NodeList() : first_child(0), last_child(0) {}
 		
 		template<class T> T *add(MemoryPool *memory_pool)
 		{
 			T *node = new (memory_pool) T;
+			
+			append(node);
+			
+			return node;
+		}
+		
+		template<class T> T *add(MemoryPool *memory_pool, Range *range)
+		{
+			T *node = new (memory_pool) T;
+			
+			node->capture(range);
 			
 			append(node);
 			
@@ -47,26 +71,86 @@ namespace Legion
 			}
 		}
 
-		Type type;
 		Node *first_child;
 		Node *last_child;
-		Node *next;
 	};
 	
-	template <Node::Type type> struct NodeType:
+	struct TypeNode:
 		public Node
 	{
-		public:
-			NodeType() : Node(type)
-			{
-			}
+		TypeNode() : base(0) {}
+		
+		TypeNode *base;
 	};
-
-	struct TypeSymbol;
+	
+	struct TypePtrNode:
+		public TypeNode
+	{
+		TypeNode *base;
+	};
+	
+	struct TypeBaseNode:
+		public TypeNode
+	{
+		String *type;
+	};
+	
+	struct PairNode:
+		public Node
+	{
+		PairNode() : type(0), name(0) {}
+		
+		TypeNode *type;
+		String *name;
+	};
 	
 	struct StructNode:
-		public NodeType<Node::STRUCT>
+		public Node
 	{
 		TypeSymbol *symbol;
+		NodeList fields;
+	};
+	
+	struct TypedefNode:
+		public PairNode
+	{
+		TypedefNode() : symbol(0) {}
+		
+		TypeSymbol *symbol;
+	};
+	
+	struct GlobalNode:
+		public Node
+	{
+		GlobalNode() : symbol(0) {}
+		
+		PairNode *pair;
+		bool is_const;
+		bool is_static;
+		VarSymbol *symbol;
+	};
+	
+	struct FuncParamNode:
+		public Node
+	{
+		PairNode *pair;
+	};
+	
+	struct FuncHeadNode:
+		public Node
+	{
+		FuncHeadNode() : symbol(0) {}
+		
+		PairNode *pair;
+		bool is_native;
+		bool is_static;
+		FuncSymbol *symbol;
+		NodeList params;
+	};
+	
+	struct FuncNode:
+		public Node
+	{
+		FuncHeadNode *head;
 	};
 };

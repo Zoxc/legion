@@ -8,19 +8,6 @@ namespace Legion
 	class Lexeme:
 		public Range
 	{
-		private:
-			bool uses_value()
-			{
-				switch(type)
-				{
-					case Lexeme::STRING:
-						return true;
-						
-					default:
-						return false;
-				}
-			}
-			
 		public:
 			enum LexemeType
 			{
@@ -75,8 +62,12 @@ namespace Legion
 				PARENT_CLOSE,
 				SQR_BRACET_OPEN,
 				SQR_BRACET_CLOSE,
-				INCLUDE,
-				STRUCT,
+				KW_INCLUDE,
+				KW_STRUCT,
+				KW_TYPEDEF,
+				KW_STATIC,
+				KW_CONST,
+				KW_NATIVE,
 				END,
 				TYPES
 			};
@@ -90,33 +81,34 @@ namespace Legion
 			
 			static std::string names[TYPES];
 			
-			bool has_value()
+			std::string describe()
 			{
-				switch(type)
-				{
-					case STRING:
-					case IDENT:
-					case INTEGER:
-					case OCTAL:
-					case HEX:
-					case REAL:
-					case INCLUDE:
-						return true;
-						
-					default:
-						return false;
-				}
+				std::string result;
+				
+				if(type >= MEMBER && type < KW_INCLUDE)
+					result = "'" + names[type] + "'";
+				else if(type >= KW_INCLUDE && type < END)
+					result = "'" + names[type] + "' (keyword)";
+				else if(type == IDENT)
+					result = "'" + string() + "' (identifier)";
+				else
+					result = string() + " (" + names[type] + ")";
+				
+				return result;
 			}
 			
-			std::string get_value()
+			static std::string describe_type(LexemeType type)
 			{
-				if(uses_value())
-				{
-					std::string result = (const char *)value->c_str;
-					return result;
-				}
-						
-				return string();
+				std::string result;
+				
+				if(type >= MEMBER && type < KW_INCLUDE)
+					result = "'" + names[type] + "'";
+				else if(type >= KW_INCLUDE && type < END)
+					result = "'" + names[type] + "' (keyword)";
+				else if(type == IDENT)
+					result = names[type];
+				
+				return result;
 			}
 	};
 };

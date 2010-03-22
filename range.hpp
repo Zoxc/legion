@@ -13,6 +13,19 @@ namespace Legion
 			const char_t *line_start;
 			size_t line;
 			bool error;
+			
+			void capture(Range *range)
+			{
+				start = range->start;
+				stop = range->stop;
+				line_start = range->line_start;
+				line = range->line;
+			}
+
+			void expand(Range *range)
+			{
+				stop = range->stop;
+			}
 
 			std::string string()
 			{

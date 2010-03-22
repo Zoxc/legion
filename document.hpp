@@ -18,7 +18,7 @@ namespace Legion
 			MemoryPool memory_pool;
 			Parser parser;
 			const char *filename;
-			Node tree;
+			NodeList tree;
 			
 			Document(Compiler *compiler, const char *filename);
 			~Document();

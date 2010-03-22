@@ -5,8 +5,8 @@ namespace Legion
 {
 	Keywords::Keywords(StringPool *pool)
 	{
-		mapping.insert(std::pair<String *, Lexeme::LexemeType>(pool->get("include"), Lexeme::INCLUDE)); 
-		mapping.insert(std::pair<String *, Lexeme::LexemeType>(pool->get("struct"), Lexeme::STRUCT)); 
+		for(size_t i = Lexeme::KW_INCLUDE; i < Lexeme::END; i++)
+			mapping.insert(std::pair<String *, Lexeme::LexemeType>(pool->get(Lexeme::names[i].c_str()), (Lexeme::LexemeType)i));
 	}
 	
 	bool Lexer::jump_table_ready = 0;

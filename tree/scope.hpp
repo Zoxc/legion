@@ -36,12 +36,14 @@ namespace Legion
 			{
 				T *result = type;
 				
+				result->capture(&parser->lexer.lexeme);
+				
 				if(parser->lexer.lexeme.type == Lexeme::IDENT)
 				{
 					result->name = parser->lexer.lexeme.value;
 					
 					if(!set(result->name, result))
-						parser->lexer.lexeme.report(document, "Redeclared identifier '" + parser->lexer.lexeme.string() + "'");
+						parser->lexer.lexeme.report(document, "Redeclared identifier '" + result->name->string() + "'");
 						
 					parser->step();
 				}
@@ -50,10 +52,28 @@ namespace Legion
 				
 				return result;
 			}
+
+			template<class T>  T *declare(Document *document, String *name, Range *range, T *type)
+			{
+				T *result = type;
+				
+				result->capture(range);
+				result->name = name;
+				
+				if(!set(name, result))
+					range->report(document, "Redeclared identifier '" + name->string() + "'");
+				
+				return result;
+			}
 			
 			template<class T>  T *declare(Document *document, Parser *parser)
 			{
 				return declare<T>(document, parser, new (memory_pool) T);
+			}
+			
+			template<class T>  T *declare(Document *document, String *name, Range *range)
+			{
+				return declare<T>(document, name, range, new (memory_pool) T);
 			}
 	};
 };
