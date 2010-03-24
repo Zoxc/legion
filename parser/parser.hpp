@@ -1,7 +1,8 @@
 #pragma once
 #include "../common.hpp"
 #include "../lexer/lexer.hpp"
-#include "../tree/node.hpp"
+#include "../tree/node_list.hpp"
+#include "../tree/globals.hpp"
 
 namespace Legion
 {

@@ -2,26 +2,22 @@
 #include "../tree/scope.hpp"
 #include "../tree/types.hpp"
 #include "../tree/symbols.hpp"
-#include "../tree/node.hpp"
+#include "../tree/globals.hpp"
 
 namespace Legion
 {
 	bool Parser::parse_pair(PairNode *node)
 	{
-		node->capture(&lexer.lexeme);
-		
 		node->type = parse_type();
 			
 		if(expect(Lexeme::IDENT))
 		{
-			node->capture(&lexer.lexeme);
+			node->range.capture(&lexer.lexeme);
 			node->name = lexer.lexeme.value;
 			step();
 			
 			return true;
 		}
-		
-		node->expand(&lexer.lexeme);
 		
 		return false;
 	}
@@ -43,7 +39,7 @@ namespace Legion
 	{
 		step();
 		
-		StructNode *node = list->add<StructNode>(memory_pool, &lexer.lexeme);
+		StructNode *node = list->add<StructNode>(memory_pool);
 		
 		node->symbol = scope->declare<TypeSymbol>(document, this);
 		
@@ -51,9 +47,9 @@ namespace Legion
 		{
 			while(lexeme() == Lexeme::IDENT)
 			{
-				PairNode *pair = node->fields.add<PairNode>(memory_pool, &lexer.lexeme);
+				FieldNode *field = node->fields.add<FieldNode>(memory_pool);
 				
-				if(parse_pair(pair))
+				if(parse_pair(&field->pair))
 					match(Lexeme::SEMICOLON);
 			}
 			
@@ -69,9 +65,11 @@ namespace Legion
 		
 		TypedefNode *type_def = list->add<TypedefNode>(memory_pool);
 		
-		if(parse_pair(type_def))
+		type_def->symbol = new (memory_pool) TypeSymbol;
+		
+		if(parse_pair(&type_def->pair))
 		{
-			type_def->symbol = scope->declare<TypeSymbol>(document, type_def->name, type_def);
+			scope->declare_symbol(document, type_def->symbol);
 			
 			match(Lexeme::SEMICOLON);
 		}
@@ -79,14 +77,14 @@ namespace Legion
 	
 	void Parser::parse_global(NodeList *list, bool is_static, bool is_const, bool is_native, PairNode *pair)
 	{
-		GlobalNode *global = list->add<GlobalNode>(memory_pool, pair);
+		GlobalNode *global = list->add<GlobalNode>(memory_pool);
 		global->pair = pair;
 		global->is_const = is_const;
 		global->is_static = is_static;
-		global->symbol = scope->declare<VarSymbol>(document, pair->name, pair);
+		global->symbol = scope->declare<VarSymbol>(document, pair);
 		
 		if(is_native)
-			global->report(document, "Global can not be natives");
+			pair->range.report(document, "Global can not be natives");
 		
 		if(matches(Lexeme::ASSIGN))
 		{
@@ -97,25 +95,24 @@ namespace Legion
 	
 	void Parser::parse_function(NodeList *list, bool is_static, bool is_const, bool is_native, PairNode *pair)
 	{
-		FuncHeadNode *head = Node::create<FuncHeadNode>(memory_pool, pair);
+		FuncHeadNode *head = new (memory_pool) FuncHeadNode;
 		head->pair = pair;
 		head->is_native = is_native;
 		head->is_static = is_static;
+		head->symbol = scope->declare<FuncSymbol>(document, pair);
 		
 		if(is_const)
-			head->report(document, "Functions can not be declared constant");
+			pair->range.report(document, "Functions can not be declared constant");
 
-		head->symbol = scope->declare<FuncSymbol>(document, pair->name, pair);
-		
 		step();
 		
 		if(lexeme() != Lexeme::PARENT_CLOSE)
 		{
 			do
 			{
-				PairNode *pair = head->params.add<PairNode>(memory_pool, &lexer.lexeme);
+				ParamNode *param = head->params.add<ParamNode>(memory_pool);
 				
-				parse_pair(pair);
+				parse_pair(&param->pair);
 			}
 			while(matches(Lexeme::COMMA));
 		}		
@@ -123,14 +120,15 @@ namespace Legion
 		
 		if(matches(Lexeme::BRACET_OPEN))
 		{
-			FuncNode *func = list->add<FuncNode>(memory_pool, head);
+			FuncNode *func = list->add<FuncNode>(memory_pool);
 			func->head = head;
 			
 			match(Lexeme::BRACET_CLOSE);
 		}
 		else
 		{
-			list->append(head);
+			PrototypeNode *proto = list->add<PrototypeNode>(memory_pool);
+			proto->head = head;
 			
 			match(Lexeme::SEMICOLON);
 		}
@@ -160,10 +158,10 @@ namespace Legion
 			step();
 		}
 		
-		PairNode *pair = Node::create<PairNode>(memory_pool);
+		PairNode *pair = new (memory_pool) PairNode;
 		
 		parse_pair(pair);
-	
+
 		switch(lexeme())
 		{
 			case Lexeme::PARENT_OPEN:

@@ -2,7 +2,7 @@
 #include "../tree/scope.hpp"
 #include "../tree/types.hpp"
 #include "../tree/symbols.hpp"
-#include "../tree/node.hpp"
+#include "../tree/types.hpp"
 
 namespace Legion
 {
@@ -36,7 +36,7 @@ namespace Legion
 		
 		if(expect(Lexeme::IDENT))
 		{
-			TypeBaseNode *node = Node::create<TypeBaseNode>(memory_pool, &lexer.lexeme);
+			TypeBaseNode *node = new (memory_pool) TypeBaseNode;
 			
 			node->type = lexer.lexeme.value;
 			step();
@@ -46,7 +46,7 @@ namespace Legion
 		
 		while(lexeme() == Lexeme::MUL)
 		{
-			TypePtrNode *node = Node::create<TypePtrNode>(memory_pool, &lexer.lexeme);
+			TypePtrNode *node = new (memory_pool) TypePtrNode;
 			step();
 	 
 			node->base = result;

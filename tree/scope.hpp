@@ -2,6 +2,7 @@
 #include "../common.hpp"
 #include "../lexer/lexer.hpp"
 #include "../parser/parser.hpp"
+#include "symbols.hpp"
 
 namespace Legion
 {
@@ -32,19 +33,36 @@ namespace Legion
 			Symbol *get(String *name);
 			bool set(String *name, Symbol *symbol);
 
+			bool declare_symbol(Document *document, Symbol *symbol)
+			{
+				if(!symbol)
+					return false;
+				
+				if(!symbol->name)
+					return false;
+					
+				if(!set(symbol->name, symbol))
+				{
+					symbol->range->report(document, "Redeclared identifier '" + symbol->name->string() + "'");
+					
+					return false;
+				}
+				
+				return true;
+			}
+
 			template<class T>  T *declare(Document *document, Parser *parser, T *type)
 			{
 				T *result = type;
 				
-				result->capture(&parser->lexer.lexeme);
-				
 				if(parser->lexer.lexeme.type == Lexeme::IDENT)
 				{
+					result->range = new (memory_pool) Range;
+					result->range->capture(&parser->lexer.lexeme);
 					result->name = parser->lexer.lexeme.value;
 					
-					if(!set(result->name, result))
-						parser->lexer.lexeme.report(document, "Redeclared identifier '" + result->name->string() + "'");
-						
+					declare_symbol(document, result);
+					
 					parser->step();
 				}
 				else
@@ -52,28 +70,38 @@ namespace Legion
 				
 				return result;
 			}
-
+/*			
 			template<class T>  T *declare(Document *document, String *name, Range *range, T *type)
 			{
 				T *result = type;
 				
 				result->capture(range);
-				result->name = name;
 				
-				if(name && !set(name, result))
-					range->report(document, "Redeclared identifier '" + name->string() + "'");
+				declare_symbol(document, result);
 				
 				return result;
 			}
-			
+		*/
 			template<class T>  T *declare(Document *document, Parser *parser)
 			{
 				return declare<T>(document, parser, new (memory_pool) T);
 			}
 			
+			template<class T>  T *declare(Document *document, PairNode *pair)
+			{
+				T *result = new (memory_pool) T;
+				
+				result->range = &pair->range;
+				result->name = pair->name;
+				
+				declare_symbol(document, result);
+				
+				return result;
+			}
+			/*
 			template<class T>  T *declare(Document *document, String *name, Range *range)
 			{
 				return declare<T>(document, name, range, new (memory_pool) T);
-			}
+			}*/
 	};
 };

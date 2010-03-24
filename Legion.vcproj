@@ -228,11 +228,11 @@
 			Name="tree"
 			>
 			<File
-				RelativePath=".\tree\node.cpp"
+				RelativePath=".\tree\globals.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\tree\node.hpp"
+				RelativePath=".\tree\node_list.hpp"
 				>
 			</File>
 			<File

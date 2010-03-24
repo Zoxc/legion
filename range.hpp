@@ -14,14 +14,22 @@ namespace Legion
 			size_t line;
 			bool error;
 			
+			Range() : start(0), stop(0), error(false) {}
+			
 			void capture(Range *range)
 			{
 				start = range->start;
 				stop = range->stop;
 				line_start = range->line_start;
 				line = range->line;
+				error = range->error;
 			}
-
+			
+			Range(Range *range)
+			{
+				capture(range);
+			}
+			
 			void expand(Range *range)
 			{
 				stop = range->stop;

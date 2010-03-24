@@ -8,8 +8,7 @@ namespace Legion
 	
 	struct TypeSymbol;
 	
-	struct Symbol:
-		public Range
+	struct Symbol
 	{
 		enum Type {
 			NONE,
@@ -21,6 +20,7 @@ namespace Legion
 		Symbol(Type type) : type(type), name(0) {}
 		
 		Type type;
+		Range *range;
 		String *name;
 		Symbol *next;
 	};
