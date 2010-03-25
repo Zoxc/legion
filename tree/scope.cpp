@@ -5,7 +5,7 @@
 
 namespace Legion
 {
-	Scope::Scope(Scope *parent, MemoryPool *memory_pool) : table(0), memory_pool(memory_pool), parent(parent)
+	Scope::Scope(Scope *parent, Type type, MemoryPool *memory_pool) : table(0), memory_pool(memory_pool), type(type), parent(parent)
 	{
 		size = 4;
 		

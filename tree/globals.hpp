@@ -1,8 +1,9 @@
 #pragma once
 #include "../common.hpp"
 #include "../range.hpp"
-#include "node_list.hpp"
+#include "node.hpp"
 #include "types.hpp"
+#include "statements.hpp"
 
 namespace Legion
 {
@@ -13,7 +14,8 @@ namespace Legion
 	struct VarSymbol;
 	struct FuncSymbol;
 	
-	struct PairNode
+	struct PairNode:
+		public Node
 	{
 		PairNode() : type(0), name(0) {}
 		
@@ -61,7 +63,8 @@ namespace Legion
 		PairNode pair;
 	};
 		
-	struct FuncHeadNode
+	struct FuncHeadNode:
+		public Node
 	{
 		FuncHeadNode() : symbol(0) {}
 		
@@ -78,9 +81,12 @@ namespace Legion
 		FuncHeadNode *head;
 	};
 	
+	struct Block;
+	
 	struct FuncNode:
 		public ListNode
 	{
 		FuncHeadNode *head;
+		Block *body;
 	};
 };

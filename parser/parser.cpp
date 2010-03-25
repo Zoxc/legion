@@ -6,13 +6,23 @@
 
 namespace Legion
 {
-	Parser::Parser(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope) : document(document), memory_pool(memory_pool), lexer(string_pool, memory_pool, document), scope(scope)
+	Parser::Parser(StringPool *string_pool, MemoryPool *memory_pool, MemoryPool *global_pool, Document *document, Scope *scope) : document(document), memory_pool(memory_pool), global_pool(global_pool), lexer(string_pool, memory_pool, document), scope(scope)
 	{
 	}
 
 	Parser::~Parser()
 	{
 	}
+	
+	Scope *Parser::push_scope(Scope::Type type)
+	{
+		return scope = new Scope(scope, type, global_pool);
+	}
+	
+	void Parser::pop_scope(Scope *scope)
+	{
+		scope = scope->parent;
+	}			
 	
 	void Parser::expected(Lexeme::LexemeType what, bool skip)
 	{

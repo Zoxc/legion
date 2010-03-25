@@ -68,6 +68,12 @@ namespace Legion
 				KW_STATIC,
 				KW_CONST,
 				KW_NATIVE,
+				KW_IF,
+				KW_ELSE,
+				KW_WHILE,
+				KW_DO,
+				KW_BREAK,
+				KW_CONTINUE,
 				END,
 				TYPES
 			};
@@ -85,7 +91,7 @@ namespace Legion
 			{
 				std::string result;
 				
-				if(type >= MEMBER && type < KW_INCLUDE)
+				if((type >= MEMBER && type < KW_INCLUDE) || type == END)
 					result = "'" + names[type] + "'";
 				else if(type >= KW_INCLUDE && type < END)
 					result = "'" + names[type] + "' (keyword)";
@@ -101,7 +107,7 @@ namespace Legion
 			{
 				std::string result;
 				
-				if(type >= MEMBER && type < KW_INCLUDE)
+				if((type >= MEMBER && type < KW_INCLUDE) || type == END)
 					result = "'" + names[type] + "'";
 				else if(type >= KW_INCLUDE && type < END)
 					result = "'" + names[type] + "' (keyword)";

@@ -41,7 +41,7 @@ namespace Legion
 		
 		StructNode *node = list->add<StructNode>(memory_pool);
 		
-		node->symbol = scope->declare<TypeSymbol>(document, this);
+		node->symbol = declare<TypeSymbol>();
 		
 		if(match(Lexeme::BRACET_OPEN))
 		{
@@ -81,7 +81,7 @@ namespace Legion
 		global->pair = pair;
 		global->is_const = is_const;
 		global->is_static = is_static;
-		global->symbol = scope->declare<VarSymbol>(document, pair);
+		global->symbol = declare<VarSymbol>(pair);
 		
 		if(is_native)
 			pair->range.report(document, "Global can not be natives");
@@ -99,7 +99,7 @@ namespace Legion
 		head->pair = pair;
 		head->is_native = is_native;
 		head->is_static = is_static;
-		head->symbol = scope->declare<FuncSymbol>(document, pair);
+		head->symbol = declare<FuncSymbol>(pair);
 		
 		if(is_const)
 			pair->range.report(document, "Functions can not be declared constant");
@@ -122,6 +122,7 @@ namespace Legion
 		{
 			FuncNode *func = list->add<FuncNode>(memory_pool);
 			func->head = head;
+			func->body = parse_block();	
 			
 			match(Lexeme::BRACET_CLOSE);
 		}
@@ -195,10 +196,7 @@ namespace Legion
 				case Lexeme::KW_TYPEDEF:
 					parse_typedef(list);
 					break;
-					
-				case Lexeme::END:
-					return;
-					
+				
 				case Lexeme::IDENT:
 					parse_global_ident<false, false, false>(list);
 					break;
@@ -217,6 +215,9 @@ namespace Legion
 					step();
 					parse_global_ident<false, false, true>(list);
 					break;
+					
+				case Lexeme::END:
+					return;
 				
 				default:
 					unexpected();

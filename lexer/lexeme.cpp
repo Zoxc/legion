@@ -61,6 +61,12 @@ namespace Legion
 		"static",
 		"const",
 		"native",
+		"if",
+		"else",
+		"while",
+		"do",
+		"break",
+		"continue",
 		"end of file"
 	};
 };

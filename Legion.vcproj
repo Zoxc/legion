@@ -176,6 +176,10 @@
 			Name="parser"
 			>
 			<File
+				RelativePath=".\parser\expressions.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\parser\globals.cpp"
 				>
 			</File>
@@ -185,6 +189,10 @@
 			</File>
 			<File
 				RelativePath=".\parser\parser.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\parser\statements.cpp"
 				>
 			</File>
 		</Filter>
@@ -228,11 +236,15 @@
 			Name="tree"
 			>
 			<File
+				RelativePath=".\tree\expressions.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\tree\globals.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\tree\node_list.hpp"
+				RelativePath=".\tree\node.hpp"
 				>
 			</File>
 			<File
@@ -241,6 +253,10 @@
 			</File>
 			<File
 				RelativePath=".\tree\scope.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tree\statements.hpp"
 				>
 			</File>
 			<File

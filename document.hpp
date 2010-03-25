@@ -2,7 +2,7 @@
 #include "common.hpp"
 #include "string_pool.hpp"
 #include "parser/parser.hpp"
-#include "tree/node_list.hpp"
+#include "tree/node.hpp"
 
 namespace Legion
 {
