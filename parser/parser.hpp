@@ -77,9 +77,14 @@ namespace Legion
 				}
 			}
 			
+			// Expressions
 			ExpressionNode *parse_expression();
+			ExpressionNode *parse_grouped_expression();
 			
 			// Statements
+			void parse_continue(NodeList *list);
+			void parse_break(NodeList *list);
+			void parse_return(NodeList *list);
 			void parse_if(NodeList *list);
 			void parse_while(NodeList *list);
 			void parse_do(NodeList *list);
@@ -99,7 +104,7 @@ namespace Legion
 			bool parse_pair(PairNode *node);	
 			
 			Scope *push_scope(Scope::Type type);
-			void pop_scope(Scope *scope);
+			void pop_scope();
 			
 			TypeNode *parse_type();	
 			

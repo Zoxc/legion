@@ -74,6 +74,7 @@ namespace Legion
 				KW_DO,
 				KW_BREAK,
 				KW_CONTINUE,
+				KW_RETURN,
 				END,
 				TYPES
 			};

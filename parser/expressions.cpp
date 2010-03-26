@@ -10,4 +10,15 @@ namespace Legion
 	{
 		return 0; //TODO: Fix
 	}
+	
+	ExpressionNode *Parser::parse_grouped_expression()
+	{
+		ExpressionNode *result;
+
+		match(Lexeme::PARENT_OPEN);
+		result = parse_expression();
+		match(Lexeme::PARENT_CLOSE);
+
+		return result;
+	}
 };

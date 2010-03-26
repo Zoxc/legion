@@ -53,4 +53,20 @@ namespace Legion
 		Block *body;
 		ExpressionNode *condition;
 	};
+
+	struct ReturnNode:
+		public StatementNode
+	{
+		ExpressionNode *value;
+	};
+
+	struct BreakNode:
+		public StatementNode
+	{
+	};
+
+	struct ContinueNode:
+		public StatementNode
+	{
+	};
 };

@@ -19,7 +19,7 @@ namespace Legion
 		return scope = new Scope(scope, type, global_pool);
 	}
 	
-	void Parser::pop_scope(Scope *scope)
+	void Parser::pop_scope()
 	{
 		scope = scope->parent;
 	}			
@@ -53,17 +53,39 @@ namespace Legion
 			
 			result = node;
 		}
-		
-		while(lexeme() == Lexeme::MUL)
+		while(true)
 		{
-			TypePtrNode *node = new (memory_pool) TypePtrNode;
-			step();
-	 
-			node->base = result;
-	 
-			result = node;
+			switch(lexeme())
+			{
+				case Lexeme::MUL:
+				{
+					TypePointerNode *node = new (memory_pool) TypePointerNode;
+					step();
+			 
+					node->base = result;
+			 
+					result = node;
+				}
+				break;
+
+				case Lexeme::SQR_BRACET_OPEN:
+				{
+					TypeArrayNode *node = new (memory_pool) TypeArrayNode;
+					step();
+			 
+					node->base = result;
+					node->size = parse_expression();
+			 
+					result = node;
+
+					match(Lexeme::SQR_BRACET_CLOSE);
+				}
+				break;
+
+				default:
+					return result;
+			}
+
 		}
-		
-		return result;
 	}
 };

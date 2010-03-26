@@ -5,6 +5,8 @@ namespace Legion
 {
 	class String;
 	class Type;
+
+	struct ExpressionNode;
 	
 	struct TypeNode
 	{
@@ -13,12 +15,19 @@ namespace Legion
 		TypeNode *base;
 	};
 	
-	struct TypePtrNode:
+	struct TypePointerNode:
 		public TypeNode
 	{
 		TypeNode *base;
 	};
 	
+	struct TypeArrayNode:
+		public TypeNode
+	{
+		TypeNode *base;
+		ExpressionNode *size;
+	};
+
 	struct TypeBaseNode:
 		public TypeNode
 	{

@@ -67,6 +67,7 @@ namespace Legion
 		"do",
 		"break",
 		"continue",
+		"return",
 		"end of file"
 	};
 };
