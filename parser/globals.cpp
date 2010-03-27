@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "../document.hpp"
 #include "../tree/scope.hpp"
 #include "../tree/types.hpp"
 #include "../tree/symbols.hpp"
@@ -28,7 +29,7 @@ namespace Legion
 		
 		if(expect(Lexeme::STRING))
 		{
-			std::cout << "Found include " << lexer.lexeme.string() << std::endl;
+			document->includes.push_back(lexer.lexeme.value->string());
 			step();
 		}
 		

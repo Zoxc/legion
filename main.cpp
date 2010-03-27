@@ -4,38 +4,65 @@
 
 using namespace Legion;
 
-#ifdef WIN32
-__int64 freq;
-#endif
+Compiler compiler;
 
-int main(int argc, char *argv[])
+std::vector<std::string> queued;
+std::vector<std::string> queue;
+
+void include(std::string file)
 {
-	std::cout << "Legion - a compiler that targets Galaxy" << std::endl;
+	file = file + ".galaxy";
 
-	if(argc < 2)
+	for(std::vector<std::string>::iterator i = queued.begin(); i != queued.end(); ++i)
 	{
-		std::cout << "Please pass the document to parse as a command line parameter." << std::endl;
-
-		return 2;
+		if(*i == file)
+			return;
 	}
-
-	Compiler compiler;
 	
-	Document doc(&compiler, argv[1]);
+	queue.push_back(file);
+	queued.push_back(file);
+}
+
+void process_file(std::string file)
+{
+	Document doc(&compiler, file);
+
+	std::cout << "Parsing " << file << "..." << std::endl;
 
 	#ifdef WIN32
-		__int64 start, stop;
+		__int64 start, stop, freq;
 		QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
 		QueryPerformanceCounter((LARGE_INTEGER *)&start);
 	#endif
-	
-	doc.parser.parse(&doc.tree);
+
+	doc.parse();
 
 	#ifdef WIN32
 		QueryPerformanceCounter((LARGE_INTEGER *)&stop);
 
 		std::cout << "Parsed document in " << (((double)1000 * (stop - start)) / (double)freq) << " ms." << std::endl;
 	#endif
+
+	for(std::vector<std::string>::iterator i = doc.includes.begin(); i != doc.includes.end(); ++i)
+		include(*i);
+}
+
+int main(int argc, char *argv[])
+{
+	std::cout << "Legion - a compiler that targets Galaxy" << std::endl;
+
+	for(int i = 1; i < argc; i++)
+	{
+		queue.push_back(argv[i]);
+		queued.push_back(argv[i]);
+	}
+	
+	while(queue.size() > 0)
+	{
+		std::string file = queue.back();
+		queue.pop_back();
+		process_file(file);
+	}
 	
 	return 0;
 }

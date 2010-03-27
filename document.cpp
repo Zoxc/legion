@@ -3,7 +3,7 @@
 
 namespace Legion
 {
-	Document::Document(Compiler *compiler, const char *filename) : input(0), parser(&compiler->string_pool, &memory_pool, &compiler->memory_pool, this, &compiler->scope)
+	Document::Document(Compiler *compiler, std::string filename) : input(0), parser(&compiler->string_pool, &memory_pool, &compiler->memory_pool, this, &compiler->scope)
 	{
 		this->filename = filename;
 		
@@ -15,10 +15,21 @@ namespace Legion
 	{
 		free((void *)input);
 	}
+
+	bool Document::parse()
+	{
+		if(input)
+		{
+			parser.parse(&tree);
+			return true;
+		}
+		else
+			return false;
+	}
 	
 	bool Document::map()
 	{
-		FILE* file = fopen(filename, "rb");
+		FILE* file = fopen(filename.c_str(), "rb");
 
 		if(!file)
 		{

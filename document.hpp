@@ -17,10 +17,13 @@ namespace Legion
 		public:
 			MemoryPool memory_pool;
 			Parser parser;
-			const char *filename;
+			std::string filename;
 			NodeList tree;
+			std::vector<std::string> includes;
+
+			bool parse();
 			
-			Document(Compiler *compiler, const char *filename);
+			Document(Compiler *compiler, std::string filename);
 			~Document();
 	};
 };
