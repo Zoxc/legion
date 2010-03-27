@@ -27,24 +27,23 @@ void process_file(std::string file)
 {
 	Document doc(&compiler, file);
 
-	std::cout << "Parsing " << file << "..." << std::endl;
-
 	#ifdef WIN32
 		__int64 start, stop, freq;
 		QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
 		QueryPerformanceCounter((LARGE_INTEGER *)&start);
 	#endif
 
-	doc.parse();
+	if(doc.parse())
+	{
+		#ifdef WIN32
+			QueryPerformanceCounter((LARGE_INTEGER *)&stop);
 
-	#ifdef WIN32
-		QueryPerformanceCounter((LARGE_INTEGER *)&stop);
+			std::cout << "Parsed '" << file << "' in " << (((double)1000 * (stop - start)) / (double)freq) << " ms." << std::endl;
+		#endif
 
-		std::cout << "Parsed document in " << (((double)1000 * (stop - start)) / (double)freq) << " ms." << std::endl;
-	#endif
-
-	for(std::vector<std::string>::iterator i = doc.includes.begin(); i != doc.includes.end(); ++i)
-		include(*i);
+		for(std::vector<std::string>::iterator i = doc.includes.begin(); i != doc.includes.end(); ++i)
+			include(*i);
+	}
 }
 
 int main(int argc, char *argv[])

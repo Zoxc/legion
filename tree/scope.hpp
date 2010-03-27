@@ -21,7 +21,7 @@ namespace Legion
 			
 			MemoryPool *memory_pool;
 			
-			bool store(Symbol **table, size_t mask, String *name, Symbol *symbol);
+			Symbol *store(Symbol **table, size_t mask, String *name, Symbol *symbol);
 			void expand();
 		public:
 			enum Type
@@ -38,27 +38,20 @@ namespace Legion
 			Scope *parent;
 			
 			Symbol *get(String *name);
-			bool set(String *name, Symbol *symbol);
+			Symbol *set(String *name, Symbol *symbol);
 
-			bool declare_symbol(Document *document, Symbol *symbol)
+			Symbol *declare_symbol(Symbol *symbol)
 			{
 				if(type == LOOP)
-					return parent->declare_symbol(document, symbol);
+					return parent->declare_symbol(symbol);
 				
 				if(!symbol)
-					return false;
+					return 0;
 				
 				if(!symbol->name)
-					return false;
-					
-				if(!set(symbol->name, symbol))
-				{
-					symbol->range->report(document, "Redeclared identifier '" + symbol->name->string() + "'");
-					
-					return false;
-				}
+					return 0;
 				
-				return true;
+				return set(symbol->name, symbol);
 			}
 
 	};

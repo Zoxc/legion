@@ -66,17 +66,18 @@ namespace Legion
 		
 		TypedefNode *type_def = list->add<TypedefNode>(memory_pool);
 		
-		type_def->symbol = new (memory_pool) TypeSymbol;
+		PairNode *pair = new (memory_pool) PairNode;
 		
-		if(parse_pair(&type_def->pair))
+		if(parse_pair(pair))
 		{
-			scope->declare_symbol(document, type_def->symbol);
+			type_def->symbol = declare<TypeSymbol>(pair);
+			type_def->pair = pair;
 			
 			match(Lexeme::SEMICOLON);
 		}
 	}
 	
-	void Parser::parse_global(NodeList *list, bool is_static, bool is_const, bool is_native, PairNode *pair)
+	void Parser::parse_global(NodeList *list, bool is_static, bool is_native, bool is_const, PairNode *pair)
 	{
 		GlobalNode *global = list->add<GlobalNode>(memory_pool);
 		global->pair = pair;
@@ -95,13 +96,18 @@ namespace Legion
 		match(Lexeme::SEMICOLON);
 	}
 	
-	void Parser::parse_function(NodeList *list, bool is_static, bool is_const, bool is_native, PairNode *pair)
+	void Parser::parse_function(NodeList *list, bool is_static, bool is_native, bool is_const, PairNode *pair)
 	{
+		Symbol *prev;
+
 		FuncHeadNode *head = new (memory_pool) FuncHeadNode;
 		head->pair = pair;
 		head->is_native = is_native;
 		head->is_static = is_static;
-		head->symbol = declare<FuncSymbol>(pair);
+		head->symbol = declare<FuncSymbol>(pair, &prev);
+
+		if(prev && prev->type != Symbol::FUNCTION)
+			head->symbol->redeclared(document);
 		
 		if(is_const)
 			pair->range.report(document, "Functions can not be declared constant");
@@ -119,12 +125,22 @@ namespace Legion
 			while(matches(Lexeme::COMMA));
 		}		
 		match(Lexeme::PARENT_CLOSE);
-		
+
 		if(lexeme() == Lexeme::BRACET_OPEN)
 		{
 			FuncNode *func = list->add<FuncNode>(memory_pool);
 			func->head = head;
 			func->body = new (memory_pool) Block;
+
+			if(prev && prev->type == Symbol::FUNCTION)
+			{
+				FuncSymbol *prev_func = (FuncSymbol *)prev;
+
+				if(prev_func->defined)
+					head->symbol->redeclared(document);
+
+				prev_func->defined = true;
+			}
 
 			step();
 			
@@ -136,7 +152,7 @@ namespace Legion
 		{
 			PrototypeNode *proto = list->add<PrototypeNode>(memory_pool);
 			proto->head = head;
-			
+
 			match(Lexeme::SEMICOLON);
 		}
 	}
@@ -146,17 +162,21 @@ namespace Legion
 		bool is_static = prev_static;
 		bool is_const = prev_const;
 		bool is_native = prev_native;
+
+		lexer.identify_keywords();
 		
 		if(!prev_static && lexeme() == Lexeme::KW_STATIC)
 		{
 			is_static = true;
 			step();
+			lexer.identify_keywords();
 		}
 		
 		if(!prev_const && lexeme() == Lexeme::KW_CONST)
 		{
 			is_const = true;
 			step();
+			lexer.identify_keywords();
 		}
 		
 		if(!prev_native && lexeme() == Lexeme::KW_NATIVE)

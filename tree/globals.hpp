@@ -41,9 +41,9 @@ namespace Legion
 	struct TypedefNode:
 		public ListNode
 	{
-		TypedefNode() : symbol(0) {}
+		TypedefNode() : symbol(0), pair(0) {}
 		
-		PairNode pair;
+		PairNode *pair;
 		TypeSymbol *symbol;
 	};
 	

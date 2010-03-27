@@ -108,8 +108,8 @@ namespace Legion
 			void parse_include(NodeList *list);	
 			void parse_struct(NodeList *list);	
 			void parse_typedef(NodeList *list);
-			void parse_global(NodeList *list, bool is_static, bool is_const, bool is_native, PairNode *pair);
-			void parse_function(NodeList *list, bool is_static, bool is_const, bool is_native, PairNode *pair);
+			void parse_global(NodeList *list, bool is_static, bool is_native, bool is_const, PairNode *pair);
+			void parse_function(NodeList *list, bool is_static, bool is_native, bool is_const, PairNode *pair);
 			template<bool prev_static, bool prev_const, bool prev_native> void parse_global_ident(NodeList *list);
 			
 			bool parse_pair(PairNode *node);	
@@ -118,8 +118,8 @@ namespace Legion
 			void pop_scope();
 			
 			TypeNode *parse_type();	
-			
-			template<class T>  T *declare(T *type)
+
+			template<class T>  T *declare(T *type, Symbol **prev)
 			{
 				T *result = type;
 				
@@ -129,13 +129,25 @@ namespace Legion
 					result->range->capture(&lexer.lexeme);
 					result->name = lexer.lexeme.value;
 					
-					scope->declare_symbol(document, result);
-					
+					*prev = scope->declare_symbol(result);
+
 					step();
 				}
 				else
 					expected(Lexeme::IDENT);
 				
+				return result;
+			}
+
+			template<class T>  T *declare(T *type)
+			{
+				Symbol *prev;
+
+				T *result = declare<T>(type, &prev);
+
+				if(prev)
+					result->redeclared(document);
+
 				return result;
 			}
 			
@@ -144,15 +156,27 @@ namespace Legion
 				return declare<T>(new (memory_pool) T);
 			}
 			
-			template<class T>  T *declare(PairNode *pair)
+			template<class T>  T *declare(PairNode *pair, Symbol **prev)
 			{
 				T *result = new (memory_pool) T;
 				
 				result->range = &pair->range;
 				result->name = pair->name;
 				
-				scope->declare_symbol(document, result);
+				*prev = scope->declare_symbol(result);
 				
+				return result;
+			}
+
+			template<class T>  T *declare(PairNode *pair)
+			{
+				Symbol *prev;
+
+				T *result = declare<T>(pair, &prev);
+
+				if(prev)
+					result->redeclared(document);
+
 				return result;
 			}
 	};

@@ -18,6 +18,11 @@ namespace Legion
 		};
 		
 		Symbol(Type type) : type(type), name(0) {}
+
+		void redeclared(Document *document)
+		{
+			range->report(document, "Redeclared identifier '" + name->string() + "'");
+		}
 		
 		Type type;
 		Range *range;
@@ -25,10 +30,10 @@ namespace Legion
 		Symbol *next;
 	};
 	
-	template<Symbol::Type type> struct SymbolType:
+	template<Symbol::Type symbol_type> struct SymbolType:
 		public Symbol
 	{
-		SymbolType() : Symbol(type) {}
+		SymbolType() : Symbol(symbol_type) {}
 	};
 
 	struct TypeSymbol:
@@ -44,8 +49,11 @@ namespace Legion
 	};
 	
 	struct FuncSymbol:
-		public SymbolType<Symbol::VARIABLE>
+		public SymbolType<Symbol::FUNCTION>
 	{
+		FuncSymbol() : returns(0), defined(false) {}
+
 		Type *returns;
+		bool defined;
 	};
 };

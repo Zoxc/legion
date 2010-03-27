@@ -37,6 +37,8 @@ namespace Legion
 		
 		node->condition = parse_grouped_expression();
 		node->do_true = parse_block();
+
+		lexer.identify_keywords();
 		
 		if(matches(Lexeme::KW_ELSE))
 			node->do_false = parse_block();

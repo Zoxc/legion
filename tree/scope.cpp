@@ -51,7 +51,7 @@ namespace Legion
 		this->table = table;
 	}
 	
-	bool Scope::store(Symbol **table, size_t mask, String *name, Symbol *symbol)
+	Symbol *Scope::store(Symbol **table, size_t mask, String *name, Symbol *symbol)
 	{
 		size_t index = (size_t)name & mask;
 		Symbol *entry = table[index];
@@ -60,7 +60,7 @@ namespace Legion
 		while(entry)
 		{
 			if(entry->name == name)
-				return false;
+				return entry;
 			
 			tail = entry;
 			entry = entry->next;
@@ -73,7 +73,7 @@ namespace Legion
 
 		symbol->next = 0;
 		
-		return true;
+		return 0;
 	}
 	
 	Symbol *Scope::get(String *name)
@@ -92,11 +92,11 @@ namespace Legion
 		return 0;
 	}
 	
-	bool Scope::set(String *name, Symbol *symbol)
+	Symbol *Scope::set(String *name, Symbol *symbol)
 	{
-		bool result = store(this->table, this->mask, name, symbol);
+		Symbol *result = store(this->table, this->mask, name, symbol);
 		
-		if(result)
+		if(!result)
 		{
 			this->entries++;
 			
