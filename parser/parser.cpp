@@ -22,7 +22,7 @@ namespace Legion
 	void Parser::pop_scope()
 	{
 		scope = scope->parent;
-	}			
+	}
 	
 	void Parser::expected(Lexeme::Type what, bool skip)
 	{
