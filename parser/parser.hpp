@@ -125,7 +125,7 @@ namespace Legion
 				
 				if(lexer.lexeme.type == Lexeme::IDENT)
 				{
-					result->range = new (memory_pool) Range;
+					result->range = new (global_pool) Range;
 					result->range->capture(&lexer.lexeme);
 					result->name = lexer.lexeme.value;
 					
@@ -153,14 +153,14 @@ namespace Legion
 			
 			template<class T>  T *declare()
 			{
-				return declare<T>(new (memory_pool) T);
+				return declare<T>(new (global_pool) T);
 			}
 			
 			template<class T>  T *declare(PairNode *pair, Symbol **prev)
 			{
-				T *result = new (memory_pool) T;
+				T *result = new (global_pool) T;
 				
-				result->range = &pair->range;
+				result->range = new (global_pool) Range(&pair->range);
 				result->name = pair->name;
 				
 				*prev = scope->declare_symbol(result);

@@ -38,7 +38,7 @@ void process_file(std::string file)
 		#ifdef WIN32
 			QueryPerformanceCounter((LARGE_INTEGER *)&stop);
 
-			std::cout << "Parsed '" << file << "' in " << (((double)1000 * (stop - start)) / (double)freq) << " ms." << std::endl;
+			std::cout << "Parsed file '" << file << "' in " << (((double)1000 * (stop - start)) / (double)freq) << " ms." << std::endl;
 		#endif
 
 		for(std::vector<std::string>::iterator i = doc.includes.begin(); i != doc.includes.end(); ++i)

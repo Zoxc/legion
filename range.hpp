@@ -25,7 +25,7 @@ namespace Legion
 				error = range->error;
 			}
 			
-			Range(Range *range)
+			Range(Range *range) : start(0), stop(0), error(false)
 			{
 				capture(range);
 			}
