@@ -13,6 +13,7 @@ namespace Legion
 	struct TypeSymbol;
 	struct VarSymbol;
 	struct FuncSymbol;
+	struct ExpressionNode;
 	
 	struct PairNode:
 		public Node
@@ -55,6 +56,7 @@ namespace Legion
 		bool is_const;
 		bool is_static;
 		VarSymbol *symbol;
+		ExpressionNode *value;
 	};
 	
 	struct ParamNode:

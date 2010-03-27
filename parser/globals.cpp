@@ -87,8 +87,9 @@ namespace Legion
 			pair->range.report(document, "Global can not be natives");
 		
 		if(matches(Lexeme::ASSIGN))
-		{
-		}
+			global->value = parse_expression();
+		else
+			global->value = 0;
 		
 		match(Lexeme::SEMICOLON);
 	}
@@ -118,12 +119,16 @@ namespace Legion
 		}		
 		match(Lexeme::PARENT_CLOSE);
 		
-		if(matches(Lexeme::BRACET_OPEN))
+		if(lexeme() == Lexeme::BRACET_OPEN)
 		{
 			FuncNode *func = list->add<FuncNode>(memory_pool);
 			func->head = head;
-			func->body = parse_block();	
+			func->body = new (memory_pool) Block;
+
+			step();
 			
+			parse_statements(&func->body->statements);	
+
 			match(Lexeme::BRACET_CLOSE);
 		}
 		else

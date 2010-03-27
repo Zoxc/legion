@@ -24,7 +24,7 @@ namespace Legion
 		scope = scope->parent;
 	}			
 	
-	void Parser::expected(Lexeme::LexemeType what, bool skip)
+	void Parser::expected(Lexeme::Type what, bool skip)
 	{
 		lexer.lexeme.report(document, "Expected " + Lexeme::describe_type(what) + ", but found " + lexer.lexeme.describe());
 		

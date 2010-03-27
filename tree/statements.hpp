@@ -69,4 +69,13 @@ namespace Legion
 		public StatementNode
 	{
 	};
+
+	struct LocalNode:
+		public StatementNode
+	{
+		ExpressionNode *type;
+		String *name;
+		ExpressionNode *value;
+		bool is_const;
+	};	
 };

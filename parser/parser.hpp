@@ -28,18 +28,18 @@ namespace Legion
 			void parse(NodeList *list);
 
 			void unexpected(bool skip = true);	
-			void expected(Lexeme::LexemeType what, bool skip = false);
+			void expected(Lexeme::Type what, bool skip = false);
 		private:
 			Document *document;
 			MemoryPool *memory_pool;
 			MemoryPool *global_pool;
 			
-			Lexeme::LexemeType lexeme()
+			Lexeme::Type lexeme()
 			{
 				return lexer.lexeme.type;
 			}
 			
-			bool match(Lexeme::LexemeType what)
+			bool match(Lexeme::Type what)
 			{
 				if(lexeme() == what)
 				{
@@ -53,7 +53,7 @@ namespace Legion
 				}
 			}
 			
-			bool matches(Lexeme::LexemeType what)
+			bool matches(Lexeme::Type what)
 			{
 				if(lexeme() == what)
 				{
@@ -64,7 +64,7 @@ namespace Legion
 					return false;
 			}
 			
-			bool expect(Lexeme::LexemeType what)
+			bool expect(Lexeme::Type what)
 			{
 				if(lexeme() == what)
 				{
@@ -78,10 +78,21 @@ namespace Legion
 			}
 			
 			// Expressions
+			ExpressionNode *parse_array_subscript();
+			bool is_expression(Lexeme::Type lexeme);
+			ExpressionNode *parse_factor();
+			bool is_factor_chain(Lexeme::Type lexeme);
+			ExpressionNode *parse_factor_chain();
+			ExpressionNode *parse_unary();
+			bool is_binary_operator(Lexeme::Type op);
+			ExpressionNode *parse_binary_operator();
+			ExpressionNode *parse_binary_operator(ExpressionNode *left, size_t precedence);
+			ExpressionNode *parse_assign();
 			ExpressionNode *parse_expression();
 			ExpressionNode *parse_grouped_expression();
 			
 			// Statements
+			void parse_local(bool is_const, ExpressionNode *type, NodeList *list);
 			void parse_continue(NodeList *list);
 			void parse_break(NodeList *list);
 			void parse_return(NodeList *list);

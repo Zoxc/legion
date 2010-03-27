@@ -3,9 +3,32 @@
 #include "../tree/types.hpp"
 #include "../tree/symbols.hpp"
 #include "../tree/globals.hpp"
+#include "../tree/expressions.hpp"
 
 namespace Legion
 {
+	void Parser::parse_local(bool is_const, ExpressionNode *type, NodeList *list)
+	{
+		LocalNode *node = list->add<LocalNode>(memory_pool);
+
+		node->type = type;
+
+		if(expect(Lexeme::IDENT))
+		{
+			node->name = lexer.lexeme.value;
+			step();
+		}
+		else
+			node->name = 0;
+
+		node->is_const = is_const;
+
+		if(matches(Lexeme::ASSIGN))
+			node->value = parse_expression();
+		else
+			node->value = 0;
+	}
+
 	void Parser::parse_if(NodeList *list)
 	{
 		IfNode *node = list->add<IfNode>(memory_pool);
@@ -41,6 +64,8 @@ namespace Legion
 		push_scope(Scope::LOOP);
 		node->body = parse_block();
 		pop_scope();
+
+		lexer.identify_keywords();
 		
 		match(Lexeme::KW_WHILE);		
 		node->condition = parse_grouped_expression();
@@ -117,6 +142,11 @@ namespace Legion
 				parse_continue(list);
 				break;
 			
+			case Lexeme::KW_CONST:
+				step();
+				parse_local(true, parse_expression(), list);
+				break;
+			
 			case Lexeme::BRACET_OPEN:
 				list->append(parse_block());
 				break;
@@ -126,10 +156,21 @@ namespace Legion
 				break;
 			
 			case Lexeme::END:
+			case Lexeme::BRACET_CLOSE:
 				return false;
-						
+	
 			default:
-				unexpected();
+				if(is_expression(lexeme()))
+				{
+					ExpressionNode *node = parse_expression();
+
+					if(lexeme() == Lexeme::IDENT)
+						parse_local(true, node, list);
+					else
+						list->append(node);
+				}
+				else
+					return false;
 		}
 		
 		return true;

@@ -29,6 +29,9 @@ namespace Legion
 		
 		void append(ListNode *node)
 		{
+			if(!node)
+				return;
+
 			node->next = 0;
 			
 			if(last_child)

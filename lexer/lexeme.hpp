@@ -9,7 +9,7 @@ namespace Legion
 		public Range
 	{
 		public:
-			enum LexemeType
+			enum Type
 			{
 				NONE,
 				IDENT,	
@@ -22,20 +22,8 @@ namespace Legion
 				MEMBER_PTR,
 				SEMICOLON,
 				COMMA,
-				ADD,
-				SUB,
-				MUL,
-				DIV,
-				MOD,	
-				BITWISE_OR,
-				BITWISE_XOR,
-				BITWISE_AND,
-				BITWISE_NOT,
-				LEFT_SHIFT,
-				RIGHT_SHIFT,
-				LOGICAL_OR,
-				LOGICAL_AND,
-				LOGICAL_NOT,
+
+				// Binary operators sorted after precedence
 				ASSIGN,
 				ASSIGN_ADD,
 				ASSIGN_SUB,
@@ -50,18 +38,46 @@ namespace Legion
 				ASSIGN_RIGHT_SHIFT,
 				ASSIGN_LOGICAL_OR,
 				ASSIGN_LOGICAL_AND,
+
+				LOGICAL_OR,
+
+				LOGICAL_AND,
+
+				BITWISE_OR,
+
+				BITWISE_XOR,
+
+				BITWISE_AND,
+
 				EQUAL,
 				NOT_EQUAL,
+
 				LESS,
 				LESS_OR_EQUAL,
 				GREATER,
 				GREATER_OR_EQUAL,
+
+				LEFT_SHIFT,
+				RIGHT_SHIFT,
+
+				ADD,
+				SUB,
+
+				MUL,
+				DIV,
+				MOD,
+
+				// Other
+				BITWISE_NOT,
+				LOGICAL_NOT,
 				BRACET_OPEN,
 				BRACET_CLOSE,
 				PARENT_OPEN,
 				PARENT_CLOSE,
 				SQR_BRACET_OPEN,
 				SQR_BRACET_CLOSE,
+
+				// Keywords
 				KW_INCLUDE,
 				KW_STRUCT,
 				KW_TYPEDEF,
@@ -75,11 +91,14 @@ namespace Legion
 				KW_BREAK,
 				KW_CONTINUE,
 				KW_RETURN,
+				KW_TRUE,
+				KW_FALSE,
+				KW_NULL,
 				END,
 				TYPES
 			};
 
-			LexemeType type;
+			Type type;
 			
 			union
 			{
@@ -104,7 +123,7 @@ namespace Legion
 				return result;
 			}
 			
-			static std::string describe_type(LexemeType type)
+			static std::string describe_type(Type type)
 			{
 				std::string result;
 				

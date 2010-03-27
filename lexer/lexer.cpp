@@ -6,13 +6,13 @@ namespace Legion
 	Keywords::Keywords(StringPool *pool)
 	{
 		for(size_t i = Lexeme::KW_INCLUDE; i < Lexeme::END; i++)
-			mapping.insert(std::pair<String *, Lexeme::LexemeType>(pool->get(Lexeme::names[i].c_str()), (Lexeme::LexemeType)i));
+			mapping.insert(std::pair<String *, Lexeme::Type>(pool->get(Lexeme::names[i].c_str()), (Lexeme::Type)i));
 	}
 	
 	bool Lexer::jump_table_ready = 0;
 	void(Lexer::*Lexer::jump_table[sizeof(char_t) << 8])();
 	
-	template<Lexeme::LexemeType type> void Lexer::single()
+	template<Lexeme::Type type> void Lexer::single()
 	{
 		input++;
 		
@@ -20,7 +20,7 @@ namespace Legion
 		lexeme.type = type;
 	}
 
-	template<Lexeme::LexemeType type, Lexeme::LexemeType assign_type> void Lexer::assign()
+	template<Lexeme::Type type, Lexeme::Type assign_type> void Lexer::assign()
 	{
 		input++;
 		
@@ -37,7 +37,7 @@ namespace Legion
 		}
 	}
 
-	template<Lexeme::LexemeType type, Lexeme::LexemeType assign_type, char_t match, Lexeme::LexemeType match_type, Lexeme::LexemeType match_assign> void Lexer::assign()
+	template<Lexeme::Type type, Lexeme::Type assign_type, char_t match, Lexeme::Type match_type, Lexeme::Type match_assign> void Lexer::assign()
 	{
 		input++;
 		
@@ -183,7 +183,10 @@ namespace Legion
 	
 	void Lexer::identify_keywords()
 	{
-		std::map<String *, Lexeme::LexemeType>::iterator value = keywords.mapping.find(lexeme.value);
+		if(lexeme.type != Lexeme::IDENT)
+			return;
+
+		std::map<String *, Lexeme::Type>::iterator value = keywords.mapping.find(lexeme.value);
 		
 		if(value != keywords.mapping.end())
 			lexeme.type = value->second;

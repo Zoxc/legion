@@ -15,7 +15,7 @@ namespace Legion
 		public:
 			Keywords(StringPool *pool);
 			
-			std::map<String *, Lexeme::LexemeType> mapping;
+			std::map<String *, Lexeme::Type> mapping;
 	};
 	
 	class Lexer
@@ -38,9 +38,9 @@ namespace Legion
 			
 			void report_null();
 			
-			template<Lexeme::LexemeType type> void single();
-			template<Lexeme::LexemeType type, Lexeme::LexemeType assign_type> void assign();
-			template<Lexeme::LexemeType type, Lexeme::LexemeType assign_type, char_t match, Lexeme::LexemeType match_type, Lexeme::LexemeType match_assign> void assign();
+			template<Lexeme::Type type> void single();
+			template<Lexeme::Type type, Lexeme::Type assign_type> void assign();
+			template<Lexeme::Type type, Lexeme::Type assign_type, char_t match, Lexeme::Type match_type, Lexeme::Type match_assign> void assign();
 
 			void eol();
 			void white();
