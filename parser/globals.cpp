@@ -130,7 +130,6 @@ namespace Legion
 		{
 			FuncNode *func = list->add<FuncNode>(memory_pool);
 			func->head = head;
-			func->body = new (memory_pool) Block;
 
 			if(prev && prev->type == Symbol::FUNCTION)
 			{
@@ -142,11 +141,7 @@ namespace Legion
 				prev_func->defined = true;
 			}
 
-			step();
-			
-			parse_statements(&func->body->statements);	
-
-			match(Lexeme::BRACET_CLOSE);
+			func->body = parse_block<true>(Scope::FUNCTION);
 		}
 		else
 		{

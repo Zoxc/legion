@@ -50,12 +50,66 @@ namespace Legion
 			}
 		}
 
-		T *next(T *node)
-		{
-			return static_cast<T *>(node->next);
-		}
-
 		T *first;
 		T *last;
+
+		class Iterator
+		{
+			private:
+				NodeList<T> *list;
+				T *prev;
+				T *current;
+
+			public:
+				Iterator(NodeList<T> *list) : list(list), prev(0), current(list->first) {}
+
+				void step()
+				{
+					prev = current;
+					current = static_cast<T *>(current->next);
+				}
+
+				void replace(T *node)
+				{
+					if(prev)
+						prev->next = node;
+					else
+						list->first = node;
+
+					node->next = current->next;
+
+					if(node->next == 0)
+						list->last = node;
+
+					current = node;
+				}
+
+				operator bool()
+				{
+					return current != 0;
+				}
+
+				T *operator ++()
+				{
+					step();
+					return current;
+				}
+
+				T *operator ++(int)
+				{
+					step();
+					return prev;
+				}
+
+				T *operator*()
+				{
+					return current;
+				}
+		};
+
+		Iterator begin()
+		{
+			return Iterator(this);
+		}
 	};
 };

@@ -22,6 +22,7 @@ namespace Legion
 			std::vector<std::string> includes;
 
 			bool parse();
+			void find_declarations();
 			
 			Document(Compiler *compiler, std::string filename);
 			~Document();

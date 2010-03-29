@@ -36,12 +36,12 @@ namespace Legion
 		step();
 		
 		node->condition = parse_grouped_expression();
-		node->do_true = parse_block();
+		node->do_true = parse_block<false>(Scope::CONDITIONAL);
 
 		lexer.identify_keywords();
 		
 		if(matches(Lexeme::KW_ELSE))
-			node->do_false = parse_block();
+			node->do_false = parse_block<false>(Scope::CONDITIONAL);;
 	}
 	
 	void Parser::parse_while(StatementList *list)
@@ -51,10 +51,7 @@ namespace Legion
 		step();
 		
 		node->condition = parse_grouped_expression();
-
-		push_scope(Scope::LOOP);
-		node->body = parse_block();
-		pop_scope();
+		node->body = parse_block<false>(Scope::LOOP);
 	}
 	
 	void Parser::parse_do(StatementList *list)
@@ -63,9 +60,7 @@ namespace Legion
 
 		step();
 		
-		push_scope(Scope::LOOP);
-		node->body = parse_block();
-		pop_scope();
+		node->body = parse_block<false>(Scope::LOOP);
 
 		lexer.identify_keywords();
 		
@@ -150,7 +145,7 @@ namespace Legion
 				break;
 			
 			case Lexeme::BRACET_OPEN:
-				list->append(parse_block());
+				list->append(parse_block<true>(Scope::EMPTY));
 				break;
 			
 			case Lexeme::SEMICOLON:
@@ -176,21 +171,5 @@ namespace Legion
 		}
 		
 		return true;
-	}
-	
-	Block *Parser::parse_block()
-	{
-		Block *block = new (memory_pool) Block;
-		
-		if(matches(Lexeme::BRACET_OPEN))
-		{
-			parse_statements(&block->statements);
-			
-			match(Lexeme::BRACET_CLOSE);
-		}
-		else
-			parse_statements(&block->statements);
-			
-		return block;
 	}
 };

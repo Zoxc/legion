@@ -14,7 +14,7 @@ namespace Legion
 	class Parser
 	{
 		public:
-			Parser(StringPool *string_pool, MemoryPool *memory_pool, MemoryPool *global_pool, Document *document, Scope *scope);
+			Parser(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope);
 			~Parser();
 			
 			Lexer lexer;
@@ -32,7 +32,6 @@ namespace Legion
 		private:
 			Document *document;
 			MemoryPool *memory_pool;
-			MemoryPool *global_pool;
 			
 			Lexeme::Type lexeme()
 			{
@@ -102,7 +101,37 @@ namespace Legion
 			
 			bool parse_statement(StatementList *list);
 			void parse_statements(StatementList *list);	
-			Block *parse_block();
+
+			template<bool bracets_required> Block *parse_block(Scope::Type type)
+			{
+				Block *block = new (memory_pool) Block;
+
+				block->scope = push_scope(type);
+
+				if(bracets_required)
+				{
+					match(Lexeme::BRACET_OPEN);
+					
+					parse_statements(&block->statements);
+						
+					match(Lexeme::BRACET_CLOSE);
+				}
+				else
+				{
+					if(matches(Lexeme::BRACET_OPEN))
+					{
+						parse_statements(&block->statements);
+						
+						match(Lexeme::BRACET_CLOSE);
+					}
+					else
+						parse_statements(&block->statements);
+				}
+
+				pop_scope();
+					
+				return block;
+			}
 			
 			// Globals
 			void parse_include(NamespaceList *list);	
@@ -125,7 +154,7 @@ namespace Legion
 				
 				if(lexer.lexeme.type == Lexeme::IDENT)
 				{
-					result->range = new (global_pool) Range;
+					result->range = new (scope->memory_pool) Range;
 					result->range->capture(&lexer.lexeme);
 					result->name = lexer.lexeme.value;
 					
@@ -153,14 +182,14 @@ namespace Legion
 			
 			template<class T>  T *declare()
 			{
-				return declare<T>(new (global_pool) T);
+				return declare<T>(new (scope->memory_pool) T);
 			}
 			
 			template<class T>  T *declare(PairNode *pair, Symbol **prev)
 			{
-				T *result = new (global_pool) T;
+				T *result = new (scope->memory_pool) T;
 				
-				result->range = new (global_pool) Range(&pair->range);
+				result->range = new (scope->memory_pool) Range(&pair->range);
 				result->name = pair->name;
 				
 				*prev = scope->declare_symbol(result);

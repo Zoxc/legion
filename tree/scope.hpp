@@ -19,8 +19,6 @@ namespace Legion
 			size_t mask;
 			size_t entries;
 			
-			MemoryPool *memory_pool;
-			
 			Symbol *store(Symbol **table, size_t mask, String *name, Symbol *symbol);
 			void expand();
 		public:
@@ -28,11 +26,15 @@ namespace Legion
 			{
 				ROOT,
 				FUNCTION,
-				LOOP
+				LOOP,
+				CONDITIONAL,
+				EMPTY
 			};
 			
 			Scope(Scope *parent, Type type, MemoryPool *memory_pool);
 			~Scope();
+
+			MemoryPool *memory_pool;
 			
 			Type type;
 			Scope *parent;

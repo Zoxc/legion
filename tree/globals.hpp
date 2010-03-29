@@ -99,7 +99,7 @@ namespace Legion
 		FuncHeadNode *head;
 		Block *body;
 
-		virtual bool find_declarations()
+		bool find_declarations()
 		{
 			if(body)
 				body->find_declarations();

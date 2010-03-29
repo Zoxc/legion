@@ -8,6 +8,7 @@ namespace Legion
 {
 	class String;
 	class Type;
+	class Scope;
 	
 	struct TypeSymbol;
 	struct VarSymbol;
@@ -26,18 +27,14 @@ namespace Legion
 		public StatementNode
 	{
 		StatementList statements;
+		Scope *scope;
 
-		virtual bool find_declarations()
+		bool find_declarations()
 		{
-			StatementNode *node = statements.first;
-
-			while(node)
+			for(StatementList::Iterator i = statements.begin(); i; i++)
 			{
-				if(node->find_declarations())
-				{
-				}
-
-				node = statements.next(node);
+				/*if((*i)->find_declarations());
+					i.replace((*i)->get_declaration());*/
 			}
 
 			return false;

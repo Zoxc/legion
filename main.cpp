@@ -35,6 +35,8 @@ void process_file(std::string file)
 
 	if(doc.parse())
 	{
+		doc.find_declarations();
+
 		#ifdef WIN32
 			QueryPerformanceCounter((LARGE_INTEGER *)&stop);
 
