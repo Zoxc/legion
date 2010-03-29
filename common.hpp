@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <sstream>
 #include <string.h>
 #include <malloc.h>
 #include <assert.h>

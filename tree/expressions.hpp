@@ -3,6 +3,7 @@
 #include "../range.hpp"
 #include "node.hpp"
 #include "statements.hpp"
+#include "scope.hpp"
 
 namespace Legion
 {
@@ -12,9 +13,34 @@ namespace Legion
 	struct ExpressionNode:
 		public StatementNode
 	{
+		virtual bool is_type()
+		{
+			return false;
+		}
+
+		virtual bool is_type_name()
+		{
+			return false;
+		}
 	};
 
 	typedef NodeList<ExpressionNode> ExpressionList;
+
+	struct IdentNode:
+		public ExpressionNode
+	{
+		String *ident;
+
+		Type get_type()
+		{
+			return Node::IDENT_NODE;
+		}
+
+		std::string string()
+		{
+			return wrap(ident->string());
+		}
+	};
 
 	struct BinaryOpNode:
 		public ExpressionNode
@@ -22,6 +48,36 @@ namespace Legion
 		ExpressionNode *left;
 		ExpressionNode *right;
 		Lexeme::Type op;
+
+		bool find_declarations(Scope *scope)
+		{
+			if(op == Lexeme::MUL && left->get_type() == Node::IDENT_NODE)
+			{
+				IdentNode *left = (IdentNode *)this->left;
+				
+				if(scope->get_type(left->ident) != Symbol::TYPE)
+					return false;
+				
+				return right->is_type_name();
+			}
+			else
+				return false;
+		};
+
+		bool is_type_name()
+		{
+			if(op == Lexeme::MUL)
+			{
+				return left->is_type() && right->is_type_name();
+			}
+			else
+				return false;
+		};
+
+		std::string string()
+		{
+			return wrap(left->string() + " " + Lexeme::names[op] + " " + right->string());
+		}
 	};
 
 	struct UnaryOpNode:
@@ -29,18 +85,38 @@ namespace Legion
 	{
 		Lexeme::Type op;
 		ExpressionNode *value;
+		
+		std::string string()
+		{
+			return wrap(Lexeme::names[op] + value->string());
+		}
 	};
 
 	struct ArraySubscriptNode:
 		public ExpressionNode
 	{
 		ExpressionNode *index;
+
+		std::string string()
+		{
+			return wrap("[" + index->string() + "]");
+		}
 	};
 
 	struct ArrayDefNode:
 		public ExpressionNode
 	{
-		NodeList<ExpressionNode> sizes;
+		ExpressionList sizes;
+
+		std::string string()
+		{
+			std::string result;
+
+			for(ExpressionList::Iterator i = sizes.begin(); i; i++)
+				result += "[" + (*i)->string() + "]";
+
+			return wrap(result);
+		}
 	};
 
 	struct MemberRefNode:
@@ -48,6 +124,14 @@ namespace Legion
 	{
 		String *name;
 		bool by_ptr;
+
+		std::string string()
+		{
+			if(by_ptr)
+				return wrap("->" + name->string());
+			else
+				return wrap("." + name->string());
+		}
 	};
 
 	struct FactorChainNode:
@@ -55,41 +139,71 @@ namespace Legion
 	{
 		ExpressionNode *factor;
 		ExpressionList chain;
+
+		std::string string()
+		{
+			return wrap(factor->string() + chain.join(""));
+		}
 	};
 
 	struct IntegerNode:
 		public ExpressionNode
 	{
 		int value;
+
+		std::string string()
+		{
+			std::stringstream out;
+			out << value;
+			return wrap(out.str());
+		}
 	};
 
 	struct StringNode:
 		public ExpressionNode
 	{
 		String *value;
+
+		std::string string()
+		{
+			return wrap("\"" + value->string() + "\"");
+		}
 	};
 
 	struct FixedNode:
 		public ExpressionNode
 	{
 		double value;
+
+		std::string string()
+		{
+			std::stringstream out;
+			out << value;
+			return wrap(out.str());
+		}
 	};
 
 	struct BooleanNode:
 		public ExpressionNode
 	{
 		bool value;
+
+		std::string string()
+		{
+			if(value)
+				return wrap("true");
+			else
+				return wrap("false");
+		}
 	};
 
 	struct NullNode:
 		public ExpressionNode
 	{
-	};
-
-	struct IdentNode:
-		public ExpressionNode
-	{
-		String *ident;
+		std::string string()
+		{
+			return wrap("null");
+		}
 	};
 
 	struct CallNode:
@@ -97,6 +211,11 @@ namespace Legion
 	{
 		IdentNode *ident;
 		ExpressionList arguments;
+
+		std::string string()
+		{
+			return wrap(ident->string() + "(" + arguments.join(", ") + ")");
+		}
 	};
 
 };

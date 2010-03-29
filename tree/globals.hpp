@@ -4,6 +4,8 @@
 #include "node.hpp"
 #include "types.hpp"
 #include "statements.hpp"
+#include "expressions.hpp"
+#include "symbols.hpp"
 
 namespace Legion
 {
@@ -30,6 +32,11 @@ namespace Legion
 		TypeNode *type;
 		String *name;
 		Range range;
+
+		std::string string()
+		{
+			return wrap(type->string() + " " + name->string());
+		}
 	};
 
 	
@@ -37,6 +44,11 @@ namespace Legion
 		public ListNode
 	{
 		PairNode pair;
+
+		std::string string()
+		{
+			return wrap(pair.string());
+		}
 	};
 	
 	struct StructNode:
@@ -44,6 +56,11 @@ namespace Legion
 	{
 		TypeSymbol *symbol;
 		NodeList<FieldNode> fields;
+
+		std::string string()
+		{
+			return wrap("struct " + symbol->name->string() + "\n{\n" + fields.join("    ", ";\n") + "}");
+		}
 	};
 	
 	struct TypedefNode:
@@ -53,6 +70,11 @@ namespace Legion
 		
 		PairNode *pair;
 		TypeSymbol *symbol;
+
+		std::string string()
+		{
+			return wrap("typedef " + pair->string());
+		}
 	};
 	
 	struct GlobalNode:
@@ -65,12 +87,33 @@ namespace Legion
 		bool is_static;
 		VarSymbol *symbol;
 		ExpressionNode *value;
+
+		std::string string()
+		{
+			std::string result = pair->string();
+
+			if(is_const)
+				result = "const " + result;
+
+			if(is_static)
+				result = "static " + result;
+
+			if(value)
+				result += " = " + value->string();
+
+			return wrap(result);
+		}
 	};
 	
 	struct ParamNode:
 		public ListNode
 	{
 		PairNode pair;
+
+		std::string string()
+		{
+			return wrap(pair.string());
+		}
 	};
 		
 	struct FuncHeadNode:
@@ -83,12 +126,32 @@ namespace Legion
 		bool is_static;
 		FuncSymbol *symbol;
 		NodeList<ParamNode> params;
+
+		std::string string()
+		{
+			std::string result = pair->string() + "(";
+
+			if(is_native)
+				result = "native " + result;
+
+			if(is_static)
+				result = "static " + result;
+
+			result += params.join(", ") + ")";
+
+			return wrap(result);
+		}
 	};
 	
 	struct PrototypeNode:
 		public NamespaceNode
 	{
 		FuncHeadNode *head;
+
+		std::string string()
+		{
+			return wrap(head->string());
+		}
 	};
 	
 	struct Block;
@@ -99,12 +162,17 @@ namespace Legion
 		FuncHeadNode *head;
 		Block *body;
 
-		bool find_declarations()
+		bool find_declarations(Scope *scope)
 		{
 			if(body)
-				body->find_declarations();
+				body->find_declarations(scope);
 
 			return false;
+		}
+
+		std::string string()
+		{
+			return wrap(head->string() + "\n" + body->string());
 		}
 	};
 };

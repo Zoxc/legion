@@ -42,6 +42,16 @@ namespace Legion
 			Symbol *get(String *name);
 			Symbol *set(String *name, Symbol *symbol);
 
+			Symbol::Type get_type(String *name)
+			{
+				Symbol *symbol = get(name);
+
+				if(!symbol)
+					return Symbol::NONE;
+
+				return symbol->type;
+			}
+
 			Symbol *declare_symbol(Symbol *symbol)
 			{
 				if(type == LOOP)

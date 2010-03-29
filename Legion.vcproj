@@ -250,6 +250,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\tree\printer.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\tree\scope.cpp"
 				>
 			</File>

@@ -14,6 +14,7 @@ namespace Legion
 			bool map();
 			const char_t *input;
 			size_t length;
+			Compiler *compiler;
 		public:
 			MemoryPool memory_pool;
 			Parser parser;

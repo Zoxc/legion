@@ -78,6 +78,9 @@ namespace Legion
 	
 	Symbol *Scope::get(String *name)
 	{
+		if(!name)
+			return 0;
+
 		size_t index = (size_t)name & this->mask;
 		Symbol *entry = this->table[index];
 		

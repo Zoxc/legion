@@ -162,7 +162,7 @@ namespace Legion
 					ExpressionNode *node = parse_expression();
 
 					if(lexeme() == Lexeme::IDENT)
-						parse_local(true, node, list);
+						parse_local(false, node, list);
 					else
 						list->append(node);
 				}

@@ -4,9 +4,25 @@
 
 namespace Legion
 {	
+	class Scope;
+
 	struct Node
 	{
-		virtual bool find_declarations()
+		enum Type
+		{
+			NONE,
+			IDENT_NODE
+		};
+
+		virtual Type get_type()
+		{
+			return NONE;
+		}
+
+		virtual std::string string();
+		std::string wrap(std::string string);
+
+		virtual bool find_declarations(Scope *scope)
 		{
 			return false;
 		}
@@ -22,9 +38,9 @@ namespace Legion
 	{
 		NodeList() : first(0), last(0) {}
 		
-		template<class T> T *add(MemoryPool *memory_pool)
+		template<class N> N *add(MemoryPool *memory_pool)
 		{
-			T *node = new (memory_pool) T;
+			N *node = new (memory_pool) N;
 			
 			append(node);
 			
@@ -106,6 +122,31 @@ namespace Legion
 					return current;
 				}
 		};
+
+		std::string join(std::string seperator)
+		{
+			std::string result;
+
+			for(Iterator i = begin(); i; i++)
+			{
+				result += (*i)->string();
+
+				if((*i)->next)
+					result += seperator;
+			}
+
+			return result;
+		}
+
+		std::string join(std::string pre, std::string post)
+		{
+			std::string result;
+
+			for(Iterator i = begin(); i; i++)
+				result += pre + (*i)->string() + post;
+
+			return result;
+		}
 
 		Iterator begin()
 		{

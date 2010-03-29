@@ -1,5 +1,6 @@
 #pragma once
 #include "../common.hpp"
+#include "node.hpp"
 
 namespace Legion
 {
@@ -8,17 +9,28 @@ namespace Legion
 
 	struct ExpressionNode;
 	
-	struct TypeNode
+	struct TypeNode:
+		public Node
 	{
 		TypeNode() : base(0) {}
 		
 		TypeNode *base;
+
+		std::string string()
+		{
+			return wrap(base->string());
+		}
 	};
 	
 	struct TypePointerNode:
 		public TypeNode
 	{
 		TypeNode *base;
+
+		std::string string()
+		{
+			return wrap(base->string() + " *");
+		}
 	};
 	
 	struct TypeArrayNode:
@@ -26,16 +38,19 @@ namespace Legion
 	{
 		TypeNode *base;
 		ExpressionNode *size;
+
+		std::string string();
 	};
 
 	struct TypeBaseNode:
 		public TypeNode
 	{
 		String *type;
+		
+		std::string string();
 	};
 	
 	class Type
 	{
 	};
-	
 };
