@@ -19,11 +19,29 @@ namespace Legion
 		public ListNode
 	{
 	};
+
+	typedef NodeList<StatementNode> StatementList;
 	
 	struct Block:
 		public StatementNode
 	{
-		NodeList statements;
+		StatementList statements;
+
+		virtual bool find_declarations()
+		{
+			StatementNode *node = statements.first;
+
+			while(node)
+			{
+				if(node->find_declarations())
+				{
+				}
+
+				node = statements.next(node);
+			}
+
+			return false;
+		}
 	};
 	
 	struct IfNode:
@@ -77,5 +95,5 @@ namespace Legion
 		String *name;
 		ExpressionNode *value;
 		bool is_const;
-	};	
+	};
 };

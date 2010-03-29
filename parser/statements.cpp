@@ -7,7 +7,7 @@
 
 namespace Legion
 {
-	void Parser::parse_local(bool is_const, ExpressionNode *type, NodeList *list)
+	void Parser::parse_local(bool is_const, ExpressionNode *type, StatementList *list)
 	{
 		LocalNode *node = list->add<LocalNode>(memory_pool);
 
@@ -29,7 +29,7 @@ namespace Legion
 			node->value = 0;
 	}
 
-	void Parser::parse_if(NodeList *list)
+	void Parser::parse_if(StatementList *list)
 	{
 		IfNode *node = list->add<IfNode>(memory_pool);
 		
@@ -44,7 +44,7 @@ namespace Legion
 			node->do_false = parse_block();
 	}
 	
-	void Parser::parse_while(NodeList *list)
+	void Parser::parse_while(StatementList *list)
 	{
 		WhileNode *node = list->add<WhileNode>(memory_pool);
 
@@ -57,7 +57,7 @@ namespace Legion
 		pop_scope();
 	}
 	
-	void Parser::parse_do(NodeList *list)
+	void Parser::parse_do(StatementList *list)
 	{
 		DoNode *node = list->add<DoNode>(memory_pool);
 
@@ -74,7 +74,7 @@ namespace Legion
 		match(Lexeme::SEMICOLON);
 	}
 		
-	void Parser::parse_return(NodeList *list)
+	void Parser::parse_return(StatementList *list)
 	{
 		ReturnNode *node = list->add<ReturnNode>(memory_pool);
 		
@@ -89,7 +89,7 @@ namespace Legion
 		}
 	}
 	
-	void Parser::parse_break(NodeList *list)
+	void Parser::parse_break(StatementList *list)
 	{
 		if(scope->type == Scope::LOOP)
 			list->add<BreakNode>(memory_pool);
@@ -99,7 +99,7 @@ namespace Legion
 		step();
 	}
 	
-	void Parser::parse_continue(NodeList *list)
+	void Parser::parse_continue(StatementList *list)
 	{
 		if(scope->type == Scope::LOOP)
 			list->add<ContinueNode>(memory_pool);
@@ -109,12 +109,12 @@ namespace Legion
 		step();
 	}
 	
-	void Parser::parse_statements(NodeList *list)
+	void Parser::parse_statements(StatementList *list)
 	{
 		while(parse_statement(list));
 	}
 	
-	bool Parser::parse_statement(NodeList *list)	
+	bool Parser::parse_statement(StatementList *list)	
 	{
 		lexer.identify_keywords();
 		

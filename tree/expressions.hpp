@@ -14,6 +14,8 @@ namespace Legion
 	{
 	};
 
+	typedef NodeList<ExpressionNode> ExpressionList;
+
 	struct BinaryOpNode:
 		public ExpressionNode
 	{
@@ -38,7 +40,7 @@ namespace Legion
 	struct ArrayDefNode:
 		public ExpressionNode
 	{
-		NodeList sizes;
+		NodeList<ExpressionNode> sizes;
 	};
 
 	struct MemberRefNode:
@@ -52,7 +54,7 @@ namespace Legion
 		public ExpressionNode
 	{
 		ExpressionNode *factor;
-		NodeList chain;
+		ExpressionList chain;
 	};
 
 	struct IntegerNode:
@@ -94,7 +96,7 @@ namespace Legion
 		public ExpressionNode
 	{
 		IdentNode *ident;
-		NodeList arguments;
+		ExpressionList arguments;
 	};
 
 };

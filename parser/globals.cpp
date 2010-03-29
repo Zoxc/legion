@@ -23,7 +23,7 @@ namespace Legion
 		return false;
 	}
 	
-	void Parser::parse_include(NodeList *list)
+	void Parser::parse_include(NamespaceList *list)
 	{
 		step();
 		
@@ -36,7 +36,7 @@ namespace Legion
 		matches(Lexeme::SEMICOLON);
 	}
 	
-	void Parser::parse_struct(NodeList *list)
+	void Parser::parse_struct(NamespaceList *list)
 	{
 		step();
 		
@@ -60,7 +60,7 @@ namespace Legion
 		match(Lexeme::SEMICOLON);
 	}
 	
-	void Parser::parse_typedef(NodeList *list)
+	void Parser::parse_typedef(NamespaceList *list)
 	{
 		step();
 		
@@ -77,7 +77,7 @@ namespace Legion
 		}
 	}
 	
-	void Parser::parse_global(NodeList *list, bool is_static, bool is_native, bool is_const, PairNode *pair)
+	void Parser::parse_global(NamespaceList *list, bool is_static, bool is_const, bool is_native, PairNode *pair)
 	{
 		GlobalNode *global = list->add<GlobalNode>(memory_pool);
 		global->pair = pair;
@@ -96,7 +96,7 @@ namespace Legion
 		match(Lexeme::SEMICOLON);
 	}
 	
-	void Parser::parse_function(NodeList *list, bool is_static, bool is_native, bool is_const, PairNode *pair)
+	void Parser::parse_function(NamespaceList *list, bool is_static, bool is_const, bool is_native, PairNode *pair)
 	{
 		Symbol *prev;
 
@@ -157,7 +157,7 @@ namespace Legion
 		}
 	}
 	
-	template<bool prev_static, bool prev_const, bool prev_native> void Parser::parse_global_ident(NodeList *list)
+	template<bool prev_static, bool prev_const, bool prev_native> void Parser::parse_global_ident(NamespaceList *list)
 	{
 		bool is_static = prev_static;
 		bool is_const = prev_const;
@@ -192,18 +192,18 @@ namespace Legion
 		switch(lexeme())
 		{
 			case Lexeme::PARENT_OPEN:
-				parse_function(list, is_const, is_static, is_native, pair);
+				parse_function(list, is_static, is_const, is_native, pair);
 				break;
 				
 			case Lexeme::SEMICOLON:
 			case Lexeme::ASSIGN:
 			default:
-				parse_global(list, is_const, is_static, is_native, pair);
+				parse_global(list, is_static, is_const, is_native, pair);
 				break;
 		}	
 	}	
 	
-	void Parser::parse(NodeList *list)
+	void Parser::parse(NamespaceList *list)
 	{
 		while(true)
 		{

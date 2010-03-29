@@ -6,6 +6,10 @@ namespace Legion
 {	
 	struct Node
 	{
+		virtual bool find_declarations()
+		{
+			return false;
+		}
 	};
 	
 	struct ListNode:
@@ -14,9 +18,9 @@ namespace Legion
 		ListNode *next;
 	};
 	
-	struct NodeList
+	template<class T> struct NodeList
 	{
-		NodeList() : first_child(0), last_child(0) {}
+		NodeList() : first(0), last(0) {}
 		
 		template<class T> T *add(MemoryPool *memory_pool)
 		{
@@ -27,26 +31,31 @@ namespace Legion
 			return node;
 		}
 		
-		void append(ListNode *node)
+		void append(T *node)
 		{
 			if(!node)
 				return;
 
 			node->next = 0;
 			
-			if(last_child)
+			if(last)
 			{
-				last_child->next = node;
-				last_child = node;
+				last->next = node;
+				last = node;
 			}
 			else
 			{
-				first_child = node;
-				last_child = node;
+				first = node;
+				last = node;
 			}
 		}
 
-		ListNode *first_child;
-		ListNode *last_child;
+		T *next(T *node)
+		{
+			return static_cast<T *>(node->next);
+		}
+
+		T *first;
+		T *last;
 	};
 };

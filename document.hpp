@@ -18,7 +18,7 @@ namespace Legion
 			MemoryPool memory_pool;
 			Parser parser;
 			std::string filename;
-			NodeList tree;
+			NamespaceList tree;
 			std::vector<std::string> includes;
 
 			bool parse();

@@ -15,6 +15,13 @@ namespace Legion
 	struct FuncSymbol;
 	struct ExpressionNode;
 	
+	struct NamespaceNode:
+		public ListNode
+	{
+	};
+
+	typedef NodeList<NamespaceNode> NamespaceList;
+
 	struct PairNode:
 		public Node
 	{
@@ -24,6 +31,7 @@ namespace Legion
 		String *name;
 		Range range;
 	};
+
 	
 	struct FieldNode:
 		public ListNode
@@ -32,14 +40,14 @@ namespace Legion
 	};
 	
 	struct StructNode:
-		public ListNode
+		public NamespaceNode
 	{
 		TypeSymbol *symbol;
-		NodeList fields;
+		NodeList<FieldNode> fields;
 	};
 	
 	struct TypedefNode:
-		public ListNode
+		public NamespaceNode
 	{
 		TypedefNode() : pair(0), symbol(0) {}
 		
@@ -48,7 +56,7 @@ namespace Legion
 	};
 	
 	struct GlobalNode:
-		public ListNode
+		public NamespaceNode
 	{
 		GlobalNode() : symbol(0) {}
 		
@@ -74,11 +82,11 @@ namespace Legion
 		bool is_native;
 		bool is_static;
 		FuncSymbol *symbol;
-		NodeList params;
+		NodeList<ParamNode> params;
 	};
 	
 	struct PrototypeNode:
-		public ListNode
+		public NamespaceNode
 	{
 		FuncHeadNode *head;
 	};
@@ -86,9 +94,17 @@ namespace Legion
 	struct Block;
 	
 	struct FuncNode:
-		public ListNode
+		public NamespaceNode
 	{
 		FuncHeadNode *head;
 		Block *body;
+
+		virtual bool find_declarations()
+		{
+			if(body)
+				body->find_declarations();
+
+			return false;
+		}
 	};
 };

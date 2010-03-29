@@ -25,7 +25,7 @@ namespace Legion
 				lexer.step();
 			}
 			
-			void parse(NodeList *list);
+			void parse(NamespaceList *list);
 
 			void unexpected(bool skip = true);	
 			void expected(Lexeme::Type what, bool skip = false);
@@ -92,25 +92,25 @@ namespace Legion
 			ExpressionNode *parse_grouped_expression();
 			
 			// Statements
-			void parse_local(bool is_const, ExpressionNode *type, NodeList *list);
-			void parse_continue(NodeList *list);
-			void parse_break(NodeList *list);
-			void parse_return(NodeList *list);
-			void parse_if(NodeList *list);
-			void parse_while(NodeList *list);
-			void parse_do(NodeList *list);
+			void parse_local(bool is_const, ExpressionNode *type, StatementList *list);
+			void parse_continue(StatementList *list);
+			void parse_break(StatementList *list);
+			void parse_return(StatementList *list);
+			void parse_if(StatementList *list);
+			void parse_while(StatementList *list);
+			void parse_do(StatementList *list);
 			
-			bool parse_statement(NodeList *list);
-			void parse_statements(NodeList *list);	
+			bool parse_statement(StatementList *list);
+			void parse_statements(StatementList *list);	
 			Block *parse_block();
 			
 			// Globals
-			void parse_include(NodeList *list);	
-			void parse_struct(NodeList *list);	
-			void parse_typedef(NodeList *list);
-			void parse_global(NodeList *list, bool is_static, bool is_native, bool is_const, PairNode *pair);
-			void parse_function(NodeList *list, bool is_static, bool is_native, bool is_const, PairNode *pair);
-			template<bool prev_static, bool prev_const, bool prev_native> void parse_global_ident(NodeList *list);
+			void parse_include(NamespaceList *list);	
+			void parse_struct(NamespaceList *list);	
+			void parse_typedef(NamespaceList *list);
+			void parse_global(NamespaceList *list, bool is_static, bool is_const, bool is_native, PairNode *pair);
+			void parse_function(NamespaceList *list, bool is_static, bool is_const, bool is_native, PairNode *pair);
+			template<bool prev_static, bool prev_const, bool prev_native> void parse_global_ident(NamespaceList *list);
 			
 			bool parse_pair(PairNode *node);	
 			
