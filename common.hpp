@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <sstream>
+#include <typeinfo>
 #include <string.h>
 #include <malloc.h>
 #include <assert.h>
