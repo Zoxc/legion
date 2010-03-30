@@ -12,9 +12,13 @@ namespace Legion
 		{
 			NONE,
 
+			PAIR_NODE,
+			FIELD_NODE,
 			STRUCT_NODE,
 			TYPEDEF_NODE,
 			GLOBAL_NODE,
+			PARAM_NODE,
+			FUNC_HEAD_NODE,
 			PROTOTYPE_NODE,
 			FUNC_NODE,
 
@@ -39,7 +43,11 @@ namespace Legion
 			FIXED_NODE,
 			BOOL_NODE,
 			NULL_NODE,
-			CALL_NODE
+			CALL_NODE,
+
+			TYPE_POINTER_NODE,
+			TYPE_ARRAY_NODE,
+			TYPE_BASE_NODE
 		};
 
 		virtual Type get_type()
@@ -51,9 +59,6 @@ namespace Legion
 		{
 			return true;
 		}
-
-		virtual std::string string();
-		std::string wrap(std::string string);
 
 		virtual bool find_declarations(Scope *scope)
 		{
@@ -155,31 +160,6 @@ namespace Legion
 					return current;
 				}
 		};
-
-		std::string join(std::string seperator)
-		{
-			std::string result;
-
-			for(Iterator i = begin(); i; i++)
-			{
-				result += (*i)->string();
-
-				if((*i)->next)
-					result += seperator;
-			}
-
-			return result;
-		}
-
-		std::string join(std::string pre, std::string post)
-		{
-			std::string result;
-
-			for(Iterator i = begin(); i; i++)
-				result += pre + (*i)->string() + post;
-
-			return result;
-		}
 
 		Iterator begin()
 		{

@@ -23,11 +23,6 @@ namespace Legion
 		{
 			return 0;
 		}
-
-		virtual std::string indent_string(size_t indent)
-		{
-			return string();
-		}
 	};
 
 	typedef NodeList<StatementNode> StatementList;
@@ -48,8 +43,6 @@ namespace Legion
 
 			return false;
 		}
-
-		std::string indent_string(size_t indent);
 
 		Node::Type get_type()
 		{
@@ -75,8 +68,6 @@ namespace Legion
 		Block *do_true;
 		Block *do_false;
 
-		std::string indent_string(size_t ident);
-
 		Node::Type get_type()
 		{
 			return IF_NODE;
@@ -90,8 +81,6 @@ namespace Legion
 		
 		ExpressionNode *condition;
 		Block *body;
-		
-		std::string indent_string(size_t ident);
 
 		Node::Type get_type()
 		{
@@ -106,8 +95,6 @@ namespace Legion
 		
 		Block *body;
 		ExpressionNode *condition;
-		
-		std::string indent_string(size_t ident);
 
 		Node::Type get_type()
 		{
@@ -120,8 +107,6 @@ namespace Legion
 	{
 		ExpressionNode *value;
 
-		std::string string();
-
 		Node::Type get_type()
 		{
 			return RETURN_NODE;
@@ -131,8 +116,6 @@ namespace Legion
 	struct BreakNode:
 		public StatementNode
 	{
-		std::string string();
-
 		Node::Type get_type()
 		{
 			return BREAK_NODE;
@@ -142,8 +125,6 @@ namespace Legion
 	struct ContinueNode:
 		public StatementNode
 	{
-		std::string string();
-
 		Node::Type get_type()
 		{
 			return CONTINUE_NODE;
@@ -162,7 +143,5 @@ namespace Legion
 		{
 			return LOCAL_NODE;
 		}
-
-		std::string string();
 	};
 };

@@ -1,9 +1,58 @@
 #include "printer.hpp"
+#include "../string_pool.hpp"
 #include "expressions.hpp"
 
 namespace Legion
 {
-	std::string pretty_print(NamespaceList *list)
+	template<class T> std::string Printer::join(T *list, std::string seperator)
+	{
+		std::string result;
+
+		for(T::Iterator i = list->begin(); i; i++)
+		{
+			result += print_node(*i);
+
+			if((*i)->next)
+				result += seperator;
+		}
+
+		return result;
+	}
+
+	template<class T> std::string Printer::join(T *list, std::string pre, std::string post)
+	{
+		std::string result;
+
+		for(T::Iterator i = list->begin(); i; i++)
+			result += pre + print_node(*i) + post;
+
+		return result;
+	}
+
+	std::string Printer::print_string(String *string)
+	{
+		if(string)
+			return string->string();
+		else
+			return "<null>";
+	}
+
+	std::string Printer::wrap(Node *node, std::string result)
+	{
+		return result;
+	}
+
+	std::string Printer::print_node(Node *node)
+	{
+		return wrap(node, this->node(node, 0));
+	}
+
+	std::string Printer::print_node(Node *node, size_t indent)
+	{
+		return wrap(node, this->node(node, indent));
+	}
+
+	std::string Printer::print(NamespaceList *list)
 	{
 		std::string result;
 		Node::Type prev = Node::NONE;
@@ -17,7 +66,7 @@ namespace Legion
 
 			prev = type;
 
-			result += (*i)->string();
+			result += print_node(*i);
 
 			if((*i)->use_semi())
 				result += ";";
@@ -28,280 +77,333 @@ namespace Legion
 		return result;
 	}
 
-	std::string Node::string()
+	std::string Printer::node(Node *node, size_t indent)
 	{
-		return "";
-	}
-
-	std::string Node::wrap(std::string string)
-	{
-		/*const std::type_info &info = typeid(*this);
-
-		std::string name = info.name();
-
-		return "(" + name.substr(name.find("::") + 2) + ": " +  string + ")";*/
-
-		return string;
-	}
-
-	/*
-	 * Globals
-	 */
-
-	std::string PairNode::string()
-	{
-		return wrap(type->string() + " " + name->string());
-	}
-
-	std::string FieldNode::string()
-	{
-		return wrap(pair.string());
-	}
-
-	std::string StructNode::string()
-	{
-		return wrap("struct " + symbol->name->string() + "\n{\n" + fields.join("    ", ";\n") + "}");
-	}
-
-	std::string TypedefNode::string()
-	{
-		return wrap("typedef " + pair->string());
-	}
-
-	std::string GlobalNode::string()
-	{
-		std::string result = pair->string();
-
-		if(is_const)
-			result = "const " + result;
-
-		if(is_static)
-			result = "static " + result;
-
-		if(value)
-			result += " = " + value->string();
-
-		return wrap(result);
-	}
-
-	std::string ParamNode::string()
-	{
-		return wrap(pair.string());
-	}
-
-	std::string FuncHeadNode::string()
-	{
-		std::string result = pair->string() + "(";
-
-		if(is_native)
-			result = "native " + result;
-
-		if(is_static)
-			result = "static " + result;
-
-		result += params.join(", ") + ")";
-
-		return wrap(result);
-	}
-
-	std::string PrototypeNode::string()
-	{
-		return wrap(head->string());
-	}
-
-	std::string FuncNode::string()
-	{
-		return wrap(head->string() + "\n" + body->indent_string(0));
-	}
-
-	/*
-	 * Statements
-	 */
-
-	std::string Block::indent_string(size_t indent)
-	{
-		std::string indentation;
-
-		for(size_t i = 0; i < indent; i++)
-			indentation += "\t";
-
-		std::string result = indentation + "{\n";
-
-		Node::Type prev = Node::NONE;
-
-		for(StatementList::Iterator i = statements.begin(); i; i++)
+		switch(node->get_type())
 		{
-			Node::Type type = (*i)->get_type();
+			/*
+			 * Globals
+			 */
 
-			if(prev != Node::NONE && !(prev == type && ((*i)->use_semi() || type == Node::LOCAL_NODE)))
-				result += "\n";
+			case Node::PAIR_NODE:
+			{
+				PairNode *target = (PairNode *)node;
 
-			prev = type;
+				return print_node(target->type) + " " + print_string(target->name);
+			}
 
-			result += indentation + "\t" + (*i)->indent_string(indent + 1);
+			case Node::FIELD_NODE:
+			{
+				FieldNode *target = (FieldNode *)node;
 
-			if((*i)->use_semi())
-				result += ";";
+				return print_node(&target->pair);
+			}
 
-			result += "\n";
+			case Node::STRUCT_NODE:
+			{
+				StructNode *target = (StructNode *)node;
+
+				return "struct " + print_string(target->symbol->name) + "\n{\n" + join(&target->fields, "\t", ";\n") + "}";
+			}
+
+			case Node::TYPEDEF_NODE:
+			{
+				TypedefNode *target = (TypedefNode *)node;
+
+				return "typedef " + print_node(target->pair);
+			}
+
+			case Node::GLOBAL_NODE:
+			{
+				GlobalNode *target = (GlobalNode *)node;
+
+				std::string result = print_node(target->pair);
+
+				if(target->is_const)
+					result = "const " + result;
+
+				if(target->is_static)
+					result = "static " + result;
+
+				if(target->value)
+					result += " = " + print_node(target->value);
+
+				return result;
+			}
+
+			case Node::PARAM_NODE:
+			{
+				ParamNode *target = (ParamNode *)node;
+
+				return print_node(&target->pair);
+			}
+
+			case Node::FUNC_HEAD_NODE:
+			{
+				FuncHeadNode *target = (FuncHeadNode *)node;
+
+				std::string result = print_node(target->pair) + "(";
+
+				if(target->is_native)
+					result = "native " + result;
+
+				if(target->is_static)
+					result = "static " + result;
+
+				result += join(&target->params, ", ") + ")";
+
+				return result;
+			}
+
+			case Node::PROTOTYPE_NODE:
+			{
+				PrototypeNode *target = (PrototypeNode *)node;
+
+				return print_node(target->head);
+			}
+
+			case Node::FUNC_NODE:
+			{
+				FuncNode *target = (FuncNode *)node;
+
+				return print_node(target->head) + "\n" + print_node(target->body);
+			}
+
+			/*
+			 * Statements
+			 */
+
+			case Node::BLOCK_NODE:
+			{
+				Block *target = (Block *)node;
+
+				std::string indentation;
+
+				for(size_t i = 0; i < indent; i++)
+					indentation += "\t";
+
+				std::string result = indentation + "{\n";
+
+				Node::Type prev = Node::NONE;
+
+				for(StatementList::Iterator i = target->statements.begin(); i; i++)
+				{
+					Node::Type type = (*i)->get_type();
+
+					if(prev != Node::NONE && !(prev == type && (*i)->use_semi()))
+						result += "\n";
+
+					prev = type;
+
+					result += indentation + "\t" + print_node(*i, indent + 1);
+
+					if((*i)->use_semi())
+						result += ";";
+
+					result += "\n";
+				}
+
+				return result + indentation + "}";
+			}
+
+			case Node::IF_NODE:
+			{
+				IfNode *target = (IfNode *)node;
+
+				std::string result = "if(" + print_node(target->condition) + ")\n" + print_node(target->do_true, indent);
+
+				if(target->do_false)
+					result += "else\n" + print_node(target->do_false, indent);
+
+				return result;
+			}
+
+			case Node::WHILE_NODE:
+			{
+				WhileNode *target = (WhileNode *)node;
+
+				return "while(" + print_node(target->condition) + ")\n" + print_node(target->body, indent);
+			}
+
+			case Node::DO_NODE:
+			{
+				DoNode *target = (DoNode *)node;
+
+				return "do\n" + print_node(target->body, indent) + "while(" + print_node(target->condition) + ")";
+			}
+
+			case Node::RETURN_NODE:
+			{
+				ReturnNode *target = (ReturnNode *)node;
+
+				return "return " + print_node(target->value);
+			}
+
+			case Node::BREAK_NODE:
+				return "break";
+
+			case Node::CONTINUE_NODE:
+				return "continue";
+
+			case Node::LOCAL_NODE:
+			{
+				LocalNode *target = (LocalNode *)node;
+
+				std::string result = print_node(target->type) + " " + print_string(target->name);
+
+				if(target->is_const)
+					result = "const " + result;
+
+				if(target->value)
+					result += " = " + print_node(target->value);
+
+				return result;
+			}
+
+			/*
+			 * Expressions
+			 */
+
+			case Node::IDENT_NODE:
+			{
+				IdentNode *target = (IdentNode *)node;
+
+				return print_string(target->ident);
+			}
+
+			case Node::BINARY_OP_NODE:
+			{
+				BinaryOpNode *target = (BinaryOpNode *)node;
+
+				return print_node(target->left) + " " + Lexeme::names[target->op] + " " + print_node(target->right);
+			}
+
+			case Node::UNARY_OP_NODE:
+			{
+				UnaryOpNode *target = (UnaryOpNode *)node;
+
+				return Lexeme::names[target->op] + print_node(target->value);
+			}
+
+			case Node::ARRAY_SUBSCRIPT_NODE:
+			{
+				ArraySubscriptNode *target = (ArraySubscriptNode *)node;
+
+				return "[" + print_node(target->index) + "]";
+			}
+
+			case Node::ARRAY_DEF_NODE:
+			{
+				ArrayDefNode *target = (ArrayDefNode *)node;
+
+				std::string result;
+
+				for(ExpressionList::Iterator i = target->sizes.begin(); i; i++)
+					result += "[" + print_node(*i) + "]";
+
+				return result;
+			}
+
+			case Node::MEMBER_REF_NODE:
+			{
+				MemberRefNode *target = (MemberRefNode *)node;
+
+				if(target->by_ptr)
+					return "->" + print_string(target->name);
+				else
+					return "." + print_string(target->name);
+			}
+
+			case Node::FACTOR_CHAIN_NODE:
+			{
+				FactorChainNode *target = (FactorChainNode *)node;
+
+				return print_node(target->factor) + join(&target->chain, "");
+			}
+
+			case Node::INT_NODE:
+			{
+				IntegerNode *target = (IntegerNode *)node;
+
+				std::stringstream out;
+				out << target->value;
+				return out.str();
+			}
+
+			case Node::STRING_NODE:
+			{
+				StringNode *target = (StringNode *)node;
+
+				return "\"" + print_string(target->value) + "\"";
+			}
+
+			case Node::FIXED_NODE:
+			{
+				FixedNode *target = (FixedNode *)node;
+
+				std::stringstream out;
+				out << target->value;
+				return out.str();
+			}
+
+			case Node::BOOL_NODE:
+			{
+				BooleanNode *target = (BooleanNode *)node;
+
+				if(target->value)
+					return "true";
+				else
+					return "false";
+			}
+
+			case Node::NULL_NODE:
+				return "null";
+
+			case Node::CALL_NODE:
+			{
+				CallNode *target = (CallNode *)node;
+
+				return print_node(target->ident) + "(" + join(&target->arguments, ", ") + ")";
+			}
+
+			/*
+			 * Types
+			 */
+
+			case Node::TYPE_POINTER_NODE:
+			{
+				TypePointerNode *target = (TypePointerNode *)node;
+
+				return print_node(target->base) + "*";
+			}
+
+			case Node::TYPE_ARRAY_NODE:
+			{
+				TypeArrayNode *target = (TypeArrayNode *)node;
+
+				return print_node(target->base) + "[" + print_node(target->size) + "]";
+			}
+
+			case Node::TYPE_BASE_NODE:
+			{
+				TypeBaseNode *target = (TypeBaseNode *)node;
+
+				return print_string(target->type);
+			}
+
+			default:
+				return "<unknown>";
 		}
-
-		return wrap(result + indentation + "}");
 	}
 
-	std::string IfNode::indent_string(size_t indent)
-	{
-		std::string result = "if(" + condition->string() + ")\n" + do_true->indent_string(indent);
-
-		if(do_false)
-			result += "else\n" + do_false->indent_string(indent);
-
-		return wrap(result);
-	}
-
-	std::string WhileNode::indent_string(size_t indent)
-	{
-		return wrap("while(" + condition->string() + ")\n" + body->indent_string(indent));
-	}
-
-	std::string DoNode::indent_string(size_t indent)
-	{
-		return wrap("do\n" + body->indent_string(indent) + "while(" + condition->string() + ")\n");
-	}
-
-	std::string ReturnNode::string()
-	{
-		return wrap("return " + value->string());
-	}
-
-	std::string BreakNode::string()
-	{
-		return wrap("break");
-	}
-
-	std::string ContinueNode::string()
-	{
-		return wrap("continue");
-	}
-
-	std::string LocalNode::string()
-	{
-		std::string result = type->string() + " " + name->string();
-
-		if(is_const)
-			result = "const " + result;
-
-		if(value)
-			result += " = " + value->string();
-
-		return wrap(result);
-	}
-
-	/*
-	 * Expressions
-	 */
-
-	std::string IdentNode::string()
-	{
-		return wrap(ident->string());
-	}
-
-	std::string BinaryOpNode::string()
-	{
-		return wrap(left->string() + " " + Lexeme::names[op] + " " + right->string());
-	}
-
-	std::string UnaryOpNode::string()
-	{
-		return wrap(Lexeme::names[op] + value->string());
-	}
-
-	std::string ArraySubscriptNode::string()
-	{
-		return wrap("[" + index->string() + "]");
-	}
-
-	std::string ArrayDefNode::string()
-	{
-		std::string result;
-
-		for(ExpressionList::Iterator i = sizes.begin(); i; i++)
-			result += "[" + (*i)->string() + "]";
-
-		return wrap(result);
-	}
-
-	std::string MemberRefNode::string()
-	{
-		if(by_ptr)
-			return wrap("->" + name->string());
-		else
-			return wrap("." + name->string());
-	}
-
-	std::string FactorChainNode::string()
-	{
-		return wrap(factor->string() + chain.join(""));
-	}
-
-	std::string IntegerNode::string()
-	{
-		std::stringstream out;
-		out << value;
-		return wrap(out.str());
-	}
-
-	std::string StringNode::string()
-	{
-		return wrap("\"" + value->string() + "\"");
-	}
-
-	std::string FixedNode::string()
-	{
-		std::stringstream out;
-		out << value;
-		return wrap(out.str());
-	}
-
-	std::string BooleanNode::string()
-	{
-		if(value)
-			return wrap("true");
-		else
-			return wrap("false");
-	}
-
-	std::string NullNode::string()
-	{
-		return wrap("null");
-	}
-
-	std::string CallNode::string()
-	{
-		return wrap(ident->string() + "(" + arguments.join(", ") + ")");
-	}
-
-	/*
-	 * Types
-	 */
-
-	std::string TypeNode::string()
-	{
-		return wrap(base->string());
-	}
-
-	std::string TypePointerNode::string()
-	{
-		return wrap(base->string() + " *");
-	}
-
-	std::string TypeArrayNode::string()
-	{
-		return wrap(base->string() + "[" + size->string() + "]");
-	}
-
-	std::string TypeBaseNode::string()
-	{
-		return wrap(type->string());
-	}
+	#ifdef AST_DEBUG
+		std::string DebugPrinter::wrap(Node *node, std::string result)
+		{
+			const std::type_info &info = typeid(*node);
+	 
+			std::string name = info.name();
+	 
+			return "(" + name.substr(name.find("::") + 2) + ": " +  result + ")";
+		}	
+	#endif
 };

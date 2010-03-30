@@ -4,7 +4,9 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <typeinfo>
+#ifdef AST_DEBUG
+	#include <typeinfo>
+#endif
 #include <string.h>
 #include <malloc.h>
 #include <assert.h>

@@ -44,7 +44,9 @@ void process_file(std::string file)
 			std::cout << "Parsed file '" << file << "' in " << (((double)1000 * (stop - start)) / (double)freq) << " ms." << std::endl;
 		#endif
 
-		std::cout << pretty_print(&doc.tree);
+		Printer printer;
+
+		std::cout << printer.print(&doc.tree);
 
 		for(std::vector<std::string>::iterator i = doc.includes.begin(); i != doc.includes.end(); ++i)
 			include(*i);

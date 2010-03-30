@@ -15,8 +15,6 @@ namespace Legion
 		TypeNode() : base(0) {}
 		
 		TypeNode *base;
-
-		std::string string();
 	};
 	
 	struct TypePointerNode:
@@ -24,7 +22,10 @@ namespace Legion
 	{
 		TypeNode *base;
 
-		std::string string();
+		Type get_type()
+		{
+			return Node::TYPE_POINTER_NODE;
+		}
 	};
 	
 	struct TypeArrayNode:
@@ -33,7 +34,10 @@ namespace Legion
 		TypeNode *base;
 		ExpressionNode *size;
 
-		std::string string();
+		Type get_type()
+		{
+			return Node::TYPE_ARRAY_NODE;
+		}
 	};
 
 	struct TypeBaseNode:
@@ -41,7 +45,10 @@ namespace Legion
 	{
 		String *type;
 		
-		std::string string();
+		Type get_type()
+		{
+			return Node::TYPE_BASE_NODE;
+		}
 	};
 	
 	class Type

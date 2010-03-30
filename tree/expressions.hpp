@@ -31,8 +31,6 @@ namespace Legion
 	{
 		String *ident;
 
-		std::string string();
-
 		Type get_type()
 		{
 			return Node::IDENT_NODE;
@@ -71,8 +69,6 @@ namespace Legion
 				return false;
 		};
 
-		std::string string();
-
 		Type get_type()
 		{
 			return Node::BINARY_OP_NODE;
@@ -85,8 +81,6 @@ namespace Legion
 		Lexeme::Type op;
 		ExpressionNode *value;
 		
-		std::string string();
-
 		Type get_type()
 		{
 			return Node::UNARY_OP_NODE;
@@ -98,8 +92,6 @@ namespace Legion
 	{
 		ExpressionNode *index;
 
-		std::string string();
-
 		Type get_type()
 		{
 			return Node::ARRAY_SUBSCRIPT_NODE;
@@ -110,8 +102,6 @@ namespace Legion
 		public ExpressionNode
 	{
 		ExpressionList sizes;
-
-		std::string string();
 
 		Type get_type()
 		{
@@ -125,8 +115,6 @@ namespace Legion
 		String *name;
 		bool by_ptr;
 
-		std::string string();
-
 		Type get_type()
 		{
 			return Node::MEMBER_REF_NODE;
@@ -139,8 +127,6 @@ namespace Legion
 		ExpressionNode *factor;
 		ExpressionList chain;
 
-		std::string string();
-
 		Type get_type()
 		{
 			return Node::FACTOR_CHAIN_NODE;
@@ -151,8 +137,6 @@ namespace Legion
 		public ExpressionNode
 	{
 		int value;
-
-		std::string string();
 
 		Type get_type()
 		{
@@ -165,8 +149,6 @@ namespace Legion
 	{
 		String *value;
 
-		std::string string();
-
 		Type get_type()
 		{
 			return Node::STRING_NODE;
@@ -177,8 +159,6 @@ namespace Legion
 		public ExpressionNode
 	{
 		double value;
-
-		std::string string();
 
 		Type get_type()
 		{
@@ -191,8 +171,6 @@ namespace Legion
 	{
 		bool value;
 
-		std::string string();
-
 		Type get_type()
 		{
 			return Node::BOOL_NODE;
@@ -202,8 +180,6 @@ namespace Legion
 	struct NullNode:
 		public ExpressionNode
 	{
-		std::string string();
-
 		Type get_type()
 		{
 			return Node::NULL_NODE;
@@ -215,8 +191,6 @@ namespace Legion
 	{
 		IdentNode *ident;
 		ExpressionList arguments;
-
-		std::string string();
 
 		Type get_type()
 		{

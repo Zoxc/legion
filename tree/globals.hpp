@@ -33,7 +33,10 @@ namespace Legion
 		String *name;
 		Range range;
 
-		std::string string();
+		Node::Type get_type()
+		{
+			return PAIR_NODE;
+		}
 	};
 
 	
@@ -42,7 +45,10 @@ namespace Legion
 	{
 		PairNode pair;
 
-		std::string string();
+		Node::Type get_type()
+		{
+			return FIELD_NODE;
+		}
 	};
 	
 	struct StructNode:
@@ -55,8 +61,6 @@ namespace Legion
 		{
 			return STRUCT_NODE;
 		}
-
-		std::string string();
 	};
 	
 	struct TypedefNode:
@@ -71,8 +75,6 @@ namespace Legion
 		{
 			return TYPEDEF_NODE;
 		}
-
-		std::string string();
 	};
 	
 	struct GlobalNode:
@@ -90,8 +92,6 @@ namespace Legion
 		{
 			return GLOBAL_NODE;
 		}
-
-		std::string string();
 	};
 	
 	struct ParamNode:
@@ -99,7 +99,11 @@ namespace Legion
 	{
 		PairNode pair;
 
-		std::string string();
+		Node::Type get_type()
+		{
+			return PARAM_NODE;
+		}
+
 	};
 		
 	struct FuncHeadNode:
@@ -113,7 +117,10 @@ namespace Legion
 		FuncSymbol *symbol;
 		NodeList<ParamNode> params;
 
-		std::string string();
+		Node::Type get_type()
+		{
+			return FUNC_HEAD_NODE;
+		}
 	};
 	
 	struct PrototypeNode:
@@ -125,8 +132,6 @@ namespace Legion
 		{
 			return PROTOTYPE_NODE;
 		}
-
-		std::string string();
 	};
 	
 	struct Block;
@@ -154,7 +159,5 @@ namespace Legion
 		{
 			return FUNC_NODE;
 		}
-
-		std::string string();
 	};
 };
