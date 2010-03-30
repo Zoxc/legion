@@ -1,6 +1,7 @@
 #include "common.hpp"
 #include "compiler.hpp"
 #include "document.hpp"
+#include "tree/printer.hpp"
 
 using namespace Legion;
 
@@ -43,7 +44,7 @@ void process_file(std::string file)
 			std::cout << "Parsed file '" << file << "' in " << (((double)1000 * (stop - start)) / (double)freq) << " ms." << std::endl;
 		#endif
 
-		std::cout << doc.tree.join("", ";\n");
+		std::cout << pretty_print(&doc.tree);
 
 		for(std::vector<std::string>::iterator i = doc.includes.begin(); i != doc.includes.end(); ++i)
 			include(*i);

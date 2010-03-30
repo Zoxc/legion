@@ -31,14 +31,11 @@ namespace Legion
 	{
 		String *ident;
 
+		std::string string();
+
 		Type get_type()
 		{
 			return Node::IDENT_NODE;
-		}
-
-		std::string string()
-		{
-			return wrap(ident->string());
 		}
 	};
 
@@ -74,9 +71,11 @@ namespace Legion
 				return false;
 		};
 
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			return wrap(left->string() + " " + Lexeme::names[op] + " " + right->string());
+			return Node::BINARY_OP_NODE;
 		}
 	};
 
@@ -86,9 +85,11 @@ namespace Legion
 		Lexeme::Type op;
 		ExpressionNode *value;
 		
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			return wrap(Lexeme::names[op] + value->string());
+			return Node::UNARY_OP_NODE;
 		}
 	};
 
@@ -97,9 +98,11 @@ namespace Legion
 	{
 		ExpressionNode *index;
 
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			return wrap("[" + index->string() + "]");
+			return Node::ARRAY_SUBSCRIPT_NODE;
 		}
 	};
 
@@ -108,14 +111,11 @@ namespace Legion
 	{
 		ExpressionList sizes;
 
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			std::string result;
-
-			for(ExpressionList::Iterator i = sizes.begin(); i; i++)
-				result += "[" + (*i)->string() + "]";
-
-			return wrap(result);
+			return Node::ARRAY_DEF_NODE;
 		}
 	};
 
@@ -125,12 +125,11 @@ namespace Legion
 		String *name;
 		bool by_ptr;
 
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			if(by_ptr)
-				return wrap("->" + name->string());
-			else
-				return wrap("." + name->string());
+			return Node::MEMBER_REF_NODE;
 		}
 	};
 
@@ -140,9 +139,11 @@ namespace Legion
 		ExpressionNode *factor;
 		ExpressionList chain;
 
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			return wrap(factor->string() + chain.join(""));
+			return Node::FACTOR_CHAIN_NODE;
 		}
 	};
 
@@ -151,11 +152,11 @@ namespace Legion
 	{
 		int value;
 
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			std::stringstream out;
-			out << value;
-			return wrap(out.str());
+			return Node::INT_NODE;
 		}
 	};
 
@@ -164,9 +165,11 @@ namespace Legion
 	{
 		String *value;
 
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			return wrap("\"" + value->string() + "\"");
+			return Node::STRING_NODE;
 		}
 	};
 
@@ -175,11 +178,11 @@ namespace Legion
 	{
 		double value;
 
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			std::stringstream out;
-			out << value;
-			return wrap(out.str());
+			return Node::FIXED_NODE;
 		}
 	};
 
@@ -188,21 +191,22 @@ namespace Legion
 	{
 		bool value;
 
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			if(value)
-				return wrap("true");
-			else
-				return wrap("false");
+			return Node::BOOL_NODE;
 		}
 	};
 
 	struct NullNode:
 		public ExpressionNode
 	{
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			return wrap("null");
+			return Node::NULL_NODE;
 		}
 	};
 
@@ -212,9 +216,11 @@ namespace Legion
 		IdentNode *ident;
 		ExpressionList arguments;
 
-		std::string string()
+		std::string string();
+
+		Type get_type()
 		{
-			return wrap(ident->string() + "(" + arguments.join(", ") + ")");
+			return Node::CALL_NODE;
 		}
 	};
 

@@ -24,9 +24,9 @@ namespace Legion
 			return 0;
 		}
 
-		virtual bool use_semi()
+		virtual std::string indent_string(size_t indent)
 		{
-			return true;
+			return string();
 		}
 	};
 
@@ -49,21 +49,11 @@ namespace Legion
 			return false;
 		}
 
-		std::string string()
+		std::string indent_string(size_t indent);
+
+		Node::Type get_type()
 		{
-			std::string result = "{\n";
-
-			for(StatementList::Iterator i = statements.begin(); i; i++)
-			{
-				result += "    " + (*i)->string();
-
-				if((*i)->use_semi())
-					result += ";\n";
-				else
-					result += "\n";
-			}
-
-			return result + "}";
+			return BLOCK_NODE;
 		}
 	};
 
@@ -85,7 +75,12 @@ namespace Legion
 		Block *do_true;
 		Block *do_false;
 
-		std::string string();
+		std::string indent_string(size_t ident);
+
+		Node::Type get_type()
+		{
+			return IF_NODE;
+		}
 	};
 	
 	struct WhileNode:
@@ -96,7 +91,12 @@ namespace Legion
 		ExpressionNode *condition;
 		Block *body;
 		
-		std::string string();
+		std::string indent_string(size_t ident);
+
+		Node::Type get_type()
+		{
+			return WHILE_NODE;
+		}
 	};
 	
 	struct DoNode:
@@ -107,7 +107,12 @@ namespace Legion
 		Block *body;
 		ExpressionNode *condition;
 		
-		std::string string();
+		std::string indent_string(size_t ident);
+
+		Node::Type get_type()
+		{
+			return DO_NODE;
+		}
 	};
 
 	struct ReturnNode:
@@ -116,23 +121,32 @@ namespace Legion
 		ExpressionNode *value;
 
 		std::string string();
+
+		Node::Type get_type()
+		{
+			return RETURN_NODE;
+		}
 	};
 
 	struct BreakNode:
 		public StatementNode
 	{
-		std::string string()
+		std::string string();
+
+		Node::Type get_type()
 		{
-			return wrap("break");
+			return BREAK_NODE;
 		}
 	};
 
 	struct ContinueNode:
 		public StatementNode
 	{
-		std::string string()
+		std::string string();
+
+		Node::Type get_type()
 		{
-			return wrap("continue");
+			return CONTINUE_NODE;
 		}
 	};
 
@@ -143,6 +157,11 @@ namespace Legion
 		String *name;
 		ExpressionNode *value;
 		bool is_const;
+
+		Node::Type get_type()
+		{
+			return LOCAL_NODE;
+		}
 
 		std::string string();
 	};

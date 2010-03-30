@@ -16,10 +16,7 @@ namespace Legion
 		
 		TypeNode *base;
 
-		std::string string()
-		{
-			return wrap(base->string());
-		}
+		std::string string();
 	};
 	
 	struct TypePointerNode:
@@ -27,10 +24,7 @@ namespace Legion
 	{
 		TypeNode *base;
 
-		std::string string()
-		{
-			return wrap(base->string() + " *");
-		}
+		std::string string();
 	};
 	
 	struct TypeArrayNode:

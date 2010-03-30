@@ -11,12 +11,45 @@ namespace Legion
 		enum Type
 		{
 			NONE,
-			IDENT_NODE
+
+			STRUCT_NODE,
+			TYPEDEF_NODE,
+			GLOBAL_NODE,
+			PROTOTYPE_NODE,
+			FUNC_NODE,
+
+			BLOCK_NODE,
+			IF_NODE,
+			WHILE_NODE,
+			DO_NODE,
+			RETURN_NODE,
+			BREAK_NODE,
+			CONTINUE_NODE,
+			LOCAL_NODE,
+
+			IDENT_NODE,
+			BINARY_OP_NODE,
+			UNARY_OP_NODE,
+			ARRAY_SUBSCRIPT_NODE,
+			ARRAY_DEF_NODE,
+			MEMBER_REF_NODE,
+			FACTOR_CHAIN_NODE,
+			INT_NODE,
+			STRING_NODE,
+			FIXED_NODE,
+			BOOL_NODE,
+			NULL_NODE,
+			CALL_NODE
 		};
 
 		virtual Type get_type()
 		{
 			return NONE;
+		}
+
+		virtual bool use_semi()
+		{
+			return true;
 		}
 
 		virtual std::string string();

@@ -254,6 +254,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\tree\printer.hpp"
+				>
+			</File>
+			<File
 				RelativePath=".\tree\scope.cpp"
 				>
 			</File>

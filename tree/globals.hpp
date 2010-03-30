@@ -33,10 +33,7 @@ namespace Legion
 		String *name;
 		Range range;
 
-		std::string string()
-		{
-			return wrap(type->string() + " " + name->string());
-		}
+		std::string string();
 	};
 
 	
@@ -45,10 +42,7 @@ namespace Legion
 	{
 		PairNode pair;
 
-		std::string string()
-		{
-			return wrap(pair.string());
-		}
+		std::string string();
 	};
 	
 	struct StructNode:
@@ -57,10 +51,12 @@ namespace Legion
 		TypeSymbol *symbol;
 		NodeList<FieldNode> fields;
 
-		std::string string()
+		Node::Type get_type()
 		{
-			return wrap("struct " + symbol->name->string() + "\n{\n" + fields.join("    ", ";\n") + "}");
+			return STRUCT_NODE;
 		}
+
+		std::string string();
 	};
 	
 	struct TypedefNode:
@@ -71,10 +67,12 @@ namespace Legion
 		PairNode *pair;
 		TypeSymbol *symbol;
 
-		std::string string()
+		Node::Type get_type()
 		{
-			return wrap("typedef " + pair->string());
+			return TYPEDEF_NODE;
 		}
+
+		std::string string();
 	};
 	
 	struct GlobalNode:
@@ -88,21 +86,12 @@ namespace Legion
 		VarSymbol *symbol;
 		ExpressionNode *value;
 
-		std::string string()
+		Node::Type get_type()
 		{
-			std::string result = pair->string();
-
-			if(is_const)
-				result = "const " + result;
-
-			if(is_static)
-				result = "static " + result;
-
-			if(value)
-				result += " = " + value->string();
-
-			return wrap(result);
+			return GLOBAL_NODE;
 		}
+
+		std::string string();
 	};
 	
 	struct ParamNode:
@@ -110,10 +99,7 @@ namespace Legion
 	{
 		PairNode pair;
 
-		std::string string()
-		{
-			return wrap(pair.string());
-		}
+		std::string string();
 	};
 		
 	struct FuncHeadNode:
@@ -127,20 +113,7 @@ namespace Legion
 		FuncSymbol *symbol;
 		NodeList<ParamNode> params;
 
-		std::string string()
-		{
-			std::string result = pair->string() + "(";
-
-			if(is_native)
-				result = "native " + result;
-
-			if(is_static)
-				result = "static " + result;
-
-			result += params.join(", ") + ")";
-
-			return wrap(result);
-		}
+		std::string string();
 	};
 	
 	struct PrototypeNode:
@@ -148,10 +121,12 @@ namespace Legion
 	{
 		FuncHeadNode *head;
 
-		std::string string()
+		Node::Type get_type()
 		{
-			return wrap(head->string());
+			return PROTOTYPE_NODE;
 		}
+
+		std::string string();
 	};
 	
 	struct Block;
@@ -170,9 +145,16 @@ namespace Legion
 			return false;
 		}
 
-		std::string string()
+		bool use_semi()
 		{
-			return wrap(head->string() + "\n" + body->string());
+			return false;
 		}
+
+		Node::Type get_type()
+		{
+			return FUNC_NODE;
+		}
+
+		std::string string();
 	};
 };
