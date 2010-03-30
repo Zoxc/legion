@@ -10,7 +10,11 @@ namespace Legion
 
 	std::string Node::wrap(std::string string)
 	{
-		return string;
+		const std::type_info &info = typeid(*this);
+
+		std::string name = info.name();
+
+		return "(" + name.substr(name.find("::") + 2) + ": " +  string + ")";
 	}
 
 	std::string IfNode::string()
