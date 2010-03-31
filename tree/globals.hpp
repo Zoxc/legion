@@ -87,6 +87,7 @@ namespace Legion
 		bool is_static;
 		VarSymbol *symbol;
 		ExpressionNode *value;
+		bool has_value;
 
 		Node::Type get_type()
 		{

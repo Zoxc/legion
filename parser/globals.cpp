@@ -89,9 +89,12 @@ namespace Legion
 			pair->range.report(document, "Global can not be natives");
 		
 		if(matches(Lexeme::ASSIGN))
+		{
+			global->has_value = true;
 			global->value = parse_expression();
+		}
 		else
-			global->value = 0;
+			global->has_value = false;
 		
 		match(Lexeme::SEMICOLON);
 	}

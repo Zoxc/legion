@@ -138,7 +138,7 @@ namespace Legion
 				if(target->is_static)
 					result = "static " + result;
 
-				if(target->value)
+				if(target->has_value)
 					result += " = " + print_node(target->value);
 
 				return result;
@@ -246,7 +246,10 @@ namespace Legion
 			{
 				ReturnNode *target = (ReturnNode *)node;
 
-				return "return " + print_node(target->value);
+				if(target->has_value)
+					return "return " + print_node(target->value);
+				else
+					return "return";
 			}
 
 			case Node::BREAK_NODE:
@@ -264,7 +267,7 @@ namespace Legion
 				if(target->is_const)
 					result = "const " + result;
 
-				if(target->value)
+				if(target->has_value)
 					result += " = " + print_node(target->value);
 
 				return result;

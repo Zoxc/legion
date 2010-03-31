@@ -24,9 +24,12 @@ namespace Legion
 		node->is_const = is_const;
 
 		if(matches(Lexeme::ASSIGN))
+		{
+			node->has_value = true;
 			node->value = parse_expression();
+		}
 		else
-			node->value = 0;
+			node->has_value = false;
 	}
 
 	void Parser::parse_if(StatementList *list)
@@ -76,9 +79,10 @@ namespace Legion
 		step();
 
 		if(matches(Lexeme::SEMICOLON))
-			node->value = 0;
+			node->has_value = false;
 		else
 		{
+			node->has_value = true;
 			node->value = parse_expression();
 			match(Lexeme::SEMICOLON);
 		}
