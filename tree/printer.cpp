@@ -8,7 +8,7 @@ namespace Legion
 	{
 		std::string result;
 
-		for(T::Iterator i = list->begin(); i; i++)
+		for(typename T::Iterator i = list->begin(); i; i++)
 		{
 			result += print_node(*i);
 
@@ -23,8 +23,18 @@ namespace Legion
 	{
 		std::string result;
 
-		for(T::Iterator i = list->begin(); i; i++)
+		for(typename T::Iterator i = list->begin(); i; i++)
 			result += pre + print_node(*i) + post;
+
+		return result;
+	}
+
+	std::string Printer::get_indent(size_t indent)
+	{
+		std::string result;
+
+		for(size_t i = 0; i < indent; i++)
+			result += "\t";
 
 		return result;
 	}
@@ -34,7 +44,7 @@ namespace Legion
 		if(string)
 			return string->string();
 		else
-			return "<null>";
+			return "<null_string>";
 	}
 
 	std::string Printer::wrap(Node *node, std::string result)
@@ -79,6 +89,9 @@ namespace Legion
 
 	std::string Printer::node(Node *node, size_t indent)
 	{
+		if(!node)
+			return "<null_node>";
+
 		switch(node->get_type())
 		{
 			/*
@@ -125,7 +138,7 @@ namespace Legion
 				if(target->is_static)
 					result = "static " + result;
 
-				if(target->value)
+				if(target->has_value)
 					result += " = " + print_node(target->value);
 
 				return result;
@@ -177,10 +190,7 @@ namespace Legion
 			{
 				Block *target = (Block *)node;
 
-				std::string indentation;
-
-				for(size_t i = 0; i < indent; i++)
-					indentation += "\t";
+				std::string indentation = get_indent(indent);
 
 				std::string result = indentation + "{\n";
 
@@ -213,7 +223,7 @@ namespace Legion
 				std::string result = "if(" + print_node(target->condition) + ")\n" + print_node(target->do_true, indent);
 
 				if(target->do_false)
-					result += "else\n" + print_node(target->do_false, indent);
+					result += "\n" + get_indent(indent) + "else\n" + print_node(target->do_false, indent);
 
 				return result;
 			}
@@ -236,7 +246,10 @@ namespace Legion
 			{
 				ReturnNode *target = (ReturnNode *)node;
 
-				return "return " + print_node(target->value);
+				if(target->has_value)
+					return "return " + print_node(target->value);
+				else
+					return "return";
 			}
 
 			case Node::BREAK_NODE:
@@ -254,7 +267,7 @@ namespace Legion
 				if(target->is_const)
 					result = "const " + result;
 
-				if(target->value)
+				if(target->has_value)
 					result += " = " + print_node(target->value);
 
 				return result;

@@ -108,6 +108,7 @@ namespace Legion
 		public StatementNode
 	{
 		ExpressionNode *value;
+		bool has_value;
 
 		Node::Type get_type()
 		{
@@ -139,6 +140,7 @@ namespace Legion
 		ExpressionNode *type;
 		String *name;
 		ExpressionNode *value;
+		bool has_value;
 		bool is_const;
 
 		Node::Type get_type()

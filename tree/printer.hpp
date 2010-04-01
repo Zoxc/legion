@@ -15,6 +15,7 @@ namespace Legion
 			template<class T> std::string join(T *list, std::string pre, std::string post);
 			std::string print_node(Node *node, size_t indent);
 			std::string print_string(String *string);
+			virtual std::string get_indent(size_t indent);
 		public:
 			std::string print_node(Node *node);
 			virtual std::string print(NamespaceList *list);
