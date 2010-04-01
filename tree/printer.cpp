@@ -412,11 +412,16 @@ namespace Legion
 	#ifdef AST_DEBUG
 		std::string DebugPrinter::wrap(Node *node, std::string result)
 		{
-			const std::type_info &info = typeid(*node);
-	 
-			std::string name = info.name();
-	 
-			return "(" + name.substr(name.find("::") + 2) + ": " +  result + ")";
+			if(node)
+				{
+				const std::type_info &info = typeid(*node);
+		 
+				std::string name = info.name();
+		 
+				return "(" + name.substr(name.find("::") + 2) + ": " +  result + ")";
+			}
+			else
+				return result;
 		}	
 	#endif
 };
