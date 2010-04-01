@@ -19,7 +19,7 @@ namespace Legion
 	struct StatementNode:
 		public ListNode
 	{
-		StatementNode *get_declaration()
+		virtual StatementNode *get_declaration(Scope *scope)
 		{
 			return 0;
 		}
@@ -37,8 +37,10 @@ namespace Legion
 		{
 			for(StatementList::Iterator i = statements.begin(); i; i++)
 			{
-				if((*i)->find_declarations(this->scope))
-					i.replace((*i)->get_declaration());
+				StatementNode *node = (*i)->get_declaration(this->scope);
+
+				if(node)
+					i.replace(node);
 			}
 
 			return false;

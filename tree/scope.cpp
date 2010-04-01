@@ -75,6 +75,18 @@ namespace Legion
 		
 		return 0;
 	}
+
+	Symbol *Scope::lookup(String *name)
+	{
+		Symbol *result = get(name);
+
+		if(result)
+			return result;
+		else if(parent)
+			return parent->lookup(name);
+		else
+			return 0;
+	}
 	
 	Symbol *Scope::get(String *name)
 	{

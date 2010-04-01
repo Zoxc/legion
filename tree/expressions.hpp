@@ -13,12 +13,17 @@ namespace Legion
 	struct ExpressionNode:
 		public StatementNode
 	{
-		virtual bool is_type()
+		virtual bool is_declaration_name()
 		{
 			return false;
 		}
 
-		virtual bool is_type_name()
+		virtual bool is_type_name(Scope *scope)
+		{
+			return false;
+		}
+
+		virtual bool is_type_array()
 		{
 			return false;
 		}
@@ -35,6 +40,17 @@ namespace Legion
 		{
 			return Node::IDENT_NODE;
 		}
+
+		bool is_type_name(Scope *scope)
+		{
+			return scope->lookup_type(ident) == Symbol::TYPE;
+		}
+		
+		bool is_declaration_name()
+		{
+			std::cout << "true @ is_declaration_name\n";
+			return true;
+		};
 	};
 
 	struct BinaryOpNode:
@@ -44,29 +60,26 @@ namespace Legion
 		ExpressionNode *right;
 		Lexeme::Type op;
 
-		bool find_declarations(Scope *scope)
+		StatementNode *get_declaration(Scope *scope)
 		{
-			if(op == Lexeme::MUL && left->get_type() == Node::IDENT_NODE)
+			if(op == Lexeme::MUL && right->is_declaration_name() && left->is_type_name(scope))
 			{
-				IdentNode *left = (IdentNode *)this->left;
-				
-				if(scope->get_type(left->ident) != Symbol::TYPE)
-					return false;
-				
-				return right->is_type_name();
-			}
-			else
-				return false;
-		};
+				LocalNode *declaration = new (scope->memory_pool) LocalNode;
 
-		bool is_type_name()
-		{
-			if(op == Lexeme::MUL)
-			{
-				return left->is_type() && right->is_type_name();
+				declaration->is_const = false;
+				declaration->name = 0;
+				declaration->value = 0;
+				declaration->type = 0;
+
+				return declaration;
 			}
 			else
-				return false;
+				return 0;
+		}
+
+		bool is_type_name(Scope *scope)
+		{
+			return op == Lexeme::MUL && left->is_type_name(scope) && right->is_type_array();
 		};
 
 		Type get_type()
@@ -85,6 +98,22 @@ namespace Legion
 		{
 			return Node::UNARY_OP_NODE;
 		}
+
+		bool is_declaration_name()
+		{
+			if(op == Lexeme::MUL)
+				return value->is_declaration_name();
+			else
+				return false;
+		};
+
+		bool is_type_array()
+		{
+			if(op == Lexeme::MUL)
+				return value->is_type_array();
+			else
+				return false;
+		};
 	};
 
 	struct ArraySubscriptNode:
@@ -107,6 +136,11 @@ namespace Legion
 		{
 			return Node::ARRAY_DEF_NODE;
 		}
+
+		bool is_type_array()
+		{
+			return true;
+		};
 	};
 
 	struct MemberRefNode:
@@ -131,6 +165,20 @@ namespace Legion
 		{
 			return Node::FACTOR_CHAIN_NODE;
 		}
+
+		bool is_type_name(Scope *scope)
+		{
+			if(!factor->is_type_name(scope))
+				return false;
+
+			for(ExpressionList::Iterator i = chain.begin(); i; i++)
+			{
+				if((*i)->get_type() != Node::ARRAY_SUBSCRIPT_NODE)
+					return false;
+			}
+
+			return true;
+		};
 	};
 
 	struct IntegerNode:

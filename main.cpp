@@ -26,6 +26,8 @@ void include(std::string file)
 
 void process_file(std::string file)
 {
+	DebugPrinter printer;
+
 	Document doc(&compiler, file);
 
 	#ifdef WIN32
@@ -36,17 +38,17 @@ void process_file(std::string file)
 
 	if(doc.parse())
 	{
+		std::cout << printer.print(&doc.tree);
+
 		doc.find_declarations();
+		
+		std::cout << printer.print(&doc.tree);
 
 		#ifdef WIN32
 			QueryPerformanceCounter((LARGE_INTEGER *)&stop);
 
 			std::cout << "Parsed file '" << file << "' in " << (((double)1000 * (stop - start)) / (double)freq) << " ms." << std::endl;
 		#endif
-
-		Printer printer;
-
-		std::cout << printer.print(&doc.tree);
 
 		for(std::vector<std::string>::iterator i = doc.includes.begin(); i != doc.includes.end(); ++i)
 			include(*i);

@@ -40,11 +40,12 @@ namespace Legion
 			Scope *parent;
 			
 			Symbol *get(String *name);
+			Symbol *lookup(String *name);
 			Symbol *set(String *name, Symbol *symbol);
 
-			Symbol::Type get_type(String *name)
+			Symbol::Type lookup_type(String *name)
 			{
-				Symbol *symbol = get(name);
+				Symbol *symbol = lookup(name);
 
 				if(!symbol)
 					return Symbol::NONE;
@@ -54,8 +55,16 @@ namespace Legion
 
 			Symbol *declare_symbol(Symbol *symbol)
 			{
-				if(type == LOOP)
-					return parent->declare_symbol(symbol);
+				switch(type)
+				{
+					case LOOP:
+					case CONDITIONAL:
+					case EMPTY:
+						return parent->declare_symbol(symbol);
+
+					default:
+						break;
+				}
 				
 				if(!symbol)
 					return 0;
