@@ -143,10 +143,10 @@ namespace Legion
 		FuncHeadNode *head;
 		Block *body;
 
-		bool find_declarations(Scope *scope)
+		bool find_declarations(Document *document)
 		{
 			if(body)
-				body->find_declarations(scope);
+				body->find_declarations(document);
 
 			return false;
 		}

@@ -107,7 +107,7 @@ namespace Legion
 			
 			static std::string names[TYPES];
 			
-			std::string describe()
+			static std::string describe(Range *range, Type type)
 			{
 				std::string result;
 				
@@ -116,13 +116,18 @@ namespace Legion
 				else if(type >= KW_INCLUDE && type < END)
 					result = "'" + names[type] + "' (keyword)";
 				else if(type == IDENT)
-					result = "'" + string() + "' (identifier)";
+					result = "'" + range->string() + "' (identifier)";
 				else
-					result = string() + " (" + names[type] + ")";
+					result = range->string() + " (" + names[type] + ")";
 				
 				return result;
 			}
 			
+			std::string describe()
+			{
+				return describe(this, this->type);
+			}
+
 			static std::string describe_type(Type type)
 			{
 				std::string result;

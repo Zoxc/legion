@@ -19,7 +19,7 @@ namespace Legion
 	struct StatementNode:
 		public ListNode
 	{
-		virtual StatementNode *get_declaration(Scope *scope)
+		virtual StatementNode *get_declaration(Document *document)
 		{
 			return 0;
 		}
@@ -33,18 +33,7 @@ namespace Legion
 		StatementList statements;
 		Scope *scope;
 
-		bool find_declarations(Scope *scope)
-		{
-			for(StatementList::Iterator i = statements.begin(); i; i++)
-			{
-				StatementNode *node = (*i)->get_declaration(this->scope);
-
-				if(node)
-					i.replace(node);
-			}
-
-			return false;
-		}
+		bool find_declarations(Document *document);
 
 		Node::Type get_type()
 		{
@@ -137,8 +126,9 @@ namespace Legion
 	struct LocalNode:
 		public StatementNode
 	{
-		ExpressionNode *type;
-		String *name;
+		ExpressionNode *type_expression;
+		TypeNode *type;
+		VarSymbol *symbol;
 		ExpressionNode *value;
 		bool has_value;
 		bool is_const;
@@ -147,5 +137,7 @@ namespace Legion
 		{
 			return LOCAL_NODE;
 		}
+
+		StatementNode *get_declaration(Document *document);
 	};
 };

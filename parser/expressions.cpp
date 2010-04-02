@@ -45,6 +45,7 @@ namespace Legion
 			{
 				IdentNode *ident = new (memory_pool) IdentNode;
 
+				ident->range = new (memory_pool) Range(&lexer.lexeme);
 				ident->ident = lexer.lexeme.value;
 
 				step();
@@ -263,11 +264,9 @@ namespace Legion
 		}
 	}
 
-	ExpressionNode *Parser::parse_assign()
+	bool Parser::is_assign_operator(Lexeme::Type lexeme)
 	{
-		ExpressionNode *result = parse_binary_operator();
-
-		switch(lexeme())
+		switch(lexeme)
 		{
 			case Lexeme::ASSIGN:
 			case Lexeme::ASSIGN_ADD:
@@ -280,25 +279,33 @@ namespace Legion
 			case Lexeme::ASSIGN_BITWISE_AND:
 			case Lexeme::ASSIGN_LEFT_SHIFT:
 			case Lexeme::ASSIGN_RIGHT_SHIFT:
-			{
-				BinaryOpNode *node = new (memory_pool) BinaryOpNode;
-
-				node->op = lexeme();
-				node->left = result;
-
-				step();
-
-				node->right = parse_assign();
-
-				result = node;
-			}
-			break;
+				return true;
 
 			default:
-				break;
+				return false;
 		}
+	}
 
-		return result;
+	ExpressionNode *Parser::parse_assign()
+	{
+		ExpressionNode *result = parse_binary_operator();
+
+		if(is_assign_operator(lexeme()))
+		{
+			AssignNode *node = new (memory_pool) AssignNode;
+
+			node->op = lexeme();
+			node->range = new (memory_pool) Range(&lexer.lexeme);
+			node->left = result;
+
+			step();
+
+			node->right = parse_assign();
+
+			return node;
+		}
+		else
+			return result;
 	}
 
 	ExpressionNode *Parser::parse_expression()
@@ -365,6 +372,7 @@ namespace Legion
 		while(true)
 		{
 			Lexeme::Type op = lexeme();
+			Range *range = new (memory_pool) Range(&lexer.lexeme);
 
 			if(!is_binary_operator(op))
 				break;
@@ -396,6 +404,7 @@ namespace Legion
 			BinaryOpNode *node = new (memory_pool) BinaryOpNode;
 
 			node->op = op;
+			node->range = range;
 			node->left = left;
 			node->right = right;
 

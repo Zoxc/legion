@@ -262,7 +262,14 @@ namespace Legion
 			{
 				LocalNode *target = (LocalNode *)node;
 
-				std::string result = print_node(target->type) + " " + print_string(target->name);
+				std::string result;
+				
+				if(target->type)
+					result = print_node(target->type);
+				else
+					result = print_node(target->type_expression);
+				
+				result += " " + print_string(target->symbol->name);
 
 				if(target->is_const)
 					result = "const " + result;
@@ -285,6 +292,7 @@ namespace Legion
 			}
 
 			case Node::BINARY_OP_NODE:
+			case Node::ASSIGN_NODE:
 			{
 				BinaryOpNode *target = (BinaryOpNode *)node;
 
@@ -383,26 +391,23 @@ namespace Legion
 			 * Types
 			 */
 
-			case Node::TYPE_POINTER_NODE:
+			case Node::TYPE_NODE:
 			{
-				TypePointerNode *target = (TypePointerNode *)node;
+				TypeNode *target = (TypeNode *)node;
 
-				return print_node(target->base) + "*";
+				return print_string(target->name) + join(&target->modifiers, "");
 			}
+
+			case Node::TYPE_POINTER_NODE:
+				return "*";
 
 			case Node::TYPE_ARRAY_NODE:
 			{
 				TypeArrayNode *target = (TypeArrayNode *)node;
 
-				return print_node(target->base) + "[" + print_node(target->size) + "]";
+				return "[" + print_node(target->size) + "]";
 			}
 
-			case Node::TYPE_BASE_NODE:
-			{
-				TypeBaseNode *target = (TypeBaseNode *)node;
-
-				return print_string(target->type);
-			}
 
 			default:
 				return "<unknown>";

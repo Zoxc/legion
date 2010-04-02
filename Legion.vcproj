@@ -242,6 +242,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\tree\expressions2.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\tree\globals.hpp"
 				>
 			</File>
@@ -267,6 +271,10 @@
 			</File>
 			<File
 				RelativePath=".\tree\statements.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tree\statements2.cpp"
 				>
 			</File>
 			<File

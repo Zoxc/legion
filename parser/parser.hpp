@@ -78,14 +78,15 @@ namespace Legion
 			
 			// Expressions
 			ExpressionNode *parse_array_subscript();
-			bool is_expression(Lexeme::Type lexeme);
+			static bool is_expression(Lexeme::Type lexeme);
 			ExpressionNode *parse_factor();
-			bool is_factor_chain(Lexeme::Type lexeme);
+			static bool is_factor_chain(Lexeme::Type lexeme);
 			ExpressionNode *parse_factor_chain();
 			ExpressionNode *parse_unary();
-			bool is_binary_operator(Lexeme::Type op);
+			static bool is_binary_operator(Lexeme::Type lexeme);
 			ExpressionNode *parse_binary_operator();
 			ExpressionNode *parse_binary_operator(ExpressionNode *left, size_t precedence);
+			static bool is_assign_operator(Lexeme::Type lexeme);
 			ExpressionNode *parse_assign();
 			ExpressionNode *parse_expression();
 			ExpressionNode *parse_grouped_expression();
@@ -152,18 +153,15 @@ namespace Legion
 			{
 				T *result = type;
 				
-				if(lexer.lexeme.type == Lexeme::IDENT)
+				if(expect(Lexeme::IDENT))
 				{
-					result->range = new (scope->memory_pool) Range;
-					result->range->capture(&lexer.lexeme);
+					result->range = new (scope->memory_pool) Range(&lexer.lexeme);
 					result->name = lexer.lexeme.value;
 					
 					*prev = scope->declare_symbol(result);
 
 					step();
 				}
-				else
-					expected(Lexeme::IDENT);
 				
 				return result;
 			}

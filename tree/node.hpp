@@ -3,8 +3,8 @@
 #include "../range.hpp"
 
 namespace Legion
-{	
-	class Scope;
+{
+	class Document;
 
 	struct Node
 	{
@@ -33,6 +33,7 @@ namespace Legion
 
 			IDENT_NODE,
 			BINARY_OP_NODE,
+			ASSIGN_NODE,
 			UNARY_OP_NODE,
 			ARRAY_SUBSCRIPT_NODE,
 			ARRAY_DEF_NODE,
@@ -45,9 +46,9 @@ namespace Legion
 			NULL_NODE,
 			CALL_NODE,
 
+			TYPE_NODE,
 			TYPE_POINTER_NODE,
-			TYPE_ARRAY_NODE,
-			TYPE_BASE_NODE
+			TYPE_ARRAY_NODE
 		};
 
 		virtual Type get_type()
@@ -60,7 +61,7 @@ namespace Legion
 			return true;
 		}
 
-		virtual bool find_declarations(Scope *scope)
+		virtual bool find_declarations(Document *document)
 		{
 			return false;
 		}

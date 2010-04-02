@@ -9,19 +9,30 @@ namespace Legion
 
 	struct ExpressionNode;
 	
+	struct TypeModifierNode:
+		public ListNode
+	{
+	};
+
+	typedef NodeList<TypeModifierNode> TypeModifierList;
+
 	struct TypeNode:
 		public Node
 	{
-		TypeNode() : base(0) {}
+		TypeNode() : name(0) {}
+
+		String *name;
+		TypeModifierList modifiers;
 		
-		TypeNode *base;
+		Type get_type()
+		{
+			return Node::TYPE_NODE;
+		}
 	};
 	
 	struct TypePointerNode:
-		public TypeNode
+		public TypeModifierNode
 	{
-		TypeNode *base;
-
 		Type get_type()
 		{
 			return Node::TYPE_POINTER_NODE;
@@ -29,25 +40,13 @@ namespace Legion
 	};
 	
 	struct TypeArrayNode:
-		public TypeNode
+		public TypeModifierNode
 	{
-		TypeNode *base;
 		ExpressionNode *size;
 
 		Type get_type()
 		{
 			return Node::TYPE_ARRAY_NODE;
-		}
-	};
-
-	struct TypeBaseNode:
-		public TypeNode
-	{
-		String *type;
-		
-		Type get_type()
-		{
-			return Node::TYPE_BASE_NODE;
 		}
 	};
 	

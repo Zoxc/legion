@@ -88,8 +88,13 @@ namespace Legion
 		if(is_native)
 			pair->range.report(document, "Global can not be natives");
 		
-		if(matches(Lexeme::ASSIGN))
+		if(is_assign_operator(lexeme()))
 		{
+			if(lexeme() != Lexeme::ASSIGN)
+				lexer.lexeme.report(document, "Unexpected assignment with operator " + lexer.lexeme.describe());
+
+			step();
+
 			global->has_value = true;
 			global->value = parse_expression();
 		}

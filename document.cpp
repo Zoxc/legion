@@ -3,7 +3,7 @@
 
 namespace Legion
 {
-	Document::Document(Compiler *compiler, std::string filename) : input(0), parser(&compiler->string_pool, &memory_pool, this, &compiler->scope)
+	Document::Document(Compiler *compiler, std::string filename) : input(0), parser(&compiler->string_pool, &memory_pool, this, &compiler->scope), scope(0)
 	{
 		this->filename = filename;
 		this->compiler = compiler;
@@ -30,8 +30,12 @@ namespace Legion
 
 	void Document::find_declarations()
 	{
+		scope = &compiler->scope;
+
 		for(NamespaceList::Iterator i = tree.begin(); i; i++)
-			(*i)->find_declarations(&compiler->scope);
+			(*i)->find_declarations(this);
+
+		scope = 0;
 	}
 	
 	bool Document::map()

@@ -27,6 +27,10 @@ namespace Legion
 		{
 			return false;
 		}
+
+		virtual void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		{
+		}
 	};
 
 	typedef NodeList<ExpressionNode> ExpressionList;
@@ -35,6 +39,7 @@ namespace Legion
 		public ExpressionNode
 	{
 		String *ident;
+		Range *range;
 
 		Type get_type()
 		{
@@ -48,9 +53,19 @@ namespace Legion
 		
 		bool is_declaration_name()
 		{
-			std::cout << "true @ is_declaration_name\n";
 			return true;
 		};
+		
+		void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		{
+			if(name)
+			{
+				local->symbol->name = ident;
+				local->symbol->range = range;
+			}
+			else
+				local->type->name = ident;
+		}
 	};
 
 	struct BinaryOpNode:
@@ -58,33 +73,55 @@ namespace Legion
 	{
 		ExpressionNode *left;
 		ExpressionNode *right;
+		Range *range;
 		Lexeme::Type op;
 
-		StatementNode *get_declaration(Scope *scope)
-		{
-			if(op == Lexeme::MUL && right->is_declaration_name() && left->is_type_name(scope))
-			{
-				LocalNode *declaration = new (scope->memory_pool) LocalNode;
-
-				declaration->is_const = false;
-				declaration->name = 0;
-				declaration->value = 0;
-				declaration->type = 0;
-
-				return declaration;
-			}
-			else
-				return 0;
-		}
+		StatementNode *get_declaration(Document *document);
 
 		bool is_type_name(Scope *scope)
 		{
 			return op == Lexeme::MUL && left->is_type_name(scope) && right->is_type_array();
 		};
+		
+		void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		{
+			left->setup_local(local, name, memory_pool);
+			
+			local->type->modifiers.add<TypePointerNode>(memory_pool);
+			
+			right->setup_local(local, name, memory_pool);
+		}
 
 		Type get_type()
 		{
 			return Node::BINARY_OP_NODE;
+		}
+	};
+
+	struct AssignNode:
+		public BinaryOpNode
+	{
+		StatementNode *get_declaration(Document *document)
+		{
+			LocalNode *local = (LocalNode *)left->get_declaration(document);
+
+			if(local)
+			{
+				local->value = right;
+				local->has_value = true;
+
+				if(op != Lexeme::ASSIGN)
+					range->report(document, "Unexpected assignment with operator " + Lexeme::describe(range, op));
+
+				return local;
+			}
+			else
+				return 0;
+		}
+
+		Type get_type()
+		{
+			return Node::ASSIGN_NODE;
 		}
 	};
 
@@ -114,6 +151,13 @@ namespace Legion
 			else
 				return false;
 		};
+
+		void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		{
+			value->setup_local(local, name, memory_pool);
+			
+			local->type->modifiers.add<TypePointerNode>(memory_pool);
+		}
 	};
 
 	struct ArraySubscriptNode:
@@ -140,7 +184,17 @@ namespace Legion
 		bool is_type_array()
 		{
 			return true;
-		};
+		}
+
+		void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		{
+			for(ExpressionList::Iterator i = sizes.begin(); i; i++)
+			{
+				TypeArrayNode *node = local->type->modifiers.add<TypeArrayNode>(memory_pool);
+	
+				node->size = *i;
+			}
+		}
 	};
 
 	struct MemberRefNode:
@@ -178,7 +232,17 @@ namespace Legion
 			}
 
 			return true;
-		};
+		}
+
+		void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		{
+			for(ExpressionList::Iterator i = chain.begin(); i; i++)
+			{
+				TypeArrayNode *node = local->type->modifiers.add<TypeArrayNode>(memory_pool);
+	
+				node->size = ((ArraySubscriptNode *)*i)->index;
+			}
+		}
 	};
 
 	struct IntegerNode:
@@ -245,5 +309,4 @@ namespace Legion
 			return Node::CALL_NODE;
 		}
 	};
-
 };

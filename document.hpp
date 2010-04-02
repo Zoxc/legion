@@ -21,6 +21,7 @@ namespace Legion
 			std::string filename;
 			NamespaceList tree;
 			std::vector<std::string> includes;
+			Scope *scope;
 
 			bool parse();
 			void find_declarations();

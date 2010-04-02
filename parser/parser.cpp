@@ -42,48 +42,39 @@ namespace Legion
 	
 	TypeNode *Parser::parse_type()
 	{
-		TypeNode *result = 0;
+		TypeNode *type = new (memory_pool) TypeNode;
 		
 		if(expect(Lexeme::IDENT))
 		{
-			TypeBaseNode *node = new (memory_pool) TypeBaseNode;
-			
-			node->type = lexer.lexeme.value;
+			type->name = lexer.lexeme.value;
+
 			step();
-			
-			result = node;
 		}
+
 		while(true)
 		{
 			switch(lexeme())
 			{
 				case Lexeme::MUL:
 				{
-					TypePointerNode *node = new (memory_pool) TypePointerNode;
+					type->modifiers.add<TypePointerNode>(memory_pool);
 					step();
-			 
-					node->base = result;
-			 
-					result = node;
 				}
 				break;
 
 				case Lexeme::SQR_BRACET_OPEN:
 				{
-					TypeArrayNode *node = new (memory_pool) TypeArrayNode;
+					TypeArrayNode *node = type->modifiers.add<TypeArrayNode>(memory_pool);
 					step();
 			 
-					node->base = result;
 					node->size = parse_expression();
 			 
-					result = node;
-
 					match(Lexeme::SQR_BRACET_CLOSE);
 				}
 				break;
 
 				default:
-					return result;
+					return type;
 			}
 
 		}

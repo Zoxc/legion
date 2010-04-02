@@ -11,20 +11,28 @@ namespace Legion
 	{
 		LocalNode *node = list->add<LocalNode>(memory_pool);
 
-		node->type = type;
+		node->type_expression = type;
+		node->type = 0;
+
+		node->symbol = new (memory_pool) VarSymbol;
 
 		if(expect(Lexeme::IDENT))
 		{
-			node->name = lexer.lexeme.value;
+			node->symbol->range = new (scope->memory_pool) Range(&lexer.lexeme);
+			node->symbol->name = lexer.lexeme.value;
+
 			step();
 		}
-		else
-			node->name = 0;
 
 		node->is_const = is_const;
 
-		if(matches(Lexeme::ASSIGN))
+		if(is_assign_operator(lexeme()))
 		{
+			if(lexeme() != Lexeme::ASSIGN)
+				lexer.lexeme.report(document, "Unexpected assignment with operator " + lexer.lexeme.describe());
+
+			step();
+
 			node->has_value = true;
 			node->value = parse_expression();
 		}
