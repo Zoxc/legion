@@ -19,7 +19,7 @@ namespace Legion
 	struct StatementNode:
 		public ListNode
 	{
-		virtual StatementNode *get_declaration(Document *document)
+		virtual StatementNode *get_declaration(Document &document)
 		{
 			return 0;
 		}
@@ -138,6 +138,6 @@ namespace Legion
 			return LOCAL_NODE;
 		}
 
-		StatementNode *get_declaration(Document *document);
+		StatementNode *get_declaration(Document &document);
 	};
 };

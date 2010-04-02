@@ -18,7 +18,7 @@ namespace Legion
 
 		if(expect(Lexeme::IDENT))
 		{
-			node->symbol->range = new (scope->memory_pool) Range(&lexer.lexeme);
+			node->symbol->range = new (scope->memory_pool) Range(lexer.lexeme);
 			node->symbol->name = lexer.lexeme.value;
 
 			step();

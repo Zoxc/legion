@@ -155,7 +155,7 @@ namespace Legion
 				
 				if(expect(Lexeme::IDENT))
 				{
-					result->range = new (scope->memory_pool) Range(&lexer.lexeme);
+					result->range = new (scope->memory_pool) Range(lexer.lexeme);
 					result->name = lexer.lexeme.value;
 					
 					*prev = scope->declare_symbol(result);
@@ -173,7 +173,7 @@ namespace Legion
 				T *result = declare<T>(type, &prev);
 
 				if(prev)
-					result->redeclared(document);
+					result->redeclared(*document);
 
 				return result;
 			}
@@ -187,7 +187,7 @@ namespace Legion
 			{
 				T *result = new (scope->memory_pool) T;
 				
-				result->range = new (scope->memory_pool) Range(&pair->range);
+				result->range = new (scope->memory_pool) Range(pair->range);
 				result->name = pair->name;
 				
 				*prev = scope->declare_symbol(result);
@@ -202,7 +202,7 @@ namespace Legion
 				T *result = declare<T>(pair, &prev);
 
 				if(prev)
-					result->redeclared(document);
+					result->redeclared(*document);
 
 				return result;
 			}

@@ -27,7 +27,7 @@ namespace Legion
 			
 			StringPool *string_pool;
 			MemoryPool *memory_pool;
-			Document *document;
+			Document &document;
 			
 			static bool jump_table_ready;
 			static void(Lexer::*jump_table[sizeof(char_t) << 8])();

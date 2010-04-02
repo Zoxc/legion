@@ -18,19 +18,18 @@ namespace Legion
 			return false;
 		}
 
-		virtual bool is_type_name(Scope *scope)
+		virtual Range get_range() = 0;
+
+		virtual bool is_type_name(Document &document)
 		{
 			return false;
 		}
 
-		virtual bool is_type_array()
+		virtual void setup_type(Document &document, LocalNode &local, bool name)
 		{
-			return false;
+			get_range().report_type_modifier(document);
 		}
 
-		virtual void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
-		{
-		}
 	};
 
 	typedef NodeList<ExpressionNode> ExpressionList;
@@ -46,25 +45,18 @@ namespace Legion
 			return Node::IDENT_NODE;
 		}
 
-		bool is_type_name(Scope *scope)
-		{
-			return scope->lookup_type(ident) == Symbol::TYPE;
-		}
+		bool is_type_name(Document &document);
 		
 		bool is_declaration_name()
 		{
 			return true;
 		};
 		
-		void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		void setup_type(Document &document, LocalNode &local, bool name);
+
+		Range get_range()
 		{
-			if(name)
-			{
-				local->symbol->name = ident;
-				local->symbol->range = range;
-			}
-			else
-				local->type->name = ident;
+			return *range;
 		}
 	};
 
@@ -76,21 +68,26 @@ namespace Legion
 		Range *range;
 		Lexeme::Type op;
 
-		StatementNode *get_declaration(Document *document);
+		StatementNode *get_declaration(Document &document);
 
-		bool is_type_name(Scope *scope)
+		Range get_range()
 		{
-			return op == Lexeme::MUL && left->is_type_name(scope) && right->is_type_array();
+			Range range = left->get_range();
+			range.expand(right->get_range());
+			return range;
+		}
+
+		bool is_type_name(Document &document)
+		{
+			return left->is_type_name(document);
 		};
 		
-		void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		bool is_declaration_name()
 		{
-			left->setup_local(local, name, memory_pool);
-			
-			local->type->modifiers.add<TypePointerNode>(memory_pool);
-			
-			right->setup_local(local, name, memory_pool);
-		}
+			return right->is_declaration_name();
+		};
+
+		void setup_type(Document &document, LocalNode &local, bool name);
 
 		Type get_type()
 		{
@@ -101,7 +98,7 @@ namespace Legion
 	struct AssignNode:
 		public BinaryOpNode
 	{
-		StatementNode *get_declaration(Document *document)
+		StatementNode *get_declaration(Document &document)
 		{
 			LocalNode *local = (LocalNode *)left->get_declaration(document);
 
@@ -130,6 +127,7 @@ namespace Legion
 	{
 		Lexeme::Type op;
 		ExpressionNode *value;
+		Range *range;
 		
 		Type get_type()
 		{
@@ -138,25 +136,16 @@ namespace Legion
 
 		bool is_declaration_name()
 		{
-			if(op == Lexeme::MUL)
-				return value->is_declaration_name();
-			else
-				return false;
+			return value->is_declaration_name();
 		};
 
-		bool is_type_array()
-		{
-			if(op == Lexeme::MUL)
-				return value->is_type_array();
-			else
-				return false;
-		};
+		void setup_type(Document &document, LocalNode &local, bool name);
 
-		void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		Range get_range()
 		{
-			value->setup_local(local, name, memory_pool);
-			
-			local->type->modifiers.add<TypePointerNode>(memory_pool);
+			Range range = *this->range;
+			range.expand(value->get_range());
+			return range;
 		}
 	};
 
@@ -164,10 +153,16 @@ namespace Legion
 		public ExpressionNode
 	{
 		ExpressionNode *index;
+		Range *range;
 
 		Type get_type()
 		{
 			return Node::ARRAY_SUBSCRIPT_NODE;
+		}
+		
+		Range get_range()
+		{
+			return *range;
 		}
 	};
 
@@ -181,19 +176,20 @@ namespace Legion
 			return Node::ARRAY_DEF_NODE;
 		}
 
-		bool is_type_array()
+		bool is_type_array(Document &document, bool report)
 		{
 			return true;
 		}
 
-		void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		void setup_type(Document &document, LocalNode &local, bool name);
+		
+		Range get_range()
 		{
-			for(ExpressionList::Iterator i = sizes.begin(); i; i++)
-			{
-				TypeArrayNode *node = local->type->modifiers.add<TypeArrayNode>(memory_pool);
-	
-				node->size = *i;
-			}
+			Range range;
+
+			throw std::exception("Unable to get range of ArrayDefNode!");
+
+			return range;
 		}
 	};
 
@@ -202,10 +198,16 @@ namespace Legion
 	{
 		String *name;
 		bool by_ptr;
+		Range *range;
 
 		Type get_type()
 		{
 			return Node::MEMBER_REF_NODE;
+		}
+
+		Range get_range()
+		{
+			return *range;
 		}
 	};
 
@@ -220,39 +222,37 @@ namespace Legion
 			return Node::FACTOR_CHAIN_NODE;
 		}
 
-		bool is_type_name(Scope *scope)
+		Range get_range()
 		{
-			if(!factor->is_type_name(scope))
-				return false;
+			Range range;
 
-			for(ExpressionList::Iterator i = chain.begin(); i; i++)
-			{
-				if((*i)->get_type() != Node::ARRAY_SUBSCRIPT_NODE)
-					return false;
-			}
+			throw std::exception("Unable to get range of FactorChainNode!");
 
-			return true;
+			return range;
 		}
 
-		void setup_local(LocalNode *local, bool name, MemoryPool *memory_pool)
+		bool is_type_name(Document &document)
 		{
-			for(ExpressionList::Iterator i = chain.begin(); i; i++)
-			{
-				TypeArrayNode *node = local->type->modifiers.add<TypeArrayNode>(memory_pool);
-	
-				node->size = ((ArraySubscriptNode *)*i)->index;
-			}
+			return factor->is_type_name(document);
 		}
+
+		void setup_type(Document &document, LocalNode &local, bool name);
 	};
 
 	struct IntegerNode:
 		public ExpressionNode
 	{
 		int value;
+		Range *range;
 
 		Type get_type()
 		{
 			return Node::INT_NODE;
+		}
+
+		Range get_range()
+		{
+			return *range;
 		}
 	};
 
@@ -260,10 +260,16 @@ namespace Legion
 		public ExpressionNode
 	{
 		String *value;
+		Range *range;
 
 		Type get_type()
 		{
 			return Node::STRING_NODE;
+		}
+
+		Range get_range()
+		{
+			return *range;
 		}
 	};
 
@@ -271,10 +277,16 @@ namespace Legion
 		public ExpressionNode
 	{
 		double value;
+		Range *range;
 
 		Type get_type()
 		{
 			return Node::FIXED_NODE;
+		}
+
+		Range get_range()
+		{
+			return *range;
 		}
 	};
 
@@ -282,19 +294,32 @@ namespace Legion
 		public ExpressionNode
 	{
 		bool value;
+		Range *range;
 
 		Type get_type()
 		{
 			return Node::BOOL_NODE;
+		}
+
+		Range get_range()
+		{
+			return *range;
 		}
 	};
 
 	struct NullNode:
 		public ExpressionNode
 	{
+		Range *range;
+
 		Type get_type()
 		{
 			return Node::NULL_NODE;
+		}
+
+		Range get_range()
+		{
+			return *range;
 		}
 	};
 
@@ -303,10 +328,16 @@ namespace Legion
 	{
 		IdentNode *ident;
 		ExpressionList arguments;
+		Range *range;
 
 		Type get_type()
 		{
 			return Node::CALL_NODE;
+		}
+
+		Range get_range()
+		{
+			return *range;
 		}
 	};
 };

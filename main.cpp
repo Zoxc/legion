@@ -7,53 +7,39 @@ using namespace Legion;
 
 Compiler compiler;
 
-std::vector<std::string> queued;
-std::vector<std::string> queue;
+std::vector<Document *> documents;
+std::vector<Document *> queue;
 
 void include(std::string file)
 {
 	file = file + ".galaxy";
 
-	for(std::vector<std::string>::iterator i = queued.begin(); i != queued.end(); ++i)
+	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
 	{
-		if(*i == file)
+		if((*i)->filename == file)
 			return;
 	}
 	
-	queue.push_back(file);
-	queued.push_back(file);
+	Document *document = new Document(&compiler, file);
+
+	queue.push_back(document);
+	documents.push_back(document);
 }
 
-void process_file(std::string file)
-{
-	DebugPrinter printer;
+#ifdef WIN32
+	#define BENCHMARK_VARS __int64 _start, _stop, _freq
 
-	Document doc(&compiler, file);
+	#define BENCHMARK_START \
+		QueryPerformanceFrequency((LARGE_INTEGER *)&_freq); \
+		QueryPerformanceCounter((LARGE_INTEGER *)&_start)
 
-	#ifdef WIN32
-		__int64 start, stop, freq;
-		QueryPerformanceFrequency((LARGE_INTEGER *)&freq);
-		QueryPerformanceCounter((LARGE_INTEGER *)&start);
-	#endif
-
-	if(doc.parse())
-	{
-		std::cout << printer.print(&doc.tree);
-
-		doc.find_declarations();
-		
-		std::cout << printer.print(&doc.tree);
-
-		#ifdef WIN32
-			QueryPerformanceCounter((LARGE_INTEGER *)&stop);
-
-			std::cout << "Parsed file '" << file << "' in " << (((double)1000 * (stop - start)) / (double)freq) << " ms." << std::endl;
-		#endif
-
-		for(std::vector<std::string>::iterator i = doc.includes.begin(); i != doc.includes.end(); ++i)
-			include(*i);
-	}
-}
+	#define BENCHMARK_END(action) \
+				QueryPerformanceCounter((LARGE_INTEGER *)&_stop); \
+				std::cout << action << " in " << (((double)1000 * (_stop - _start)) / (double)_freq) << " ms." << std::endl
+#else
+	#define BENCHMARK_START
+	#define BENCHMARK_END(action)
+#endif
 
 int main(int argc, char *argv[])
 {
@@ -61,15 +47,49 @@ int main(int argc, char *argv[])
 
 	for(int i = 1; i < argc; i++)
 	{
-		queue.push_back(argv[i]);
-		queued.push_back(argv[i]);
+		Document *document = new Document(&compiler, argv[i]);
+
+		queue.push_back(document);
+		documents.push_back(document);
 	}
-	
+
+	BENCHMARK_VARS;
+
+	BENCHMARK_START;
+
 	while(queue.size() > 0)
 	{
-		std::string file = queue.back();
+		Document *document = queue.back();
 		queue.pop_back();
-		process_file(file);
+
+		document->parse();
+
+		for(std::vector<std::string>::iterator i = document->includes.begin(); i != document->includes.end(); ++i)
+			include(*i);
+	}
+
+	BENCHMARK_END("Parsed files");
+
+	DebugPrinter printer;
+	
+	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
+	{
+		std::cout << std::endl << "Printing pre-AST for " + (*i)->filename << std::endl;
+		std::cout << printer.print(&(*i)->tree) << std::endl;
+	}
+
+	BENCHMARK_START;
+
+	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
+		(*i)->find_declarations();
+
+
+	BENCHMARK_END("Found declarations");
+
+	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
+	{
+		std::cout << std::endl << "Printing post-AST for " + (*i)->filename << std::endl;
+		std::cout << printer.print(&(*i)->tree) << std::endl;
 	}
 	
 	return 0;

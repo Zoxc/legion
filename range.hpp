@@ -16,23 +16,23 @@ namespace Legion
 			
 			Range() : start(0), stop(0), error(false) {}
 			
-			void capture(Range *range)
+			void capture(Range &range)
 			{
-				start = range->start;
-				stop = range->stop;
-				line_start = range->line_start;
-				line = range->line;
-				error = range->error;
+				start = range.start;
+				stop = range.stop;
+				line_start = range.line_start;
+				line = range.line;
+				error = range.error;
 			}
 			
-			Range(Range *range) : start(0), stop(0), error(false)
+			Range(Range &range) : start(0), stop(0), error(false)
 			{
 				capture(range);
 			}
 			
-			void expand(Range *range)
+			void expand(Range &range)
 			{
-				stop = range->stop;
+				stop = range.stop;
 			}
 
 			std::string string()
@@ -71,5 +71,15 @@ namespace Legion
 			}
 
 			void report(Document *document, const std::string& error);
+			
+			void report(Document &document, const std::string& error)
+			{
+				report(&document, error);
+			}
+
+			void report_type_modifier(Document &document)
+			{
+				report(&document, "Unknown type modifier '" + string() + "'");
+			}
 	};
 };

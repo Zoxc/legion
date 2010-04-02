@@ -159,11 +159,11 @@ namespace Legion
 		const char_t *start = lexeme.start;
 		lexeme.start = &input - 1;
 		lexeme.stop = &input;
-		lexeme.report(document, "Unexpected null terminator");
+		lexeme.report(&document, "Unexpected null terminator");
 		lexeme.start = start;
 	}
 
-	Lexer::Lexer(StringPool *string_pool, MemoryPool *memory_pool, Document *document) : string_pool(string_pool), memory_pool(memory_pool), document(document), keywords(string_pool)
+	Lexer::Lexer(StringPool *string_pool, MemoryPool *memory_pool, Document *document) : string_pool(string_pool), memory_pool(memory_pool), document(*document), keywords(string_pool)
 	{
 		setup_jump_table();
 	}

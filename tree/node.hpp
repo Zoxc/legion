@@ -86,6 +86,15 @@ namespace Legion
 			return node;
 		}
 		
+		template<class N> N *add(MemoryPool &memory_pool)
+		{
+			N *node = new (memory_pool) N;
+			
+			append(node);
+			
+			return node;
+		}
+
 		void append(T *node)
 		{
 			if(!node)

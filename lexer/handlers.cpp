@@ -24,9 +24,9 @@ namespace Legion
 		lexeme.type = Lexeme::NONE;
 
 		if (lexeme.length() == 1)
-			lexeme.report(document, "Invalid character '" + lexeme.string() + "'");
+			lexeme.report(&document, "Invalid character '" + lexeme.string() + "'");
 		else
-			lexeme.report(document, "Invalid characters '" + lexeme.string() + "'");
+			lexeme.report(&document, "Invalid characters '" + lexeme.string() + "'");
 
 		step();
 	}

@@ -10,7 +10,7 @@ namespace Legion
 
 		for(StatementList::Iterator i = statements.begin(); i; i++)
 		{
-			StatementNode *node = (*i)->get_declaration(document);
+			StatementNode *node = (*i)->get_declaration(*document);
 
 			if(node)
 				i.replace(node);
@@ -21,27 +21,14 @@ namespace Legion
 		return false;
 	}
 
-	StatementNode *LocalNode::get_declaration(Document *document)
+	StatementNode *LocalNode::get_declaration(Document &document)
 	{
-		Scope *scope = document->scope;
+		type = new (document.memory_pool) TypeNode;
+		type_expression->setup_type(document, *this, false);
 
-		if(type_expression->is_type_name(scope))
-		{
-			MemoryPool *memory_pool = scope->memory_pool;
+		if(document.scope->declare_symbol(symbol))
+			symbol->redeclared(document);
 
-			type = new (memory_pool) TypeNode;
-			type_expression->setup_local(this, false, memory_pool);
-
-			if(scope->declare_symbol(symbol))
-				symbol->redeclared(document);
-
-			return 0;
-		}
-		else
-		{
-			symbol->range->report(document, "Unexpected " + Lexeme::describe(symbol->range, Lexeme::IDENT));
-
-			return type_expression;
-		}
+		return 0;
 	}
 };

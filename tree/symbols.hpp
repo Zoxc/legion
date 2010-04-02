@@ -14,15 +14,18 @@ namespace Legion
 			NONE,
 			TYPE,
 			FUNCTION,
-			VARIABLE
+			VARIABLE,
+			TYPES
 		};
 		
 		Symbol(Type type) : type(type), name(0) {}
 
-		void redeclared(Document *document)
+		void redeclared(Document &document)
 		{
 			range->report(document, "Redeclared identifier '" + name->string() + "'");
 		}
+
+		static std::string names[TYPES];
 		
 		Type type;
 		Range *range;

@@ -45,7 +45,7 @@ namespace Legion
 			{
 				IdentNode *ident = new (memory_pool) IdentNode;
 
-				ident->range = new (memory_pool) Range(&lexer.lexeme);
+				ident->range = new (memory_pool) Range(lexer.lexeme);
 				ident->ident = lexer.lexeme.value;
 
 				step();
@@ -67,6 +67,8 @@ namespace Legion
 
 					match(Lexeme::PARENT_CLOSE);
 
+					ident->range->expand(lexer.lexeme);
+
 					return node;
 				}
 
@@ -78,6 +80,7 @@ namespace Legion
 				StringNode *node = new (memory_pool) StringNode;
 
 				node->value = lexer.lexeme.value;
+				node->range = new (memory_pool) Range(lexer.lexeme);
 
 				step();
 
@@ -90,6 +93,7 @@ namespace Legion
 				BooleanNode *node = new (memory_pool) BooleanNode;
 
 				node->value = lexeme() == Lexeme::KW_TRUE;
+				node->range = new (memory_pool) Range(lexer.lexeme);
 
 				step();
 
@@ -97,7 +101,13 @@ namespace Legion
 			}
 
 			case Lexeme::KW_NULL:
-				return new (memory_pool) NullNode;
+			{
+				NullNode *node = new (memory_pool) NullNode;
+				
+				node->range = new (memory_pool) Range(lexer.lexeme);
+
+				return node;
+			}
 
 			case Lexeme::INTEGER:
 			case Lexeme::HEX:
@@ -106,6 +116,7 @@ namespace Legion
 				IntegerNode *node = new (memory_pool) IntegerNode;
 
 				node->value = atoi(lexer.lexeme.string().c_str());
+				node->range = new (memory_pool) Range(lexer.lexeme);
 
 				step();
 
@@ -117,6 +128,7 @@ namespace Legion
 				FixedNode *node = new (memory_pool) FixedNode;
 
 				node->value = atof(lexer.lexeme.string().c_str());
+				node->range = new (memory_pool) Range(lexer.lexeme);
 
 				step();
 
@@ -132,12 +144,15 @@ namespace Legion
 	ExpressionNode *Parser::parse_array_subscript()
 	{
 		ArraySubscriptNode *node = new (memory_pool) ArraySubscriptNode;
+		node->range = new (memory_pool) Range(lexer.lexeme);
 
 		step();
 
 		node->index = parse_expression();
 
 		match(Lexeme::SQR_BRACET_CLOSE);
+
+		node->range->expand(lexer.lexeme);
 
 		return node;
 	}
@@ -190,8 +205,10 @@ namespace Legion
 
 						case Lexeme::MEMBER:
 						{
-							step();
 							MemberRefNode *node = chain->chain.add<MemberRefNode>(memory_pool);
+							node->range = new (memory_pool) Range(lexer.lexeme);
+
+							step();
 
 							if(expect(Lexeme::IDENT))
 							{
@@ -201,6 +218,7 @@ namespace Legion
 							else
 								node->name = 0;
 
+							node->range->expand(lexer.lexeme);
 							node->by_ptr = false;
 
 							break;
@@ -209,14 +227,17 @@ namespace Legion
 
 						case Lexeme::MEMBER_PTR:
 						{
-							step();
 							MemberRefNode *node = chain->chain.add<MemberRefNode>(memory_pool);
+							node->range = new (memory_pool) Range(lexer.lexeme);
+
+							step();
 
 							if(matches(Lexeme::IDENT))
 								node->name = lexer.lexeme.value;
 							else
 								node->name = 0;
 
+							node->range->expand(lexer.lexeme);
 							node->by_ptr = true;
 
 							break;
@@ -250,6 +271,7 @@ namespace Legion
 				UnaryOpNode *node = new (memory_pool) UnaryOpNode;
 
 				node->op = lexeme();
+				node->range = new (memory_pool) Range(lexer.lexeme);
 
 				step();
 
@@ -295,7 +317,7 @@ namespace Legion
 			AssignNode *node = new (memory_pool) AssignNode;
 
 			node->op = lexeme();
-			node->range = new (memory_pool) Range(&lexer.lexeme);
+			node->range = new (memory_pool) Range(lexer.lexeme);
 			node->left = result;
 
 			step();
@@ -372,7 +394,7 @@ namespace Legion
 		while(true)
 		{
 			Lexeme::Type op = lexeme();
-			Range *range = new (memory_pool) Range(&lexer.lexeme);
+			Range *range = new (memory_pool) Range(lexer.lexeme);
 
 			if(!is_binary_operator(op))
 				break;

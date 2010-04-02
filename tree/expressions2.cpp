@@ -3,13 +3,51 @@
 
 namespace Legion
 {
-	StatementNode *BinaryOpNode::get_declaration(Document *document)
+	bool IdentNode::is_type_name(Document &document)
 	{
-		Scope *scope = document->scope;
+		return document.scope->lookup_type(ident) == Symbol::TYPE;
+	}
 
-		if(op == Lexeme::MUL && right->is_declaration_name() && left->is_type_name(scope))
+	void IdentNode::setup_type(Document &document, LocalNode &local, bool name)
+	{
+		if(name)
 		{
-			MemoryPool *memory_pool = scope->memory_pool;
+			local.symbol->name = ident;
+			local.symbol->range = range;
+		}
+		else
+		{
+			Symbol *symbol = document.scope->lookup(ident);
+
+			if(symbol && symbol->type == Symbol::TYPE)
+				local.type->name = ident;
+			else
+			{
+				if(symbol)
+					range->report(document, "Expected type, but found '" + ident->string() + "' (" + Symbol::names[symbol->type] + ")");
+				else
+					range->report(document, "Undeclared type '" + ident->string() + "'");
+			}
+		}
+	}
+
+	void BinaryOpNode::setup_type(Document &document, LocalNode &local, bool name)
+	{
+		if(op != Lexeme::MUL)
+			range->report_type_modifier(document);
+
+		left->setup_type(document, local, name);
+		
+		local.type->modifiers.add<TypePointerNode>(&document.memory_pool);
+		
+		right->setup_type(document, local, name);
+	}
+
+	StatementNode *BinaryOpNode::get_declaration(Document &document)
+	{
+		if(left->is_type_name(document) && right->is_declaration_name())
+		{
+			MemoryPool &memory_pool = document.memory_pool;
 
 			LocalNode *local = new (memory_pool) LocalNode;
 
@@ -18,17 +56,56 @@ namespace Legion
 			local->type = new (memory_pool) TypeNode;
 			local->symbol = new (memory_pool) VarSymbol;
 
-			left->setup_local(local, false, memory_pool);
-			right->setup_local(local, true, memory_pool);
+			if(op != Lexeme::MUL)
+				range->report_type_modifier(document);
+
+			left->setup_type(document, *local, false);
 
 			local->type->modifiers.add<TypePointerNode>(memory_pool);
 
-			if(scope->declare_symbol(local->symbol))
+			right->setup_type(document, *local, true);
+
+			if(document.scope->declare_symbol(local->symbol))
 				local->symbol->redeclared(document);
 
 			return local;
 		}
 		else
 			return 0;
+	}
+
+	void UnaryOpNode::setup_type(Document &document, LocalNode &local, bool name)
+	{
+		if(op != Lexeme::MUL)
+			range->report_type_modifier(document);
+		
+		value->setup_type(document, local, name);
+		
+		local.type->modifiers.add<TypePointerNode>(document.memory_pool);
+	}
+
+	void ArrayDefNode::setup_type(Document &document, LocalNode &local, bool name)
+	{
+		for(ExpressionList::Iterator i = sizes.begin(); i; i++)
+		{
+			TypeArrayNode *node = local.type->modifiers.add<TypeArrayNode>(document.memory_pool);
+
+			node->size = *i;
+		}
+	}
+
+	void FactorChainNode::setup_type(Document &document, LocalNode &local, bool name)
+	{
+		for(ExpressionList::Iterator i = chain.begin(); i; i++)
+		{
+			if((*i)->get_type() != Node::ARRAY_SUBSCRIPT_NODE)
+				(*i)->get_range().report_type_modifier(document);
+			else
+			{
+				TypeArrayNode *node = local.type->modifiers.add<TypeArrayNode>(document.memory_pool);
+
+				node->size = ((ArraySubscriptNode *)*i)->index;
+			}
+		}
 	}
 };

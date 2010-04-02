@@ -29,3 +29,8 @@ void *operator new(size_t bytes, Legion::MemoryPool *memory_pool) throw();
 void operator delete(void *, Legion::MemoryPool *memory_pool) throw();
 void *operator new[](size_t bytes, Legion::MemoryPool *memory_pool) throw();
 void operator delete[](void *, Legion::MemoryPool *memory_pool) throw();
+
+void *operator new(size_t bytes, Legion::MemoryPool &memory_pool) throw();
+void operator delete(void *, Legion::MemoryPool &memory_pool) throw();
+void *operator new[](size_t bytes, Legion::MemoryPool &memory_pool) throw();
+void operator delete[](void *, Legion::MemoryPool &memory_pool) throw();

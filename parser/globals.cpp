@@ -13,7 +13,7 @@ namespace Legion
 			
 		if(expect(Lexeme::IDENT))
 		{
-			node->range.capture(&lexer.lexeme);
+			node->range.capture(lexer.lexeme);
 			node->name = lexer.lexeme.value;
 			step();
 			
@@ -115,7 +115,7 @@ namespace Legion
 		head->symbol = declare<FuncSymbol>(pair, &prev);
 
 		if(prev && prev->type != Symbol::FUNCTION)
-			head->symbol->redeclared(document);
+			head->symbol->redeclared(*document);
 		
 		if(is_const)
 			pair->range.report(document, "Functions can not be declared constant");
@@ -144,7 +144,7 @@ namespace Legion
 				FuncSymbol *prev_func = (FuncSymbol *)prev;
 
 				if(prev_func->defined)
-					head->symbol->redeclared(document);
+					head->symbol->redeclared(*document);
 
 				prev_func->defined = true;
 			}
