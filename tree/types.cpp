@@ -122,12 +122,12 @@ namespace Legion
 		declare(compiler, "waveinfo", type_waveinfo, true);
 		declare(compiler, "wavetarget", type_wavetarget, true);
 
-		type_fixed.type.implict_conversions.insert(&type_int.type);
+		type_fixed.type.implicit_conversions.insert(&type_int.type);
 
-		type_marker.type.implict_conversions.insert(&type_null.type);
-		type_point.type.implict_conversions.insert(&type_null.type);
-		type_string.type.implict_conversions.insert(&type_null.type);
-		type_unit.type.implict_conversions.insert(&type_null.type);
-		type_wave.type.implict_conversions.insert(&type_null.type);
+		type_marker.type.implicit_conversions.insert(&type_null.type);
+		type_point.type.implicit_conversions.insert(&type_null.type);
+		type_string.type.implicit_conversions.insert(&type_null.type);
+		type_unit.type.implicit_conversions.insert(&type_null.type);
+		type_wave.type.implicit_conversions.insert(&type_null.type);
 	}
 };

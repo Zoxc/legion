@@ -97,7 +97,7 @@ namespace Legion
 		public:
 			String *name;
 
-			std::set<Type *> implict_conversions; //TODO: Remove usage of set
+			std::set<Type *> implicit_conversions; //TODO: Remove usage of set
 
 			std::string string(bool show_typedef)
 			{
@@ -111,7 +111,7 @@ namespace Legion
 				if(this == type)
 					return true;
 
-				return implict_conversions.find(type) != implict_conversions.end();
+				return implicit_conversions.find(type) != implicit_conversions.end();
 			}
 
 			NativeType() : Type(Type::NATIVE_TYPE) {}
