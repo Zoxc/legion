@@ -173,7 +173,7 @@ namespace Legion
 	struct LocalNode:
 		public StatementNode
 	{
-		LocalNode() : type(0), type_node(0) {}
+		LocalNode() : type_node(0), type(0)  {}
 
 		ExpressionNode *type_expression;
 		TypeNode *type_node;

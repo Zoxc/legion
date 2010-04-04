@@ -16,7 +16,7 @@ namespace Legion
 			
 			Range() : start(0), stop(0), error(false) {}
 			
-			void capture(Range &range)
+			void capture(const Range &range)
 			{
 				start = range.start;
 				stop = range.stop;
@@ -25,7 +25,7 @@ namespace Legion
 				error = range.error;
 			}
 			
-			Range(Range &range) : start(0), stop(0), error(false)
+			Range(const Range &range) : start(0), stop(0), error(false)
 			{
 				capture(range);
 			}

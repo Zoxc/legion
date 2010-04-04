@@ -37,6 +37,7 @@ void include(std::string file)
 				QueryPerformanceCounter((LARGE_INTEGER *)&_stop); \
 				std::cout << action << " in " << (((double)1000 * (_stop - _start)) / (double)_freq) << " ms." << std::endl
 #else
+	#define BENCHMARK_VARS
 	#define BENCHMARK_START
 	#define BENCHMARK_END(action)
 #endif

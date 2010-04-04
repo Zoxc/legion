@@ -71,7 +71,8 @@ namespace Legion
 		Range get_range()
 		{
 			Range range = left->get_range();
-			range.expand(right->get_range());
+			Range end = right->get_range();
+			range.expand(end);
 			return range;
 		}
 
@@ -151,7 +152,8 @@ namespace Legion
 		Range get_range()
 		{
 			Range range = *this->range;
-			range.expand(value->get_range());
+			Range end = value->get_range();
+			range.expand(end);
 			return range;
 		}
 	};
@@ -194,7 +196,7 @@ namespace Legion
 		{
 			Range range;
 
-			throw std::exception("Unable to get range of ArrayDefNode!");
+			assert(0);
 
 			return range;
 		}
@@ -233,7 +235,7 @@ namespace Legion
 		{
 			Range range;
 
-			throw std::exception("Unable to get range of FactorChainNode!");
+			assert(0);
 
 			return range;
 		}

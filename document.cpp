@@ -3,7 +3,7 @@
 
 namespace Legion
 {
-	Document::Document(Compiler &compiler, std::string filename) : input(0), parser(&compiler.string_pool, &memory_pool, this, &compiler.scope), scope(0), compiler(compiler)
+	Document::Document(Compiler &compiler, std::string filename) : input(0), compiler(compiler), parser(&compiler.string_pool, &memory_pool, this, &compiler.scope), scope(0)
 	{
 		this->filename = filename;
 

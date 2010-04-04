@@ -34,6 +34,9 @@ namespace Legion
 				{
 					case TYPE_POINTER_NODE:
 						result = result->get_indirect(document);
+
+					default:
+						break;
 				}
 			}
 
