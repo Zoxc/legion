@@ -1,6 +1,7 @@
 #pragma once
 #include "../common.hpp"
 #include "../lexer/lexer.hpp"
+#include "../hash_table.hpp"
 #include "symbols.hpp"
 
 namespace Legion
@@ -10,17 +11,37 @@ namespace Legion
 	struct Symbol;
 	class Parser;
 	class Document;
-	
-	class Scope
+
+	class ScopeFunctions:
+		public HashTableFunctions<String *, Symbol *>
 	{
-		private:
-			Symbol **table;
-			size_t size;
-			size_t mask;
-			size_t entries;
-			
-			Symbol *store(Symbol **table, size_t mask, String *name, Symbol *symbol);
-			void expand();
+		public:
+			static bool compare_key_value(String *key, Symbol *value)
+			{
+				return value->name == key;
+			}
+
+			static String *get_key(Symbol *value)
+			{
+				return value->name;
+			}
+
+			static Symbol *get_value_next(Symbol *value)
+			{
+				return value->next;
+			}
+
+			static void set_value_next(Symbol *value, Symbol *next)
+			{
+				value->next = next;
+			}
+	};
+
+	typedef HashTable<String *, Symbol *, ScopeFunctions> ScopeHashTable;
+
+	class Scope:
+		public ScopeHashTable
+	{
 		public:
 			enum Type
 			{
@@ -31,17 +52,22 @@ namespace Legion
 				EMPTY
 			};
 			
-			Scope(Scope *parent, Type type, MemoryPool *memory_pool);
-			~Scope();
+			Scope(Scope *parent, Type type, MemoryPool &memory_pool) : ScopeHashTable(memory_pool, 1), type(type), parent(parent) {}
 
-			MemoryPool *memory_pool;
-			
 			Type type;
 			Scope *parent;
-			
-			Symbol *get(String *name);
-			Symbol *lookup(String *name);
-			Symbol *set(String *name, Symbol *symbol);
+				
+			Symbol *lookup(String *name)
+			{
+				Symbol *result = get(name);
+
+				if(result)
+					return result;
+				else if(parent)
+					return parent->lookup(name);
+				else
+					return 0;
+			}
 
 			Symbol::SymbolType lookup_type(String *name)
 			{
@@ -74,6 +100,5 @@ namespace Legion
 				
 				return set(symbol->name, symbol);
 			}
-
 	};
 };

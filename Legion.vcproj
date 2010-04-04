@@ -270,10 +270,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\tree\scope.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\tree\scope.hpp"
 				>
 			</File>
@@ -320,6 +316,10 @@
 		</File>
 		<File
 			RelativePath=".\document.hpp"
+			>
+		</File>
+		<File
+			RelativePath=".\hash_table.hpp"
 			>
 		</File>
 		<File

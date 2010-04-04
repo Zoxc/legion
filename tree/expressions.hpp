@@ -347,7 +347,6 @@ namespace Legion
 	{
 		IdentNode *ident;
 		ExpressionList arguments;
-		Range *range;
 
 		NodeType node_type()
 		{
@@ -356,7 +355,7 @@ namespace Legion
 
 		Range get_range()
 		{
-			return *range;
+			return *ident->range;
 		}
 	};
 };

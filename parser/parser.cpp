@@ -16,7 +16,7 @@ namespace Legion
 	
 	Scope *Parser::push_scope(Scope::Type type)
 	{
-		return scope = new Scope(scope, type, memory_pool);
+		return scope = new Scope(scope, type, *memory_pool);
 	}
 	
 	void Parser::pop_scope()
