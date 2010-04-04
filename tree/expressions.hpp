@@ -18,7 +18,12 @@ namespace Legion
 			return false;
 		}
 
-		virtual bool is_type_name(Document &document)
+		virtual bool is_type_name(Document &document, bool lookup)
+		{
+			return false;
+		}
+		
+		virtual bool is_type_array()
 		{
 			return false;
 		}
@@ -43,7 +48,7 @@ namespace Legion
 			return Node::IDENT_NODE;
 		}
 
-		bool is_type_name(Document &document);
+		bool is_type_name(Document &document, bool lookup);
 		
 		bool is_declaration_name()
 		{
@@ -78,14 +83,14 @@ namespace Legion
 			return range;
 		}
 
-		bool is_type_name(Document &document)
+		bool is_type_name(Document &document, bool lookup)
 		{
-			return left->is_type_name(document);
+			return op == Lexeme::MUL && left->is_type_name(document, lookup) && right->is_type_array();
 		};
 		
 		bool is_declaration_name()
 		{
-			return right->is_declaration_name();
+			return op == Lexeme::MUL && right->is_declaration_name();
 		};
 
 		Type *get_type(Document &document, SymbolList &stack);
@@ -146,9 +151,14 @@ namespace Legion
 			return Node::UNARY_OP_NODE;
 		}
 
+		bool is_type_array()
+		{
+			return op == Lexeme::MUL && value->is_type_array();
+		};
+
 		bool is_declaration_name()
 		{
-			return value->is_declaration_name();
+			return op == Lexeme::MUL && value->is_declaration_name();
 		};
 
 		void setup_type(Document &document, LocalNode &local, bool name);
@@ -247,9 +257,18 @@ namespace Legion
 			return range;
 		}
 
-		bool is_type_name(Document &document)
+		bool is_type_name(Document &document, bool lookup)
 		{
-			return factor->is_type_name(document);
+			if(!factor->is_type_name(document, lookup))
+				return false;
+
+			for(ExpressionList::Iterator i = chain.begin(); i; i++)
+			{
+				if((*i)->node_type() != Node::ARRAY_SUBSCRIPT_NODE)
+					return false;
+			}
+
+			return true;
 		}
 
 		void setup_type(Document &document, LocalNode &local, bool name);

@@ -4,9 +4,9 @@
 
 namespace Legion
 {
-	bool IdentNode::is_type_name(Document &document)
+	bool IdentNode::is_type_name(Document &document, bool lookup)
 	{
-		return document.scope->lookup_type(ident) == Symbol::TYPE;
+		return !lookup || document.scope->lookup_type(ident) == Symbol::TYPE;
 	}
 
 	void IdentNode::setup_type(Document &document, LocalNode &local, bool name)
@@ -51,7 +51,7 @@ namespace Legion
 
 	StatementNode *BinaryOpNode::get_declaration(Document &document)
 	{
-		if(left->is_type_name(document) && right->is_declaration_name())
+		if(left->is_type_name(document, true) && right->is_declaration_name())
 		{
 			MemoryPool &memory_pool = document.memory_pool;
 

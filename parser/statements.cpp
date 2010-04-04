@@ -91,7 +91,6 @@ namespace Legion
 		
 		match(Lexeme::KW_WHILE);		
 		node->condition = parse_grouped_expression();
-		match(Lexeme::SEMICOLON);
 	}
 		
 	void Parser::parse_return(StatementList *list)
@@ -102,14 +101,13 @@ namespace Legion
 		
 		step();
 
-		if(matches(Lexeme::SEMICOLON))
-			node->has_value = false;
-		else
+		if(is_expression(lexeme()))
 		{
 			node->has_value = true;
 			node->value = parse_expression();
-			match(Lexeme::SEMICOLON);
 		}
+		else
+			node->has_value = false;
 	}
 	
 	void Parser::parse_break(StatementList *list)
@@ -153,23 +151,28 @@ namespace Legion
 				
 			case Lexeme::KW_DO:
 				parse_do(list);
+				match(Lexeme::SEMICOLON);
 				break;
 
 			case Lexeme::KW_RETURN:
 				parse_return(list);
+				match(Lexeme::SEMICOLON);
 				break;
 			
 			case Lexeme::KW_BREAK:
 				parse_break(list);
+				match(Lexeme::SEMICOLON);
 				break;
 			
 			case Lexeme::KW_CONTINUE:
 				parse_continue(list);
+				match(Lexeme::SEMICOLON);
 				break;
 			
 			case Lexeme::KW_CONST:
 				step();
 				parse_local(true, parse_expression(), list);
+				match(Lexeme::SEMICOLON);
 				break;
 			
 			case Lexeme::BRACET_OPEN:
@@ -189,10 +192,12 @@ namespace Legion
 				{
 					ExpressionNode *node = parse_expression();
 
-					if(lexeme() == Lexeme::IDENT)
+					if(lexeme() == Lexeme::IDENT && node->is_type_name(*document, false))
 						parse_local(false, node, list);
 					else
 						list->append(node);
+
+					match(Lexeme::SEMICOLON);
 				}
 				else
 					return false;
