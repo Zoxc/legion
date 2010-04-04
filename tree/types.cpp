@@ -11,10 +11,7 @@ namespace Legion
 
 		if(!symbol || symbol->type != Symbol::TYPE)
 		{
-			if(symbol)
-				range->report(document, "Expected type, but found '" + name->string() + "' (" + Symbol::names[symbol->type] + ")");
-			else
-				range->report(document, "Undeclared type '" + name->string() + "'");
+			range->report_expected_symbol(document, symbol, name, Symbol::TYPE);
 
 			return 0;
 		}
@@ -70,7 +67,7 @@ namespace Legion
 			return;
 
 		if(!compitable(type))
-			node->get_range().report(document, "Unable to convert type '" + this->string() + "' to type '" + type->string() + "'");
+			node->get_range().report(document, "Unable to convert type '" + type->string() + "' to type '" + this->string() + "'");
 	}
 
 	void Types::declare(Compiler &compiler, const char *name, TypeNativeNode &type, bool declare)
@@ -124,5 +121,13 @@ namespace Legion
 		declare(compiler, "wave", type_wave, true);
 		declare(compiler, "waveinfo", type_waveinfo, true);
 		declare(compiler, "wavetarget", type_wavetarget, true);
+
+		type_fixed.type.implict_conversions.insert(&type_int.type);
+
+		type_marker.type.implict_conversions.insert(&type_null.type);
+		type_point.type.implict_conversions.insert(&type_null.type);
+		type_string.type.implict_conversions.insert(&type_null.type);
+		type_unit.type.implict_conversions.insert(&type_null.type);
+		type_wave.type.implict_conversions.insert(&type_null.type);
 	}
 };

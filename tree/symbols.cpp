@@ -1,4 +1,5 @@
-#include "scope.hpp"
+#include "symbols.hpp"
+#include "../range.hpp"
 
 namespace Legion
 {
@@ -8,4 +9,9 @@ namespace Legion
 		"function",
 		"variable"
 	};
+
+	void Symbol::redeclared(Document &document)
+	{
+		range->report(document, "Redeclared identifier '" + name->string() + "'");
+	}
 };

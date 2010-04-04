@@ -16,6 +16,7 @@ namespace Legion
 		node->type = 0;
 
 		node->symbol = new (memory_pool) VarSymbol;
+		node->symbol->node = node;
 
 		if(expect(Lexeme::IDENT))
 		{

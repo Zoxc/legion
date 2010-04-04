@@ -22,6 +22,20 @@ namespace Legion
 			local.type_node->range = range;
 		}
 	}
+	
+	Type *IdentNode::get_type(Document &document, SymbolList &stack)
+	{
+		Symbol *symbol = document.scope->lookup(ident);
+
+		if(!symbol || symbol->type != Symbol::VARIABLE)
+		{
+			range->report_expected_symbol(document, symbol, ident, Symbol::VARIABLE);
+
+			return 0;
+		}
+
+		return ((VarSymbol *)symbol)->node->get_type(document, stack);
+	}
 
 	void BinaryOpNode::setup_type(Document &document, LocalNode &local, bool name)
 	{
@@ -47,6 +61,7 @@ namespace Legion
 			local->has_value = false;
 			local->type_node = new (memory_pool) TypeNode;
 			local->symbol = new (memory_pool) VarSymbol;
+			local->symbol->node = local;
 
 			if(op != Lexeme::MUL)
 				range->report_type_modifier(document);

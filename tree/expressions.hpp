@@ -56,6 +56,8 @@ namespace Legion
 		{
 			return *range;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 
 	struct BinaryOpNode:

@@ -52,7 +52,7 @@ namespace Legion
 				EMPTY
 			};
 			
-			Scope(Scope *parent, Type type, MemoryPool &memory_pool) : ScopeHashTable(memory_pool, 1), type(type), parent(parent) {}
+			Scope(Scope *parent, Type type, MemoryPool &memory_pool) : ScopeHashTable(memory_pool, 2), type(type), parent(parent) {}
 
 			Type type;
 			Scope *parent;

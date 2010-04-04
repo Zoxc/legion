@@ -42,6 +42,19 @@ void include(std::string file)
 	#define BENCHMARK_END(action)
 #endif
 
+void print_ast(std::string name)
+{
+	#ifdef AST_DEBUG
+		DebugPrinter printer;
+
+		for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
+		{
+			std::cout << std::endl << "Printing " + name + " for " + (*i)->filename << std::endl;
+			std::cout << printer.print(&(*i)->tree) << std::endl;
+		}
+	#endif
+}
+
 int main(int argc, char *argv[])
 {
 	std::cout << "Legion - a compiler that targets Galaxy" << std::endl;
@@ -71,13 +84,7 @@ int main(int argc, char *argv[])
 
 	BENCHMARK_END("Parsed files");
 
-	DebugPrinter printer;
-	
-	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
-	{
-		std::cout << std::endl << "Printing pre-AST for " + (*i)->filename << std::endl;
-		std::cout << printer.print(&(*i)->tree) << std::endl;
-	}
+	print_ast("pre-AST");
 
 	BENCHMARK_START;
 
@@ -86,12 +93,8 @@ int main(int argc, char *argv[])
 
 	BENCHMARK_END("Found declarations");
 
-	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
-	{
-		std::cout << std::endl << "Printing post-AST for " + (*i)->filename << std::endl;
-		std::cout << printer.print(&(*i)->tree) << std::endl;
-	}
-	
+	print_ast("post-AST");
+
 	BENCHMARK_START;
 
 	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
@@ -99,11 +102,7 @@ int main(int argc, char *argv[])
 
 	BENCHMARK_END("Typechecked");
 
-	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
-	{
-		std::cout << std::endl << "Printing post-typechecking-AST for " + (*i)->filename << std::endl;
-		std::cout << printer.print(&(*i)->tree) << std::endl;
-	}
+	print_ast("post-typechecking-AST");
 	
 	return 0;
 }

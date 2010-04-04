@@ -36,6 +36,8 @@ namespace Legion
 
 	ExpressionNode *Parser::parse_factor()
 	{
+		lexer.identify_keywords();
+
 		switch(lexeme())
 		{
 			case Lexeme::PARENT_OPEN:
@@ -105,6 +107,8 @@ namespace Legion
 				NullNode *node = new (memory_pool) NullNode;
 				
 				node->range = new (memory_pool) Range(lexer.lexeme);
+
+				step();
 
 				return node;
 			}

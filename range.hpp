@@ -1,10 +1,11 @@
 #pragma once
 #include "common.hpp"
+#include "tree/symbols.hpp"
 
 namespace Legion
 {
 	class Document;
-	
+
 	class Range
 	{
 		public:
@@ -80,6 +81,14 @@ namespace Legion
 			void report_type_modifier(Document &document)
 			{
 				report(&document, "Unknown type modifier '" + string() + "'");
+			}
+			
+			void report_expected_symbol(Document &document, Symbol *symbol, String *name, Symbol::SymbolType type)
+			{
+				if(symbol)
+					report(document, "Expected " + Symbol::names[type] + ", but found '" + name->string() + "' (" + Symbol::names[symbol->type] + ")");
+				else
+					report(document, "Undeclared " + Symbol::names[type] + " '" + name->string() + "'");
 			}
 	};
 };

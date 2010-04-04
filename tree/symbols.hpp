@@ -6,6 +6,8 @@
 namespace Legion
 {
 	class Type;
+	class Range;
+	class Document;
 	
 	struct Node;
 	struct TypeSymbol;
@@ -22,10 +24,7 @@ namespace Legion
 		
 		Symbol(SymbolType type) : type(type), name(0) {}
 
-		void redeclared(Document &document)
-		{
-			range->report(document, "Redeclared identifier '" + name->string() + "'");
-		}
+		void redeclared(Document &document);
 
 		static std::string names[TYPES];
 		
@@ -55,7 +54,9 @@ namespace Legion
 	struct VarSymbol:
 		public SymbolType<Symbol::VARIABLE>
 	{
-		Type *type_ptr;
+		VarSymbol() : node(0) {}
+
+		Node *node;
 	};
 	
 	struct FuncSymbol:

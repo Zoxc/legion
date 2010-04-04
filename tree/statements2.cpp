@@ -53,6 +53,7 @@ namespace Legion
 				case BREAK_NODE:
 				case CONTINUE_NODE:
 				case ASSIGN_NODE:
+				case CALL_NODE:
 					allow_locals = false;
 					break;
 

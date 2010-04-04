@@ -86,6 +86,7 @@ namespace Legion
 		global->is_const = is_const;
 		global->is_static = is_static;
 		global->symbol = declare<VarSymbol>(pair);
+		global->symbol->node = global;
 		
 		if(is_native)
 			pair->range.report(document, "Global can not be natives");

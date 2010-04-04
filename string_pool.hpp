@@ -106,7 +106,7 @@ namespace Legion
 		public StringPoolHashTable
 	{
 		public:
-			StringPool(MemoryPool &memory_pool) : StringPoolHashTable(memory_pool, 1) {}
+			StringPool(MemoryPool &memory_pool) : StringPoolHashTable(memory_pool, 8) {}
 
 			String *get(const char *string)
 			{
