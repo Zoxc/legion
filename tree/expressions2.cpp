@@ -81,6 +81,27 @@ namespace Legion
 			return 0;
 	}
 
+	Type *BinaryOpNode::get_type(Document &document, SymbolList &stack)
+	{
+		Type *left_type = left->get_type(document, stack);
+		Type *right_type = right->get_type(document, stack);
+
+		switch(op)
+		{
+			case Lexeme::EQUAL:
+			case Lexeme::NOT_EQUAL:
+			case Lexeme::LOGICAL_AND:
+			case Lexeme::LOGICAL_OR:
+				left_type->compatible(document, stack, right_type, right);
+				return &document.compiler.types.type_bool.type;
+
+			default:
+				return 0;
+		}
+
+		return left_type;
+	}
+
 	void UnaryOpNode::setup_type(Document &document, LocalNode &local, bool name)
 	{
 		if(op != Lexeme::MUL)
@@ -89,6 +110,30 @@ namespace Legion
 		value->setup_type(document, local, name);
 		
 		local.type_node->modifiers.add<TypePointerNode>(document.memory_pool);
+	}
+
+	Type *UnaryOpNode::get_type(Document &document, SymbolList &stack)
+	{
+		Type *type = value->get_type(document, stack);
+
+		switch(op)
+		{
+			case Lexeme::NOT_EQUAL:
+				document.compiler.types.type_bool.type.Type::compatible(document, stack, type, value);
+				return &document.compiler.types.type_bool.type;
+
+			default:
+				return 0;
+		}
+	}
+
+	Type *ArraySubscriptNode::get_type(Document &document, SymbolList &stack)
+	{
+		Type *type = index->get_type(document, stack);
+
+		document.compiler.types.type_int.type.Type::compatible(document, stack, index);
+		
+		return 0;
 	}
 
 	void ArrayDefNode::setup_type(Document &document, LocalNode &local, bool name)
@@ -116,6 +161,13 @@ namespace Legion
 		}
 	}
 
+	Type *FactorChainNode::get_type(Document &document, SymbolList &stack)
+	{
+		Type *type = factor->get_type(document, stack);
+
+		return 0;
+	}
+
 	Type *IntegerNode::get_type(Document &document, SymbolList &stack)
 	{
 		return &document.compiler.types.type_int.type;
@@ -140,4 +192,14 @@ namespace Legion
 	{
 		return &document.compiler.types.type_null.type;
 	}
+
+	Type *CallNode::get_type(Document &document, SymbolList &stack)
+	{
+		for(ExpressionList::Iterator i = arguments.begin(); i; i++)
+			(*i)->get_type(document, stack);
+
+		return 0;
+	}
+
+	
 };

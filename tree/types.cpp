@@ -59,15 +59,18 @@ namespace Legion
 		return indirect;
 	}
 
-	void Type::compitable(Document &document, SymbolList &stack, ExpressionNode *node)
+	void Type::compatible(Document &document, SymbolList &stack, Type *type, ExpressionNode *node)
 	{
-		Type *type = node->get_type(document, stack);
-
 		if(!this || !type)
 			return;
 
 		if(!compatible(type))
 			node->get_range().report(document, "Unable to convert type '" + type->string() + "' to type '" + this->string() + "'");
+	}
+
+	void Type::compatible(Document &document, SymbolList &stack, ExpressionNode *node)
+	{
+		compatible(document, stack, node->get_type(document, stack), node);
 	}
 
 	void Types::declare(Compiler &compiler, const char *name, TypeNativeNode &type, bool declare)
@@ -85,6 +88,7 @@ namespace Legion
 	Types::Types(Compiler &compiler)
 	{
 		declare(compiler, "null", type_null, false);
+		declare(compiler, "void", type_void, false);
 
 		declare(compiler, "abilcmd", type_abilcmd, true);
 		declare(compiler, "actor", type_actor, true);

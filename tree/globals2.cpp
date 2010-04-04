@@ -39,7 +39,7 @@ namespace Legion
 			type = pair->get_type(document, stack);
 
 			if(has_value)
-				type->compitable(document, stack, value);
+				type->compatible(document, stack, value);
 		}
 
 		return type;

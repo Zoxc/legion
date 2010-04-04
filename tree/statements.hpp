@@ -53,6 +53,11 @@ namespace Legion
 	struct ControlFlowNode:
 		public StatementNode
 	{
+		ControlFlowNode() : condition(0) {}
+
+		ExpressionNode *condition;
+
+		Type *get_type(Document &document, SymbolList &stack);
 		virtual bool use_semi()
 		{
 			return false;
@@ -62,9 +67,8 @@ namespace Legion
 	struct IfNode:
 		public ControlFlowNode
 	{
-		IfNode() : condition(0), do_true(0), do_false(0) {}
+		IfNode() : do_true(0), do_false(0) {}
 		
-		ExpressionNode *condition;
 		Block *do_true;
 		Block *do_false;
 		Range range;
@@ -83,9 +87,8 @@ namespace Legion
 	struct WhileNode:
 		public ControlFlowNode
 	{
-		WhileNode() : condition(0), body(0) {}
+		WhileNode() : body(0) {}
 		
-		ExpressionNode *condition;
 		Block *body;
 		Range range;
 
@@ -103,10 +106,9 @@ namespace Legion
 	struct DoNode:
 		public ControlFlowNode
 	{
-		DoNode() : body(0), condition(0) {}
+		DoNode() : body(0) {}
 		
 		Block *body;
-		ExpressionNode *condition;
 		Range range;
 
 		Node::NodeType node_type()

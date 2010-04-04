@@ -81,7 +81,8 @@ namespace Legion
 
 			Type *get_indirect(Document &document);
 			static Type *resolve(Type *type);
-			void compitable(Document &document, SymbolList &stack, ExpressionNode *node);
+			void compatible(Document &document, SymbolList &stack, ExpressionNode *node);
+			void compatible(Document &document, SymbolList &stack, Type *type, ExpressionNode *node);
 
 			virtual std::string string(bool show_typedef = true) = 0;
 
@@ -234,6 +235,7 @@ namespace Legion
 
 		public:
 			TypeNativeNode type_null;
+			TypeNativeNode type_void;
 
 			TypeNativeNode type_abilcmd;
 			TypeNativeNode type_actor;

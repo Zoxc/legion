@@ -88,6 +88,8 @@ namespace Legion
 			return right->is_declaration_name();
 		};
 
+		Type *get_type(Document &document, SymbolList &stack);
+
 		void setup_type(Document &document, LocalNode &local, bool name);
 
 		NodeType node_type()
@@ -121,7 +123,7 @@ namespace Legion
 		{
 			Type *left_type = left->get_type(document, stack);
 
-			left_type->compitable(document, stack, right);
+			left_type->compatible(document, stack, right);
 
 			return left_type;
 		}
@@ -150,6 +152,7 @@ namespace Legion
 		};
 
 		void setup_type(Document &document, LocalNode &local, bool name);
+		Type *get_type(Document &document, SymbolList &stack);
 
 		Range get_range()
 		{
@@ -175,6 +178,8 @@ namespace Legion
 		{
 			return *range;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 
 	struct ArrayDefNode:
@@ -248,6 +253,7 @@ namespace Legion
 		}
 
 		void setup_type(Document &document, LocalNode &local, bool name);
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 
 	struct IntegerNode:
@@ -359,5 +365,7 @@ namespace Legion
 		{
 			return *ident->range;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 };

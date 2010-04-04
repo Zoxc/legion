@@ -1,5 +1,6 @@
 #include "statements.hpp"
 #include "../document.hpp"
+#include "../compiler.hpp"
 
 namespace Legion
 {
@@ -69,6 +70,13 @@ namespace Legion
 		return false;
 	}
 
+	Type *ControlFlowNode::get_type(Document &document, SymbolList &stack)
+	{
+		document.compiler.types.type_bool.type.Type::compatible(document, stack, condition);
+
+		return 0;
+	}
+
 	StatementNode *LocalNode::get_declaration(Document &document)
 	{
 		type_node = new (document.memory_pool) TypeNode;
@@ -87,7 +95,7 @@ namespace Legion
 			type = type_node->get_type(document, stack);
 
 			if(has_value)
-				type->compitable(document, stack, value);
+				type->compatible(document, stack, value);
 		}
 
 		return type;
