@@ -66,7 +66,7 @@ namespace Legion
 		if(!this || !type)
 			return;
 
-		if(!compitable(type))
+		if(!compatible(type))
 			node->get_range().report(document, "Unable to convert type '" + type->string() + "' to type '" + this->string() + "'");
 	}
 

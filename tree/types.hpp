@@ -85,7 +85,7 @@ namespace Legion
 
 			virtual std::string string(bool show_typedef = true) = 0;
 
-			virtual bool compitable(Type *other)
+			virtual bool compatible(Type *other)
 			{
 				return this == other || this == resolve(other);
 			}
@@ -104,7 +104,7 @@ namespace Legion
 				return name->string();
 			}
 
-			bool compitable(Type *other)
+			bool compatible(Type *other)
 			{
 				Type *type = resolve(other);
 
@@ -182,12 +182,12 @@ namespace Legion
 					return base->string(false);
 			}
 
-			bool compitable(Type *other)
+			bool compatible(Type *other)
 			{
 				if(!base)
 					return true;
 
-				return this == other || base->compitable(other);
+				return this == other || base->compatible(other);
 			}
 	};
 
