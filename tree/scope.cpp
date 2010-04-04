@@ -38,7 +38,7 @@ namespace Legion
 			
 			while(symbol)
 			{
-				Symbol *next = symbol->next; 
+				Symbol *next = symbol->next_match; 
 				
 				store(table, mask, symbol->name, symbol);
 				
@@ -63,15 +63,15 @@ namespace Legion
 				return entry;
 			
 			tail = entry;
-			entry = entry->next;
+			entry = entry->next_match;
 		}
 		
 		if(tail)
-			tail->next = symbol;
+			tail->next_match = symbol;
 		else
 			table[index] = symbol;
 
-		symbol->next = 0;
+		symbol->next_match = 0;
 		
 		return 0;
 	}
@@ -101,7 +101,7 @@ namespace Legion
 			if(entry->name == name)
 				return entry;
 				
-			entry = entry->next;
+			entry = entry->next_match;
 		}
 		
 		return 0;

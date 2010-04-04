@@ -1,16 +1,18 @@
 #pragma once
 #include "../common.hpp"
+#include "../string_pool.hpp"
+#include "node_list.hpp"
 
 namespace Legion
 {
-	class String;
 	class Type;
 	
+	struct Node;
 	struct TypeSymbol;
 	
 	struct Symbol
 	{
-		enum Type {
+		enum SymbolType {
 			NONE,
 			TYPE,
 			FUNCTION,
@@ -18,7 +20,7 @@ namespace Legion
 			TYPES
 		};
 		
-		Symbol(Type type) : type(type), name(0) {}
+		Symbol(SymbolType type) : type(type), name(0) {}
 
 		void redeclared(Document &document)
 		{
@@ -27,13 +29,16 @@ namespace Legion
 
 		static std::string names[TYPES];
 		
-		Type type;
+		SymbolType type;
 		Range *range;
 		String *name;
-		Symbol *next;
+		Symbol *next_match; // Next for chained symbols in a Scope
+		Symbol *next; // Next for symbols in a NodeList
 	};
+
+	typedef NodeList<Symbol> SymbolList;
 	
-	template<Symbol::Type symbol_type> struct SymbolType:
+	template<Symbol::SymbolType symbol_type> struct SymbolType:
 		public Symbol
 	{
 		SymbolType() : Symbol(symbol_type) {}
@@ -42,7 +47,9 @@ namespace Legion
 	struct TypeSymbol:
 		public SymbolType<Symbol::TYPE>
 	{
-		Type *type_ptr;
+		TypeSymbol() : node(0) {}
+
+		Node *node;
 	};
 
 	struct VarSymbol:

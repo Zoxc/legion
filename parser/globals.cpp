@@ -43,6 +43,7 @@ namespace Legion
 		StructNode *node = list->add<StructNode>(memory_pool);
 		
 		node->symbol = declare<TypeSymbol>();
+		node->symbol->node = node;
 		
 		if(match(Lexeme::BRACET_OPEN))
 		{
@@ -64,13 +65,14 @@ namespace Legion
 	{
 		step();
 		
-		TypedefNode *type_def = list->add<TypedefNode>(memory_pool);
-		
 		PairNode *pair = new (memory_pool) PairNode;
 		
 		if(parse_pair(pair))
 		{
+			TypedefNode *type_def = list->add<TypedefNode>(memory_pool);
+		
 			type_def->symbol = declare<TypeSymbol>(pair);
+			type_def->symbol->node = type_def;
 			type_def->pair = pair;
 			
 			match(Lexeme::SEMICOLON);

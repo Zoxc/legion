@@ -43,11 +43,12 @@ namespace Legion
 	TypeNode *Parser::parse_type()
 	{
 		TypeNode *type = new (memory_pool) TypeNode;
-		
+
 		if(expect(Lexeme::IDENT))
 		{
 			type->name = lexer.lexeme.value;
-
+			type->range = new Range(lexer.lexeme);
+		
 			step();
 		}
 

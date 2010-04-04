@@ -14,9 +14,9 @@ namespace Legion
 			bool map();
 			const char_t *input;
 			size_t length;
-			Compiler *compiler;
 		public:
 			MemoryPool memory_pool;
+			Compiler &compiler;
 			Parser parser;
 			std::string filename;
 			NamespaceList tree;
@@ -25,8 +25,9 @@ namespace Legion
 
 			bool parse();
 			void find_declarations();
+			void type_check();
 			
-			Document(Compiler *compiler, std::string filename);
+			Document(Compiler &compiler, std::string filename);
 			~Document();
 	};
 };

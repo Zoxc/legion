@@ -3,6 +3,7 @@
 #include <map>
 #include <vector>
 #include <string>
+#include <set>
 #include <sstream>
 #ifdef AST_DEBUG
 	#include <typeinfo>

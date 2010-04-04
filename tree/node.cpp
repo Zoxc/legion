@@ -72,7 +72,21 @@ namespace Legion
 			return false;
 		}
 
-		virtual Type *get_type(Document &document, SymbolList &stack)
+		void compitable(Document &document, SymbolList &stack, ExpressionNode *node)
+		{
+			Type *left = get_type(document, stack);
+			Type *right = node->get_type(document, stack);
+
+			if(!left || !right)
+				return;
+
+			if(!left->compitable(right))
+			{
+				node->get_range(
+			}
+		}
+
+		virtual Legion::Type *get_type(Document &document, SymbolList &stack)
 		{
 			return 0;
 		}

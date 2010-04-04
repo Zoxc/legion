@@ -19,6 +19,8 @@ namespace Legion
 	struct StatementNode:
 		public ListNode
 	{
+		virtual Range get_range() = 0;
+
 		virtual StatementNode *get_declaration(Document &document)
 		{
 			return 0;
@@ -32,12 +34,19 @@ namespace Legion
 	{
 		StatementList statements;
 		Scope *scope;
+		Range range;
 
 		bool find_declarations(Document *document);
+		Type *get_type(Document &document, SymbolList &stack);
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return BLOCK_NODE;
+		}
+
+		Range get_range()
+		{
+			return range;
 		}
 	};
 
@@ -58,10 +67,16 @@ namespace Legion
 		ExpressionNode *condition;
 		Block *do_true;
 		Block *do_false;
+		Range range;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return IF_NODE;
+		}
+
+		Range get_range()
+		{
+			return range;
 		}
 	};
 	
@@ -72,10 +87,16 @@ namespace Legion
 		
 		ExpressionNode *condition;
 		Block *body;
+		Range range;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return WHILE_NODE;
+		}
+
+		Range get_range()
+		{
+			return range;
 		}
 	};
 	
@@ -86,10 +107,16 @@ namespace Legion
 		
 		Block *body;
 		ExpressionNode *condition;
+		Range range;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return DO_NODE;
+		}
+
+		Range get_range()
+		{
+			return range;
 		}
 	};
 
@@ -98,46 +125,77 @@ namespace Legion
 	{
 		ExpressionNode *value;
 		bool has_value;
+		Range range;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return RETURN_NODE;
+		}
+
+		Range get_range()
+		{
+			return range;
 		}
 	};
 
 	struct BreakNode:
 		public StatementNode
 	{
-		Node::Type get_type()
+		Range range;
+
+		Node::NodeType node_type()
 		{
 			return BREAK_NODE;
+		}
+
+		Range get_range()
+		{
+			return range;
 		}
 	};
 
 	struct ContinueNode:
 		public StatementNode
 	{
-		Node::Type get_type()
+		Range range;
+
+		Node::NodeType node_type()
 		{
 			return CONTINUE_NODE;
+		}
+
+		Range get_range()
+		{
+			return range;
 		}
 	};
 
 	struct LocalNode:
 		public StatementNode
 	{
+		LocalNode() : type(0), type_node(0) {}
+
 		ExpressionNode *type_expression;
-		TypeNode *type;
+		TypeNode *type_node;
+		Type *type;
 		VarSymbol *symbol;
 		ExpressionNode *value;
 		bool has_value;
 		bool is_const;
+		Range range;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return LOCAL_NODE;
 		}
 
+		Range get_range()
+		{
+			return range;
+		}
+
 		StatementNode *get_declaration(Document &document);
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 };

@@ -18,8 +18,6 @@ namespace Legion
 			return false;
 		}
 
-		virtual Range get_range() = 0;
-
 		virtual bool is_type_name(Document &document)
 		{
 			return false;
@@ -40,7 +38,7 @@ namespace Legion
 		String *ident;
 		Range *range;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::IDENT_NODE;
 		}
@@ -89,7 +87,7 @@ namespace Legion
 
 		void setup_type(Document &document, LocalNode &local, bool name);
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::BINARY_OP_NODE;
 		}
@@ -116,7 +114,16 @@ namespace Legion
 				return 0;
 		}
 
-		Type get_type()
+		Type *get_type(Document &document, SymbolList &stack)
+		{
+			Type *left_type = left->get_type(document, stack);
+
+			left_type->compitable(document, stack, right);
+
+			return left_type;
+		}
+
+		NodeType node_type()
 		{
 			return Node::ASSIGN_NODE;
 		}
@@ -129,7 +136,7 @@ namespace Legion
 		ExpressionNode *value;
 		Range *range;
 		
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::UNARY_OP_NODE;
 		}
@@ -155,7 +162,7 @@ namespace Legion
 		ExpressionNode *index;
 		Range *range;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::ARRAY_SUBSCRIPT_NODE;
 		}
@@ -171,7 +178,7 @@ namespace Legion
 	{
 		ExpressionList sizes;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::ARRAY_DEF_NODE;
 		}
@@ -200,7 +207,7 @@ namespace Legion
 		bool by_ptr;
 		Range *range;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::MEMBER_REF_NODE;
 		}
@@ -217,7 +224,7 @@ namespace Legion
 		ExpressionNode *factor;
 		ExpressionList chain;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::FACTOR_CHAIN_NODE;
 		}
@@ -245,7 +252,7 @@ namespace Legion
 		int value;
 		Range *range;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::INT_NODE;
 		}
@@ -254,6 +261,8 @@ namespace Legion
 		{
 			return *range;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 
 	struct StringNode:
@@ -262,7 +271,7 @@ namespace Legion
 		String *value;
 		Range *range;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::STRING_NODE;
 		}
@@ -271,6 +280,8 @@ namespace Legion
 		{
 			return *range;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 
 	struct FixedNode:
@@ -279,7 +290,7 @@ namespace Legion
 		double value;
 		Range *range;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::FIXED_NODE;
 		}
@@ -288,6 +299,8 @@ namespace Legion
 		{
 			return *range;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 
 	struct BooleanNode:
@@ -296,7 +309,7 @@ namespace Legion
 		bool value;
 		Range *range;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::BOOL_NODE;
 		}
@@ -305,6 +318,8 @@ namespace Legion
 		{
 			return *range;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 
 	struct NullNode:
@@ -312,7 +327,7 @@ namespace Legion
 	{
 		Range *range;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::NULL_NODE;
 		}
@@ -321,6 +336,8 @@ namespace Legion
 		{
 			return *range;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 
 	struct CallNode:
@@ -330,7 +347,7 @@ namespace Legion
 		ExpressionList arguments;
 		Range *range;
 
-		Type get_type()
+		NodeType node_type()
 		{
 			return Node::CALL_NODE;
 		}

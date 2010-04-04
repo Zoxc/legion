@@ -1,5 +1,6 @@
 #include "expressions.hpp"
 #include "../document.hpp"
+#include "../compiler.hpp"
 
 namespace Legion
 {
@@ -17,17 +18,8 @@ namespace Legion
 		}
 		else
 		{
-			Symbol *symbol = document.scope->lookup(ident);
-
-			if(symbol && symbol->type == Symbol::TYPE)
-				local.type->name = ident;
-			else
-			{
-				if(symbol)
-					range->report(document, "Expected type, but found '" + ident->string() + "' (" + Symbol::names[symbol->type] + ")");
-				else
-					range->report(document, "Undeclared type '" + ident->string() + "'");
-			}
+			local.type_node->name = ident;
+			local.type_node->range = range;
 		}
 	}
 
@@ -38,7 +30,7 @@ namespace Legion
 
 		left->setup_type(document, local, name);
 		
-		local.type->modifiers.add<TypePointerNode>(&document.memory_pool);
+		local.type_node->modifiers.add<TypePointerNode>(&document.memory_pool);
 		
 		right->setup_type(document, local, name);
 	}
@@ -53,7 +45,7 @@ namespace Legion
 
 			local->is_const = false;
 			local->has_value = false;
-			local->type = new (memory_pool) TypeNode;
+			local->type_node = new (memory_pool) TypeNode;
 			local->symbol = new (memory_pool) VarSymbol;
 
 			if(op != Lexeme::MUL)
@@ -61,7 +53,7 @@ namespace Legion
 
 			left->setup_type(document, *local, false);
 
-			local->type->modifiers.add<TypePointerNode>(memory_pool);
+			local->type_node->modifiers.add<TypePointerNode>(memory_pool);
 
 			right->setup_type(document, *local, true);
 
@@ -81,14 +73,14 @@ namespace Legion
 		
 		value->setup_type(document, local, name);
 		
-		local.type->modifiers.add<TypePointerNode>(document.memory_pool);
+		local.type_node->modifiers.add<TypePointerNode>(document.memory_pool);
 	}
 
 	void ArrayDefNode::setup_type(Document &document, LocalNode &local, bool name)
 	{
 		for(ExpressionList::Iterator i = sizes.begin(); i; i++)
 		{
-			TypeArrayNode *node = local.type->modifiers.add<TypeArrayNode>(document.memory_pool);
+			TypeArrayNode *node = local.type_node->modifiers.add<TypeArrayNode>(document.memory_pool);
 
 			node->size = *i;
 		}
@@ -98,14 +90,39 @@ namespace Legion
 	{
 		for(ExpressionList::Iterator i = chain.begin(); i; i++)
 		{
-			if((*i)->get_type() != Node::ARRAY_SUBSCRIPT_NODE)
+			if((*i)->node_type() != Node::ARRAY_SUBSCRIPT_NODE)
 				(*i)->get_range().report_type_modifier(document);
 			else
 			{
-				TypeArrayNode *node = local.type->modifiers.add<TypeArrayNode>(document.memory_pool);
+				TypeArrayNode *node = local.type_node->modifiers.add<TypeArrayNode>(document.memory_pool);
 
 				node->size = ((ArraySubscriptNode *)*i)->index;
 			}
 		}
+	}
+
+	Type *IntegerNode::get_type(Document &document, SymbolList &stack)
+	{
+		return &document.compiler.types.type_int.type;
+	}
+
+	Type *StringNode::get_type(Document &document, SymbolList &stack)
+	{
+		return &document.compiler.types.type_string.type;
+	}
+
+	Type *FixedNode::get_type(Document &document, SymbolList &stack)
+	{
+		return &document.compiler.types.type_fixed.type;
+	}
+
+	Type *BooleanNode::get_type(Document &document, SymbolList &stack)
+	{
+		return &document.compiler.types.type_bool.type;
+	}
+
+	Type *NullNode::get_type(Document &document, SymbolList &stack)
+	{
+		return &document.compiler.types.type_null.type;
 	}
 };

@@ -65,11 +65,11 @@ namespace Legion
 	std::string Printer::print(NamespaceList *list)
 	{
 		std::string result;
-		Node::Type prev = Node::NONE;
+		Node::NodeType prev = Node::NONE;
 
 		for(NamespaceList::Iterator i = list->begin(); i; i++)
 		{
-			Node::Type type = (*i)->get_type();
+			Node::NodeType type = (*i)->node_type();
 
 			if(prev != Node::NONE && !(prev == type && (type == Node::TYPEDEF_NODE || type == Node::GLOBAL_NODE)))
 				result += "\n";
@@ -92,7 +92,7 @@ namespace Legion
 		if(!node)
 			return "<null_node>";
 
-		switch(node->get_type())
+		switch(node->node_type())
 		{
 			/*
 			 * Globals
@@ -194,11 +194,11 @@ namespace Legion
 
 				std::string result = indentation + "{\n";
 
-				Node::Type prev = Node::NONE;
+				Node::NodeType prev = Node::NONE;
 
 				for(StatementList::Iterator i = target->statements.begin(); i; i++)
 				{
-					Node::Type type = (*i)->get_type();
+					Node::NodeType type = (*i)->node_type();
 
 					if(prev != Node::NONE && !(prev == type && (*i)->use_semi()))
 						result += "\n";
@@ -265,7 +265,9 @@ namespace Legion
 				std::string result;
 				
 				if(target->type)
-					result = print_node(target->type);
+					result = target->type->string();
+				else if(target->type_node)
+					result = print_node(target->type_node);
 				else
 					result = print_node(target->type_expression);
 				

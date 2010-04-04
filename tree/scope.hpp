@@ -43,7 +43,7 @@ namespace Legion
 			Symbol *lookup(String *name);
 			Symbol *set(String *name, Symbol *symbol);
 
-			Symbol::Type lookup_type(String *name)
+			Symbol::SymbolType lookup_type(String *name)
 			{
 				Symbol *symbol = lookup(name);
 

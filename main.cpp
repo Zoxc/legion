@@ -20,7 +20,7 @@ void include(std::string file)
 			return;
 	}
 	
-	Document *document = new Document(&compiler, file);
+	Document *document = new Document(compiler, file);
 
 	queue.push_back(document);
 	documents.push_back(document);
@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 
 	for(int i = 1; i < argc; i++)
 	{
-		Document *document = new Document(&compiler, argv[i]);
+		Document *document = new Document(compiler, argv[i]);
 
 		queue.push_back(document);
 		documents.push_back(document);
@@ -83,12 +83,24 @@ int main(int argc, char *argv[])
 	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
 		(*i)->find_declarations();
 
-
 	BENCHMARK_END("Found declarations");
 
 	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
 	{
 		std::cout << std::endl << "Printing post-AST for " + (*i)->filename << std::endl;
+		std::cout << printer.print(&(*i)->tree) << std::endl;
+	}
+	
+	BENCHMARK_START;
+
+	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
+		(*i)->type_check();
+
+	BENCHMARK_END("Typechecked");
+
+	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
+	{
+		std::cout << std::endl << "Printing post-typechecking-AST for " + (*i)->filename << std::endl;
 		std::cout << printer.print(&(*i)->tree) << std::endl;
 	}
 	

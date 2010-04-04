@@ -250,7 +250,15 @@
 				>
 			</File>
 			<File
+				RelativePath=".\tree\globals2.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\tree\node.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\tree\node_list.hpp"
 				>
 			</File>
 			<File

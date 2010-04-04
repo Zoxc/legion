@@ -33,9 +33,14 @@ namespace Legion
 		String *name;
 		Range range;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return PAIR_NODE;
+		}
+
+		Type *get_type(Document &document, SymbolList &stack)
+		{
+			return type->get_type(document, stack);
 		}
 	};
 
@@ -45,7 +50,7 @@ namespace Legion
 	{
 		PairNode pair;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return FIELD_NODE;
 		}
@@ -54,33 +59,41 @@ namespace Legion
 	struct StructNode:
 		public NamespaceNode
 	{
+		StructNode() : type(0) {}
+
 		TypeSymbol *symbol;
 		NodeList<FieldNode> fields;
+		CompositeType *type;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return STRUCT_NODE;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 	
 	struct TypedefNode:
 		public NamespaceNode
 	{
-		TypedefNode() : pair(0), symbol(0) {}
-		
+		TypedefNode() : type(0) {}
+
 		PairNode *pair;
 		TypeSymbol *symbol;
+		TypedefType *type;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return TYPEDEF_NODE;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 	
 	struct GlobalNode:
 		public NamespaceNode
 	{
-		GlobalNode() : symbol(0) {}
+		GlobalNode() : symbol(0), type(0) {}
 		
 		PairNode *pair;
 		bool is_const;
@@ -88,11 +101,14 @@ namespace Legion
 		VarSymbol *symbol;
 		ExpressionNode *value;
 		bool has_value;
+		Type *type;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return GLOBAL_NODE;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 	
 	struct ParamNode:
@@ -100,13 +116,13 @@ namespace Legion
 	{
 		PairNode pair;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return PARAM_NODE;
 		}
 
 	};
-		
+	
 	struct FuncHeadNode:
 		public Node
 	{
@@ -118,7 +134,7 @@ namespace Legion
 		FuncSymbol *symbol;
 		NodeList<ParamNode> params;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return FUNC_HEAD_NODE;
 		}
@@ -129,7 +145,7 @@ namespace Legion
 	{
 		FuncHeadNode *head;
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return PROTOTYPE_NODE;
 		}
@@ -156,9 +172,16 @@ namespace Legion
 			return false;
 		}
 
-		Node::Type get_type()
+		Node::NodeType node_type()
 		{
 			return FUNC_NODE;
+		}
+
+		Type *get_type(Document &document, SymbolList &stack)
+		{
+			body->get_type(document, stack);
+
+			return 0;
 		}
 	};
 };

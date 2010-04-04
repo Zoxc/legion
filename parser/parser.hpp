@@ -107,6 +107,7 @@ namespace Legion
 			{
 				Block *block = new (memory_pool) Block;
 
+				block->range.capture(lexer.lexeme);
 				block->scope = push_scope(type);
 
 				if(bracets_required)
@@ -128,6 +129,8 @@ namespace Legion
 					else
 						parse_statements(&block->statements);
 				}
+
+				block->range.expand(lexer.lexeme);
 
 				pop_scope();
 					

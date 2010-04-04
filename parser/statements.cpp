@@ -11,6 +11,7 @@ namespace Legion
 	{
 		LocalNode *node = list->add<LocalNode>(memory_pool);
 
+		node->range.capture(type->get_range());
 		node->type_expression = type;
 		node->type = 0;
 
@@ -38,15 +39,21 @@ namespace Legion
 		}
 		else
 			node->has_value = false;
+
+		node->range.expand(lexer.lexeme);
 	}
 
 	void Parser::parse_if(StatementList *list)
 	{
 		IfNode *node = list->add<IfNode>(memory_pool);
+
+		node->range.capture(lexer.lexeme);
 		
 		step();
 		
 		node->condition = parse_grouped_expression();
+		node->range.expand(lexer.lexeme);
+
 		node->do_true = parse_block<false>(Scope::CONDITIONAL);
 
 		lexer.identify_keywords();
@@ -59,15 +66,21 @@ namespace Legion
 	{
 		WhileNode *node = list->add<WhileNode>(memory_pool);
 
+		node->range.capture(lexer.lexeme);
+
 		step();
 		
 		node->condition = parse_grouped_expression();
+		node->range.expand(lexer.lexeme);
+
 		node->body = parse_block<false>(Scope::LOOP);
 	}
 	
 	void Parser::parse_do(StatementList *list)
 	{
 		DoNode *node = list->add<DoNode>(memory_pool);
+
+		node->range.capture(lexer.lexeme);
 
 		step();
 		
@@ -83,6 +96,8 @@ namespace Legion
 	void Parser::parse_return(StatementList *list)
 	{
 		ReturnNode *node = list->add<ReturnNode>(memory_pool);
+
+		node->range.capture(lexer.lexeme);
 		
 		step();
 
@@ -99,7 +114,7 @@ namespace Legion
 	void Parser::parse_break(StatementList *list)
 	{
 		if(scope->type == Scope::LOOP)
-			list->add<BreakNode>(memory_pool);
+			list->add<BreakNode>(memory_pool)->range.capture(lexer.lexeme);
 		else
 			lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.describe() + " outside of loop");
 		
@@ -109,7 +124,7 @@ namespace Legion
 	void Parser::parse_continue(StatementList *list)
 	{
 		if(scope->type == Scope::LOOP)
-			list->add<ContinueNode>(memory_pool);
+			list->add<ContinueNode>(memory_pool)->range.capture(lexer.lexeme);
 		else
 			lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.describe() + " outside of loop");
 		
