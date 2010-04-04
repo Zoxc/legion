@@ -114,7 +114,7 @@ namespace Legion
 	
 	void Parser::parse_break(StatementList *list)
 	{
-		if(scope->type == Scope::LOOP)
+		if(scope->find_type(Scope::LOOP))
 			list->add<BreakNode>(memory_pool)->range.capture(lexer.lexeme);
 		else
 			lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.describe() + " outside of loop");
@@ -124,7 +124,7 @@ namespace Legion
 	
 	void Parser::parse_continue(StatementList *list)
 	{
-		if(scope->type == Scope::LOOP)
+		if(scope->find_type(Scope::LOOP))
 			list->add<ContinueNode>(memory_pool)->range.capture(lexer.lexeme);
 		else
 			lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.describe() + " outside of loop");

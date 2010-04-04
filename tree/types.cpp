@@ -124,7 +124,9 @@ namespace Legion
 
 		type_fixed.type.implicit_conversions.insert(&type_int.type);
 
+		type_abilcmd.type.implicit_conversions.insert(&type_null.type);
 		type_marker.type.implicit_conversions.insert(&type_null.type);
+		type_order.type.implicit_conversions.insert(&type_null.type);
 		type_point.type.implicit_conversions.insert(&type_null.type);
 		type_string.type.implicit_conversions.insert(&type_null.type);
 		type_unit.type.implicit_conversions.insert(&type_null.type);

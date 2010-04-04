@@ -68,6 +68,14 @@ namespace Legion
 				else
 					return 0;
 			}
+			
+			bool find_type(Type target)
+			{
+				if((size_t)target < (size_t)type)
+					return parent->find_type(target);
+				else
+					return type == target;
+			}
 
 			Symbol::SymbolType lookup_type(String *name)
 			{
