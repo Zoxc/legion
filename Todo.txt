@@ -1,3 +1,3 @@
 [ ] Store grouped expressions in the AST.
-[ ] Use a own scope for parameters
+[X] Use a own scope for parameters
 [ ] Implement array types

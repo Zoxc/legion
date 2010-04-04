@@ -86,7 +86,7 @@ namespace Legion
 
 			virtual std::string string(bool show_typedef = true) = 0;
 
-			virtual bool compatible(Type *other)
+			virtual bool compatible(Document &document, Type *other)
 			{
 				return this == other || this == resolve(other);
 			}
@@ -105,7 +105,7 @@ namespace Legion
 				return name->string();
 			}
 
-			bool compatible(Type *other)
+			bool compatible(Document &document, Type *other)
 			{
 				Type *type = resolve(other);
 
@@ -154,13 +154,8 @@ namespace Legion
 
 			std::string string(bool show_typedef)
 			{
-				std::stringstream out;
-
-				out << "struct " << name->string();
-
-				return out.str();
+				return name->string();
 			}
-
 	};
 
 	class TypedefType:
@@ -183,12 +178,12 @@ namespace Legion
 					return base->string(false);
 			}
 
-			bool compatible(Type *other)
+			bool compatible(Document &document, Type *other)
 			{
 				if(!base)
 					return true;
 
-				return this == other || base->compatible(other);
+				return this == other || base->compatible(document, other);
 			}
 	};
 
@@ -224,6 +219,8 @@ namespace Legion
 			{
 				return base->string(show_typedef) + "*";
 			}
+
+			bool compatible(Document &document, Type *other);
 	};
 
 	class Compiler;

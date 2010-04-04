@@ -72,7 +72,15 @@ namespace Legion
 
 	Type *ControlFlowNode::get_type(Document &document, SymbolList &stack)
 	{
-		document.compiler.types.type_bool.type.Type::compatible(document, stack, condition);
+		Type *type = condition->get_type(document, stack);
+
+		if(!type)
+			return 0;
+
+		if(document.compiler.types.type_bool.type.compatible(document, type) || type->compatible(document, &document.compiler.types.type_null.type))
+			return 0;
+
+		condition->get_range().report_types(document, type, &document.compiler.types.type_bool.type);
 
 		return 0;
 	}

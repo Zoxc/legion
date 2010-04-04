@@ -5,6 +5,7 @@
 namespace Legion
 {
 	class Document;
+	class Type;
 
 	class Range
 	{
@@ -90,5 +91,7 @@ namespace Legion
 				else
 					report(document, "Undeclared " + Symbol::names[type] + " '" + name->string() + "'");
 			}
+
+			void report_types(Document &document, Type *from, Type *to);
 	};
 };

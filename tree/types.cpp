@@ -16,7 +16,7 @@ namespace Legion
 			return 0;
 		}
 
-		return ((TypeSymbol *)symbol)->node->get_type(document, stack);
+		return symbol->node->get_type(document, stack);
 	}
 
 	Type *TypeNode::get_type(Document &document, SymbolList &stack)
@@ -64,13 +64,21 @@ namespace Legion
 		if(!this || !type)
 			return;
 
-		if(!compatible(type))
-			node->get_range().report(document, "Unable to convert type '" + type->string() + "' to type '" + this->string() + "'");
+		if(!compatible(document, type))
+			node->get_range().report_types(document, type, this);
 	}
 
 	void Type::compatible(Document &document, SymbolList &stack, ExpressionNode *node)
 	{
 		compatible(document, stack, node->get_type(document, stack), node);
+	}
+
+	bool PointerType::compatible(Document &document, Type *other)
+	{
+		if(!base)
+			return true;
+
+		return this == other || other == &document.compiler.types.type_null.type || base->compatible(document, other);
 	}
 
 	void Types::declare(Compiler &compiler, const char *name, TypeNativeNode &type, bool declare)

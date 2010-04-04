@@ -22,7 +22,7 @@ namespace Legion
 			TYPES
 		};
 		
-		Symbol(SymbolType type) : type(type), name(0) {}
+		Symbol(SymbolType type) : type(type), name(0), node(0) {}
 
 		void redeclared(Document &document);
 
@@ -31,6 +31,7 @@ namespace Legion
 		SymbolType type;
 		Range *range;
 		String *name;
+		Node *node;
 		Symbol *next_match; // Next for chained symbols in a Scope
 		Symbol *next; // Next for symbols in a NodeList
 	};
@@ -46,25 +47,18 @@ namespace Legion
 	struct TypeSymbol:
 		public SymbolType<Symbol::TYPE>
 	{
-		TypeSymbol() : node(0) {}
-
-		Node *node;
 	};
 
 	struct VarSymbol:
 		public SymbolType<Symbol::VARIABLE>
 	{
-		VarSymbol() : node(0) {}
-
-		Node *node;
 	};
 	
 	struct FuncSymbol:
 		public SymbolType<Symbol::FUNCTION>
 	{
-		FuncSymbol() : returns(0), defined(false) {}
+		FuncSymbol() : defined(false) {}
 
-		Type *returns;
 		bool defined;
 	};
 };

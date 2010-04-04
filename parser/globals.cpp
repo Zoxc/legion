@@ -151,8 +151,20 @@ namespace Legion
 
 				prev_func->defined = true;
 			}
+			else
+				head->symbol->node = func;
 
-			func->body = parse_block<true>(Scope::FUNCTION);
+			func->scope = push_scope(Scope::FUNCTION);
+
+			for(NodeList<ParamNode>::Iterator i = head->params.begin(); i; i++)
+			{
+				VarSymbol *symbol = declare<VarSymbol>(&(*i)->pair);
+				symbol->node = *i;
+			}
+			
+			func->body = parse_block<true>(Scope::EMPTY);
+
+			pop_scope();
 		}
 		else
 		{

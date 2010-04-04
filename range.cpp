@@ -1,8 +1,14 @@
 #include "range.hpp"
 #include "document.hpp"
+#include "tree/types.hpp"
 
 namespace Legion
 {
+	void Range::report_types(Document &document, Type *from, Type *to)
+	{
+		report(document, "Unable to convert type '" + from->string() + "' to type '" + to->string() + "'");
+	}
+
 	void Range::report(Document *document, const std::string& error)
 	{
 		std::cout << document->filename << "[" << line + 1 << "]: " << error << std::endl << get_line() << std::endl;

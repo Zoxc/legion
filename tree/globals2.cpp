@@ -44,4 +44,12 @@ namespace Legion
 
 		return type;
 	}
+
+	Type *ParamNode::get_type(Document &document, SymbolList &stack)
+	{
+		if(!type)
+			type = pair.get_type(document, stack);
+
+		return type;
+	}
 };

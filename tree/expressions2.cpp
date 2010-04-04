@@ -34,7 +34,7 @@ namespace Legion
 			return 0;
 		}
 
-		return ((VarSymbol *)symbol)->node->get_type(document, stack);
+		return symbol->node->get_type(document, stack);
 	}
 
 	void BinaryOpNode::setup_type(Document &document, LocalNode &local, bool name)

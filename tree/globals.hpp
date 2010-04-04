@@ -115,12 +115,14 @@ namespace Legion
 		public ListNode
 	{
 		PairNode pair;
+		Type *type;
 
 		Node::NodeType node_type()
 		{
 			return PARAM_NODE;
 		}
 
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 	
 	struct FuncHeadNode:
@@ -157,6 +159,7 @@ namespace Legion
 		public NamespaceNode
 	{
 		FuncHeadNode *head;
+		Scope *scope;
 		Block *body;
 
 		bool find_declarations(Document *document)
