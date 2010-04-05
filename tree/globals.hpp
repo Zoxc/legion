@@ -128,18 +128,21 @@ namespace Legion
 	struct FuncHeadNode:
 		public Node
 	{
-		FuncHeadNode() : symbol(0) {}
+		FuncHeadNode() : symbol(0), type(0) {}
 		
 		PairNode *pair;
 		bool is_native;
 		bool is_static;
 		FuncSymbol *symbol;
 		NodeList<ParamNode> params;
+		FunctionType *type;
 
 		Node::NodeType node_type()
 		{
 			return FUNC_HEAD_NODE;
 		}
+
+		Type *get_type(Document &document, SymbolList &stack);
 	};
 	
 	struct PrototypeNode:
@@ -182,6 +185,7 @@ namespace Legion
 
 		Type *get_type(Document &document, SymbolList &stack)
 		{
+			head->get_type(document, stack);
 			body->get_type(document, stack);
 
 			return 0;

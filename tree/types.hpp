@@ -69,6 +69,7 @@ namespace Legion
 				NATIVE_TYPE,
 				TYPEDEF_TYPE,
 				COMPOSITE_TYPE,
+				FUNCTION_TYPE,
 				ARRAY_TYPE,
 				POINTER_TYPE
 			};
@@ -155,6 +156,38 @@ namespace Legion
 			std::string string(bool show_typedef)
 			{
 				return name->string();
+			}
+	};
+
+	class FunctionType:
+		public Type
+	{
+		public:
+			class Parameter
+			{
+				public:
+					Type *type;
+					Parameter *next;
+			};
+
+			FunctionType() : Type(Type::FUNCTION_TYPE) {}
+
+			Type *returns;
+			CountedNodeList<Parameter> params;
+
+			std::string string(bool show_typedef)
+			{
+				std::string result = returns->string() + "(";
+
+				for(NodeList<Parameter>::Iterator i = params.begin(); i; i++)
+				{
+					result += (*i)->type->string();
+
+					if((*i)->next)
+						result += ", ";
+				}
+
+				return result + ")";
 			}
 	};
 

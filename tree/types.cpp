@@ -21,7 +21,12 @@ namespace Legion
 
 	Type *TypeNode::get_type(Document &document, SymbolList &stack)
 	{
-		Type *result = lookup_type(document, stack, name, range);
+		Type *result;
+		
+		if(name)
+			result = lookup_type(document, stack, name, range);
+		else
+			result = 0;
 
 		if(result)
 		{

@@ -147,12 +147,23 @@ namespace Legion
 				FuncSymbol *prev_func = (FuncSymbol *)prev;
 
 				if(prev_func->defined)
+				{
 					head->symbol->redeclared(*document);
+					head->symbol = 0;
+				}
+				else
+				{
+					prev_func->node = func;
+					prev_func->defined = true;
 
-				prev_func->defined = true;
+					head->symbol = prev_func;
+				}
 			}
 			else
+			{
+				head->symbol->defined = true;
 				head->symbol->node = func;
+			}
 
 			func->scope = push_scope(Scope::FUNCTION);
 

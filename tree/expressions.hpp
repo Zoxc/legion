@@ -250,9 +250,10 @@ namespace Legion
 
 		Range get_range()
 		{
-			Range range;
+			Range range = factor->get_range();
+			Range end = chain.last->get_range();
 
-			assert(0);
+			range.expand(end);
 
 			return range;
 		}
@@ -373,7 +374,7 @@ namespace Legion
 		public ExpressionNode
 	{
 		IdentNode *ident;
-		ExpressionList arguments;
+		CountedNodeList<ExpressionNode> arguments;
 
 		NodeType node_type()
 		{

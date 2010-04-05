@@ -25,7 +25,7 @@ namespace Legion
 			return node;
 		}
 
-		void append(T *node)
+		virtual void append(T *node)
 		{
 			if(!node)
 				return;
@@ -105,5 +105,24 @@ namespace Legion
 		{
 			return Iterator(this);
 		}
+	};
+
+	template<class T> struct CountedNodeList:
+		public NodeList<T>
+	{
+		public:
+			CountedNodeList() : size(0) {}
+
+			size_t size;
+
+			void append(T *node)
+			{
+				if(!node)
+					return;
+
+				NodeList<T>::append(node);
+
+				size++;
+			}
 	};
 };

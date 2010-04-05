@@ -129,8 +129,6 @@ namespace Legion
 
 	Type *ArraySubscriptNode::get_type(Document &document, SymbolList &stack)
 	{
-		Type *type = index->get_type(document, stack);
-
 		document.compiler.types.type_int.type.Type::compatible(document, stack, index);
 		
 		return 0;
@@ -195,11 +193,55 @@ namespace Legion
 
 	Type *CallNode::get_type(Document &document, SymbolList &stack)
 	{
-		for(ExpressionList::Iterator i = arguments.begin(); i; i++)
-			(*i)->get_type(document, stack);
+		Symbol *symbol = document.scope->lookup(ident->ident);
 
-		return 0;
+		if(!symbol || symbol->type != Symbol::FUNCTION)
+		{
+			get_range().report_expected_symbol(document, symbol, ident->ident, Symbol::FUNCTION);
+
+			return 0;
+		}
+
+		FunctionType *type = 0;
+		
+		if(symbol && symbol->node)
+			type = (FunctionType *)symbol->node->get_type(document, stack);
+
+		if(type && arguments.size != type->params.size)
+		{
+			std::stringstream message;
+
+			message << "Expected " << type->params.size << "argument";
+
+			if(type->params.size != 1)
+				message << "s";
+
+			message << " to function '" << ident->ident->string() << "', but found " << arguments.size << "argument";
+
+			if(arguments.size != 1)
+				message << "s";
+
+			get_range().report(document, message.str());
+
+			for(CountedNodeList<ExpressionNode>::Iterator i = arguments.begin(); i; i++)
+				(*i)->get_type(document, stack);
+		}
+		else if(type)
+		{
+			CountedNodeList<FunctionType::Parameter>::Iterator j = type->params.begin();
+
+			for(CountedNodeList<ExpressionNode>::Iterator i = arguments.begin(); i; i++, j++)
+				(*j)->type->compatible(document, stack, *i);
+		}
+		else
+		{
+			for(CountedNodeList<ExpressionNode>::Iterator i = arguments.begin(); i; i++)
+				(*i)->get_type(document, stack);
+		}
+
+		if(type)
+			return type->returns;
+		else
+			return 0;
 	}
-
-	
 };
