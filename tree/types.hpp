@@ -14,7 +14,7 @@ namespace Legion
 	{
 	};
 
-	typedef NodeList<TypeModifierNode> TypeModifierList;
+	typedef List<TypeModifierNode> TypeModifierList;
 
 	struct TypeNode:
 		public Node
@@ -151,7 +151,7 @@ namespace Legion
 			CompositeType() : Type(Type::COMPOSITE_TYPE) {}
 
 			String *name;
-			NodeList<Field> fields;
+			List<Field> fields;
 
 			std::string string(bool show_typedef)
 			{
@@ -173,13 +173,13 @@ namespace Legion
 			FunctionType() : Type(Type::FUNCTION_TYPE) {}
 
 			Type *returns;
-			NodeList<Parameter> params;
+			List<Parameter> params;
 
 			std::string string(bool show_typedef)
 			{
 				std::string result = returns->string() + "(";
 
-				for(NodeList<Parameter>::Iterator i = params.begin(); i; i++)
+				for(List<Parameter>::Iterator i = params.begin(); i; i++)
 				{
 					result += i().type->string();
 

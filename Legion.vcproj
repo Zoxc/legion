@@ -258,10 +258,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\tree\node_list.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\tree\printer.cpp"
 				>
 			</File>
@@ -324,6 +320,10 @@
 		</File>
 		<File
 			RelativePath=".\legion.hpp"
+			>
+		</File>
+		<File
+			RelativePath=".\list.hpp"
 			>
 		</File>
 		<File

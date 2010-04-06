@@ -167,7 +167,7 @@ namespace Legion
 
 			func->scope = push_scope(Scope::FUNCTION);
 
-			for(NodeList<ParamNode>::Iterator i = head->params.begin(); i; i++)
+			for(List<ParamNode>::Iterator i = head->params.begin(); i; i++)
 			{
 				VarSymbol *symbol = declare<VarSymbol>(&(*i)->pair);
 				symbol->node = *i;

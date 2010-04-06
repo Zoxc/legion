@@ -1,7 +1,7 @@
 #pragma once
 #include "../common.hpp"
 #include "../range.hpp"
-#include "node_list.hpp"
+#include "../list.hpp"
 #include "symbols.hpp"
 
 namespace Legion

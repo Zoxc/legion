@@ -11,7 +11,7 @@ namespace Legion
 			type = new (args.memory_pool) CompositeType();
 			type->name = symbol->name;
 
-			for(NodeList<FieldNode>::Iterator i = fields.begin(); i; i++)
+			for(List<FieldNode>::Iterator i = fields.begin(); i; i++)
 			{
 				CompositeType::Field *field = type->fields.add<CompositeType::Field>(args.memory_pool);
 				field->name = (*i)->pair.name;
@@ -65,7 +65,7 @@ namespace Legion
 			else
 				type->returns = pair->validate(args);
 
-			for(NodeList<ParamNode>::Iterator i = params.begin(); i; i++)
+			for(List<ParamNode>::Iterator i = params.begin(); i; i++)
 			{
 				FunctionType::Parameter *param = type->params.add<FunctionType::Parameter>(args.memory_pool);
 				param->type = i().pair.validate(args);

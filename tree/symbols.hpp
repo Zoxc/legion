@@ -1,7 +1,7 @@
 #pragma once
 #include "../common.hpp"
 #include "../string_pool.hpp"
-#include "node_list.hpp"
+#include "../list.hpp"
 
 namespace Legion
 {
@@ -36,7 +36,7 @@ namespace Legion
 		Symbol *next; // Next for symbols in a NodeList
 	};
 
-	typedef NodeList<Symbol> SymbolList;
+	typedef List<Symbol> SymbolList;
 	
 	template<Symbol::SymbolType symbol_type> struct SymbolType:
 		public Symbol

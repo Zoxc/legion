@@ -228,7 +228,7 @@ namespace Legion
 		}
 		else if(type)
 		{
-			NodeList<FunctionType::Parameter>::Iterator j = type->params.begin();
+			List<FunctionType::Parameter>::Iterator j = type->params.begin();
 
 			for(ExpressionList::Iterator i = arguments.begin(); i; i++, j++)
 				j().type->compatible(args, *i);

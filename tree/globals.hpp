@@ -22,7 +22,7 @@ namespace Legion
 	{
 	};
 
-	typedef NodeList<NamespaceNode> NamespaceList;
+	typedef List<NamespaceNode> NamespaceList;
 
 	struct PairNode:
 		public Node
@@ -62,7 +62,7 @@ namespace Legion
 		StructNode() : type(0) {}
 
 		TypeSymbol *symbol;
-		NodeList<FieldNode> fields;
+		List<FieldNode> fields;
 		CompositeType *type;
 
 		Node::NodeType node_type()
@@ -136,7 +136,7 @@ namespace Legion
 		bool is_native;
 		bool is_static;
 		FuncSymbol *symbol;
-		NodeList<ParamNode> params;
+		List<ParamNode> params;
 		FunctionType *type;
 
 		Node::NodeType node_type()

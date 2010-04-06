@@ -35,7 +35,7 @@ namespace Legion
 
 	};
 
-	typedef NodeList<ExpressionNode> ExpressionList;
+	typedef List<ExpressionNode> ExpressionList;
 
 	struct IdentNode:
 		public ExpressionNode
@@ -374,7 +374,7 @@ namespace Legion
 		public ExpressionNode
 	{
 		IdentNode *ident;
-		NodeList<ExpressionNode> arguments;
+		List<ExpressionNode> arguments;
 
 		NodeType node_type()
 		{

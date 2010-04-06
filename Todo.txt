@@ -4,3 +4,4 @@
 [ ] Catch recursive definitions of symbols
 [ ] Catch symbols used before they are declared
 [X] Use a structure to pass arguments for verification
+[ ] Implement typechecking for all operators

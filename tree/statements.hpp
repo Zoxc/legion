@@ -27,7 +27,7 @@ namespace Legion
 		}
 	};
 
-	typedef NodeList<StatementNode> StatementList;
+	typedef List<StatementNode> StatementList;
 	
 	struct Block:
 		public StatementNode
