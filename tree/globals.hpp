@@ -114,6 +114,8 @@ namespace Legion
 	struct ParamNode:
 		public ListNode
 	{
+		ParamNode() : type(0) {}
+
 		PairNode pair;
 		Type *type;
 
