@@ -173,7 +173,7 @@ namespace Legion
 			FunctionType() : Type(Type::FUNCTION_TYPE) {}
 
 			Type *returns;
-			CountedNodeList<Parameter> params;
+			NodeList<Parameter> params;
 
 			std::string string(bool show_typedef)
 			{
@@ -181,9 +181,9 @@ namespace Legion
 
 				for(NodeList<Parameter>::Iterator i = params.begin(); i; i++)
 				{
-					result += (*i)->type->string();
+					result += i().type->string();
 
-					if((*i)->next)
+					if(i().next)
 						result += ", ";
 				}
 

@@ -223,20 +223,20 @@ namespace Legion
 
 			get_range().report(document, message.str());
 
-			for(CountedNodeList<ExpressionNode>::Iterator i = arguments.begin(); i; i++)
-				(*i)->get_type(document, stack);
+			for(ExpressionList::Iterator i = arguments.begin(); i; i++)
+				i().get_type(document, stack);
 		}
 		else if(type)
 		{
-			CountedNodeList<FunctionType::Parameter>::Iterator j = type->params.begin();
+			NodeList<FunctionType::Parameter>::Iterator j = type->params.begin();
 
-			for(CountedNodeList<ExpressionNode>::Iterator i = arguments.begin(); i; i++, j++)
-				(*j)->type->compatible(document, stack, *i);
+			for(ExpressionList::Iterator i = arguments.begin(); i; i++, j++)
+				j().type->compatible(document, stack, *i);
 		}
 		else
 		{
-			for(CountedNodeList<ExpressionNode>::Iterator i = arguments.begin(); i; i++)
-				(*i)->get_type(document, stack);
+			for(ExpressionList::Iterator i = arguments.begin(); i; i++)
+				i().get_type(document, stack);
 		}
 
 		if(type)

@@ -374,7 +374,7 @@ namespace Legion
 		public ExpressionNode
 	{
 		IdentNode *ident;
-		CountedNodeList<ExpressionNode> arguments;
+		NodeList<ExpressionNode> arguments;
 
 		NodeType node_type()
 		{
