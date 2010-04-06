@@ -31,7 +31,7 @@ namespace Legion
 			return Node::TYPE_NODE;
 		}
 		
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 	
 	struct TypePointerNode:
@@ -80,14 +80,14 @@ namespace Legion
 			{
 			}
 
-			Type *get_indirect(Document &document);
+			Type *get_indirect(ValidationArgs &args);
 			static Type *resolve(Type *type);
-			void compatible(Document &document, SymbolList &stack, ExpressionNode *node);
-			void compatible(Document &document, SymbolList &stack, Type *type, ExpressionNode *node);
+			void compatible(ValidationArgs &args, ExpressionNode *node);
+			void compatible(ValidationArgs &args, Type *type, ExpressionNode *node);
 
 			virtual std::string string(bool show_typedef = true) = 0;
 
-			virtual bool compatible(Document &document, Type *other)
+			virtual bool compatible(ValidationArgs &args, Type *other)
 			{
 				return this == other || this == resolve(other);
 			}
@@ -106,7 +106,7 @@ namespace Legion
 				return name->string();
 			}
 
-			bool compatible(Document &document, Type *other)
+			bool compatible(ValidationArgs &args, Type *other)
 			{
 				Type *type = resolve(other);
 
@@ -211,12 +211,12 @@ namespace Legion
 					return base->string(false);
 			}
 
-			bool compatible(Document &document, Type *other)
+			bool compatible(ValidationArgs &args, Type *other)
 			{
 				if(!base)
 					return true;
 
-				return this == other || base->compatible(document, other);
+				return this == other || base->compatible(args, other);
 			}
 	};
 
@@ -253,7 +253,7 @@ namespace Legion
 				return base->string(show_typedef) + "*";
 			}
 
-			bool compatible(Document &document, Type *other);
+			bool compatible(ValidationArgs &args, Type *other);
 	};
 
 	class Compiler;

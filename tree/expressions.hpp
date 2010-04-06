@@ -62,7 +62,7 @@ namespace Legion
 			return *range;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 
 	struct BinaryOpNode:
@@ -93,7 +93,7 @@ namespace Legion
 			return op == Lexeme::MUL && right->is_declaration_name();
 		};
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 
 		void setup_type(Document &document, LocalNode &local, bool name);
 
@@ -124,11 +124,11 @@ namespace Legion
 				return 0;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack)
+		Type *validate(ValidationArgs &args)
 		{
-			Type *left_type = left->get_type(document, stack);
+			Type *left_type = left->validate(args);
 
-			left_type->compatible(document, stack, right);
+			left_type->compatible(args, right);
 
 			return left_type;
 		}
@@ -162,7 +162,7 @@ namespace Legion
 		};
 
 		void setup_type(Document &document, LocalNode &local, bool name);
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 
 		Range get_range()
 		{
@@ -189,7 +189,7 @@ namespace Legion
 			return *range;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 
 	struct ArrayDefNode:
@@ -273,7 +273,7 @@ namespace Legion
 		}
 
 		void setup_type(Document &document, LocalNode &local, bool name);
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 
 	struct IntegerNode:
@@ -292,7 +292,7 @@ namespace Legion
 			return *range;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 
 	struct StringNode:
@@ -311,7 +311,7 @@ namespace Legion
 			return *range;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 
 	struct FixedNode:
@@ -330,7 +330,7 @@ namespace Legion
 			return *range;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 
 	struct BooleanNode:
@@ -349,7 +349,7 @@ namespace Legion
 			return *range;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 
 	struct NullNode:
@@ -367,7 +367,7 @@ namespace Legion
 			return *range;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 
 	struct CallNode:
@@ -386,6 +386,6 @@ namespace Legion
 			return *ident->range;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 };

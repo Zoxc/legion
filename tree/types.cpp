@@ -5,26 +5,26 @@
 
 namespace Legion
 {
-	Type *lookup_type(Document &document, SymbolList &stack, String *name, Range *range)
+	Type *lookup_type(ValidationArgs &args, String *name, Range *range)
 	{
-		Symbol *symbol = document.scope->lookup(name);
+		Symbol *symbol = args.scope->lookup(name);
 
 		if(!symbol || symbol->type != Symbol::TYPE)
 		{
-			range->report_expected_symbol(document, symbol, name, Symbol::TYPE);
+			range->report_expected_symbol(args.document, symbol, name, Symbol::TYPE);
 
 			return 0;
 		}
 
-		return symbol->node->get_type(document, stack);
+		return symbol->node->validate(args);
 	}
 
-	Type *TypeNode::get_type(Document &document, SymbolList &stack)
+	Type *TypeNode::validate(ValidationArgs &args)
 	{
 		Type *result;
 		
 		if(name)
-			result = lookup_type(document, stack, name, range);
+			result = lookup_type(args, name, range);
 		else
 			result = 0;
 
@@ -35,7 +35,7 @@ namespace Legion
 				switch((*i)->node_type())
 				{
 					case TYPE_POINTER_NODE:
-						result = result->get_indirect(document);
+						result = result->get_indirect(args);
 
 					default:
 						break;
@@ -56,34 +56,34 @@ namespace Legion
 		return type;
 	}
 
-	Type *Type::get_indirect(Document &document)
+	Type *Type::get_indirect(ValidationArgs &args)
 	{
 		if(!indirect)
-			indirect = new (document.memory_pool) PointerType(this); 
+			indirect = new (args.memory_pool) PointerType(this); 
 
 		return indirect;
 	}
 
-	void Type::compatible(Document &document, SymbolList &stack, Type *type, ExpressionNode *node)
+	void Type::compatible(ValidationArgs &args, Type *type, ExpressionNode *node)
 	{
 		if(!this || !type)
 			return;
 
-		if(!compatible(document, type))
-			node->get_range().report_types(document, type, this);
+		if(!compatible(args, type))
+			node->get_range().report_types(args.document, type, this);
 	}
 
-	void Type::compatible(Document &document, SymbolList &stack, ExpressionNode *node)
+	void Type::compatible(ValidationArgs &args, ExpressionNode *node)
 	{
-		compatible(document, stack, node->get_type(document, stack), node);
+		compatible(args, node->validate(args), node);
 	}
 
-	bool PointerType::compatible(Document &document, Type *other)
+	bool PointerType::compatible(ValidationArgs &args, Type *other)
 	{
 		if(!base)
 			return true;
 
-		return this == other || other == &document.compiler.types.type_null.type || base->compatible(document, other);
+		return this == other || other == &args.types.type_null.type || base->compatible(args, other);
 	}
 
 	void Types::declare(Compiler &compiler, const char *name, TypeNativeNode &type, bool declare)

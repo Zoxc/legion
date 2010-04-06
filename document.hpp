@@ -7,7 +7,7 @@
 namespace Legion
 {
 	class Compiler;
-	
+
 	class Document
 	{
 		private:
@@ -25,7 +25,7 @@ namespace Legion
 
 			bool parse();
 			void find_declarations();
-			void type_check();
+			void validate();
 			
 			Document(Compiler &compiler, std::string filename);
 			~Document();

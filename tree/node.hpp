@@ -7,9 +7,22 @@
 namespace Legion
 {
 	class Document;
+	class Types;
 	class Type;
+	class Scope;
 
 	struct ExpressionNode;
+
+	struct ValidationArgs
+	{
+		ValidationArgs(Document &document, Types &types, Scope *scope, MemoryPool &memory_pool) : document(document), types(types), scope(scope), memory_pool(memory_pool) {}
+
+		Document &document;
+		Types &types;
+		Scope *scope;
+		MemoryPool &memory_pool;
+		SymbolList stack;
+	};
 
 	struct Node
 	{
@@ -72,7 +85,7 @@ namespace Legion
 			return false;
 		}
 
-		virtual Type *get_type(Document &document, SymbolList &stack)
+		virtual Type *validate(ValidationArgs &args)
 		{
 			return 0;
 		}

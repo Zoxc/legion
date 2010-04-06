@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	BENCHMARK_START;
 
 	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
-		(*i)->type_check();
+		(*i)->validate();
 
 	BENCHMARK_END("Typechecked");
 

@@ -23,18 +23,18 @@ namespace Legion
 		}
 	}
 	
-	Type *IdentNode::get_type(Document &document, SymbolList &stack)
+	Type *IdentNode::validate(ValidationArgs &args)
 	{
-		Symbol *symbol = document.scope->lookup(ident);
+		Symbol *symbol = args.scope->lookup(ident);
 
 		if(!symbol || symbol->type != Symbol::VARIABLE)
 		{
-			range->report_expected_symbol(document, symbol, ident, Symbol::VARIABLE);
+			range->report_expected_symbol(args.document, symbol, ident, Symbol::VARIABLE);
 
 			return 0;
 		}
 
-		return symbol->node->get_type(document, stack);
+		return symbol->node->validate(args);
 	}
 
 	void BinaryOpNode::setup_type(Document &document, LocalNode &local, bool name)
@@ -81,10 +81,10 @@ namespace Legion
 			return 0;
 	}
 
-	Type *BinaryOpNode::get_type(Document &document, SymbolList &stack)
+	Type *BinaryOpNode::validate(ValidationArgs &args)
 	{
-		Type *left_type = left->get_type(document, stack);
-		Type *right_type = right->get_type(document, stack);
+		Type *left_type = left->validate(args);
+		Type *right_type = right->validate(args);
 
 		switch(op)
 		{
@@ -92,8 +92,8 @@ namespace Legion
 			case Lexeme::NOT_EQUAL:
 			case Lexeme::LOGICAL_AND:
 			case Lexeme::LOGICAL_OR:
-				left_type->compatible(document, stack, right_type, right);
-				return &document.compiler.types.type_bool.type;
+				left_type->compatible(args, right_type, right);
+				return &args.types.type_bool.type;
 
 			default:
 				return 0;
@@ -112,24 +112,24 @@ namespace Legion
 		local.type_node->modifiers.add<TypePointerNode>(document.memory_pool);
 	}
 
-	Type *UnaryOpNode::get_type(Document &document, SymbolList &stack)
+	Type *UnaryOpNode::validate(ValidationArgs &args)
 	{
-		Type *type = value->get_type(document, stack);
+		Type *type = value->validate(args);
 
 		switch(op)
 		{
 			case Lexeme::NOT_EQUAL:
-				document.compiler.types.type_bool.type.Type::compatible(document, stack, type, value);
-				return &document.compiler.types.type_bool.type;
+				args.types.type_bool.type.Type::compatible(args, type, value);
+				return &args.types.type_bool.type;
 
 			default:
 				return 0;
 		}
 	}
 
-	Type *ArraySubscriptNode::get_type(Document &document, SymbolList &stack)
+	Type *ArraySubscriptNode::validate(ValidationArgs &args)
 	{
-		document.compiler.types.type_int.type.Type::compatible(document, stack, index);
+		args.types.type_int.type.Type::compatible(args, index);
 		
 		return 0;
 	}
@@ -159,45 +159,45 @@ namespace Legion
 		}
 	}
 
-	Type *FactorChainNode::get_type(Document &document, SymbolList &stack)
+	Type *FactorChainNode::validate(ValidationArgs &args)
 	{
-		Type *type = factor->get_type(document, stack);
+		Type *type = factor->validate(args);
 
 		return 0;
 	}
 
-	Type *IntegerNode::get_type(Document &document, SymbolList &stack)
+	Type *IntegerNode::validate(ValidationArgs &args)
 	{
-		return &document.compiler.types.type_int.type;
+		return &args.types.type_int.type;
 	}
 
-	Type *StringNode::get_type(Document &document, SymbolList &stack)
+	Type *StringNode::validate(ValidationArgs &args)
 	{
-		return &document.compiler.types.type_string.type;
+		return &args.types.type_string.type;
 	}
 
-	Type *FixedNode::get_type(Document &document, SymbolList &stack)
+	Type *FixedNode::validate(ValidationArgs &args)
 	{
-		return &document.compiler.types.type_fixed.type;
+		return &args.types.type_fixed.type;
 	}
 
-	Type *BooleanNode::get_type(Document &document, SymbolList &stack)
+	Type *BooleanNode::validate(ValidationArgs &args)
 	{
-		return &document.compiler.types.type_bool.type;
+		return &args.types.type_bool.type;
 	}
 
-	Type *NullNode::get_type(Document &document, SymbolList &stack)
+	Type *NullNode::validate(ValidationArgs &args)
 	{
-		return &document.compiler.types.type_null.type;
+		return &args.types.type_null.type;
 	}
 
-	Type *CallNode::get_type(Document &document, SymbolList &stack)
+	Type *CallNode::validate(ValidationArgs &args)
 	{
-		Symbol *symbol = document.scope->lookup(ident->ident);
+		Symbol *symbol = args.scope->lookup(ident->ident);
 
 		if(!symbol || symbol->type != Symbol::FUNCTION)
 		{
-			get_range().report_expected_symbol(document, symbol, ident->ident, Symbol::FUNCTION);
+			get_range().report_expected_symbol(args.document, symbol, ident->ident, Symbol::FUNCTION);
 
 			return 0;
 		}
@@ -205,7 +205,7 @@ namespace Legion
 		FunctionType *type = 0;
 		
 		if(symbol && symbol->node)
-			type = (FunctionType *)symbol->node->get_type(document, stack);
+			type = (FunctionType *)symbol->node->validate(args);
 
 		if(type && arguments.size != type->params.size)
 		{
@@ -221,22 +221,22 @@ namespace Legion
 			if(arguments.size != 1)
 				message << "s";
 
-			get_range().report(document, message.str());
+			get_range().report(args.document, message.str());
 
 			for(ExpressionList::Iterator i = arguments.begin(); i; i++)
-				i().get_type(document, stack);
+				i().validate(args);
 		}
 		else if(type)
 		{
 			NodeList<FunctionType::Parameter>::Iterator j = type->params.begin();
 
 			for(ExpressionList::Iterator i = arguments.begin(); i; i++, j++)
-				j().type->compatible(document, stack, *i);
+				j().type->compatible(args, *i);
 		}
 		else
 		{
 			for(ExpressionList::Iterator i = arguments.begin(); i; i++)
-				i().get_type(document, stack);
+				i().validate(args);
 		}
 
 		if(type)

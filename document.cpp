@@ -37,16 +37,12 @@ namespace Legion
 		scope = 0;
 	}
 
-	void Document::type_check()
+	void Document::validate()
 	{
-		SymbolList stack;
-
-		scope = &compiler.scope;
+		ValidationArgs args(*this, compiler.types, &compiler.scope, memory_pool);
 
 		for(NamespaceList::Iterator i = tree.begin(); i; i++)
-			(*i)->get_type(*this, stack);
-
-		scope = 0;
+			(*i)->validate(args);
 	}
 	
 	bool Document::map()

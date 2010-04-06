@@ -4,75 +4,75 @@
 
 namespace Legion
 {
-	Type *StructNode::get_type(Document &document, SymbolList &stack)
+	Type *StructNode::validate(ValidationArgs &args)
 	{
 		if(!type)
 		{
-			type = new (document.memory_pool) CompositeType();
+			type = new (args.memory_pool) CompositeType();
 			type->name = symbol->name;
 
 			for(NodeList<FieldNode>::Iterator i = fields.begin(); i; i++)
 			{
-				CompositeType::Field *field = type->fields.add<CompositeType::Field>(document.memory_pool);
+				CompositeType::Field *field = type->fields.add<CompositeType::Field>(args.memory_pool);
 				field->name = (*i)->pair.name;
-				field->type = (*i)->pair.get_type(document, stack);
+				field->type = (*i)->pair.validate(args);
 			}
 		}
 		
 		return type;
 	}
 
-	Type *TypedefNode::get_type(Document &document, SymbolList &stack)
+	Type *TypedefNode::validate(ValidationArgs &args)
 	{
 		if(!type)
 		{
-			type = new (document.memory_pool) TypedefType(pair->get_type(document, stack));
+			type = new (args.memory_pool) TypedefType(pair->validate(args));
 			type->name = pair->name;
 		}
 
 		return type;
 	}
 
-	Type *GlobalNode::get_type(Document &document, SymbolList &stack)
+	Type *GlobalNode::validate(ValidationArgs &args)
 	{
 		if(!type)
 		{
-			type = pair->get_type(document, stack);
+			type = pair->validate(args);
 
 			if(has_value)
-				type->compatible(document, stack, value);
+				type->compatible(args, value);
 		}
 
 		return type;
 	}
 
-	Type *ParamNode::get_type(Document &document, SymbolList &stack)
+	Type *ParamNode::validate(ValidationArgs &args)
 	{
 		if(!type)
-			type = pair.get_type(document, stack);
+			type = pair.validate(args);
 
 		return type;
 	}
 
-	Type *FuncHeadNode::get_type(Document &document, SymbolList &stack)
+	Type *FuncHeadNode::validate(ValidationArgs &args)
 	{
 		if(!type)
 		{
-			type = new (document.memory_pool) FunctionType();
+			type = new (args.memory_pool) FunctionType();
 
-			if(pair->type && !pair->type->modifiers.first && pair->type->name == document.compiler.types.type_void.type.name)
-				type->returns = &document.compiler.types.type_void.type;
+			if(pair->type && !pair->type->modifiers.first && pair->type->name == args.types.type_void.type.name)
+				type->returns = &args.types.type_void.type;
 			else
-				type->returns = pair->get_type(document, stack);
+				type->returns = pair->validate(args);
 
 			for(NodeList<ParamNode>::Iterator i = params.begin(); i; i++)
 			{
-				FunctionType::Parameter *param = type->params.add<FunctionType::Parameter>(document.memory_pool);
-				param->type = (*i)->pair.get_type(document, stack);
+				FunctionType::Parameter *param = type->params.add<FunctionType::Parameter>(args.memory_pool);
+				param->type = i().pair.validate(args);
 			}
 
 			if(symbol && !symbol->defined)
-				pair->range.report(document, "Undefined prototype");
+				pair->range.report(args.document, "Undefined prototype");
 		}
 
 		return type;

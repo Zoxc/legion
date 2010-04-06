@@ -38,9 +38,9 @@ namespace Legion
 			return PAIR_NODE;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack)
+		Type *validate(ValidationArgs &args)
 		{
-			return type->get_type(document, stack);
+			return type->validate(args);
 		}
 	};
 
@@ -70,7 +70,7 @@ namespace Legion
 			return STRUCT_NODE;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 	
 	struct TypedefNode:
@@ -87,7 +87,7 @@ namespace Legion
 			return TYPEDEF_NODE;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 	
 	struct GlobalNode:
@@ -108,7 +108,7 @@ namespace Legion
 			return GLOBAL_NODE;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 	
 	struct ParamNode:
@@ -124,7 +124,7 @@ namespace Legion
 			return PARAM_NODE;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 	
 	struct FuncHeadNode:
@@ -144,7 +144,7 @@ namespace Legion
 			return FUNC_HEAD_NODE;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 	
 	struct PrototypeNode:
@@ -185,10 +185,10 @@ namespace Legion
 			return FUNC_NODE;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack)
+		Type *validate(ValidationArgs &args)
 		{
-			head->get_type(document, stack);
-			body->get_type(document, stack);
+			head->validate(args);
+			body->validate(args);
 
 			return 0;
 		}

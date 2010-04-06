@@ -22,26 +22,26 @@ namespace Legion
 		return false;
 	}
 
-	Type *Block::get_type(Document &document, SymbolList &stack)
+	Type *Block::validate(ValidationArgs &args)
 	{
-		Scope *old = document.scope;
-		document.scope = scope;
+		Scope *old = args.scope;
+		args.scope = scope;
 
 		bool allow_locals = true;
 		bool saw_return = false;
 
 		for(StatementList::Iterator i = statements.begin(); i; i++)
 		{
-			(*i)->get_type(document, stack);
+			i().validate(args);
 
 			if(saw_return)
-				(*i)->get_range().report(document, "Statement after a return statement");
+				i().get_range().report(args.document, "Statement after a return statement");
 
-			switch((*i)->node_type())
+			switch(i().node_type())
 			{
 				case LOCAL_NODE:
 					if(!allow_locals)
-						(*i)->get_range().report(document, "Local variables must be declared at the start of a function");
+						i().get_range().report(args.document, "Local variables must be declared at the start of a function");
 					break;
 	
 				case RETURN_NODE:
@@ -60,27 +60,27 @@ namespace Legion
 
 				default:
 					allow_locals = false;
-					(*i)->get_range().report(document, "Unexpected expresssion");
+					i().get_range().report(args.document, "Unexpected expresssion");
 			}
 
 		}
 
-		document.scope = old;
+		args.scope = old;
 
 		return false;
 	}
 
-	Type *ControlFlowNode::get_type(Document &document, SymbolList &stack)
+	Type *ControlFlowNode::validate(ValidationArgs &args)
 	{
-		Type *type = condition->get_type(document, stack);
+		Type *type = condition->validate(args);
 
 		if(!type)
 			return 0;
 
-		if(document.compiler.types.type_bool.type.compatible(document, type) || type->compatible(document, &document.compiler.types.type_null.type))
+		if(args.types.type_bool.type.compatible(args, type) || type->compatible(args, &args.types.type_null.type))
 			return 0;
 
-		condition->get_range().report_types(document, type, &document.compiler.types.type_bool.type);
+		condition->get_range().report_types(args.document, type, &args.types.type_bool.type);
 
 		return 0;
 	}
@@ -96,14 +96,14 @@ namespace Legion
 		return 0;
 	}
 
-	Type *LocalNode::get_type(Document &document, SymbolList &stack)
+	Type *LocalNode::validate(ValidationArgs &args)
 	{
 		if(!type)
 		{
-			type = type_node->get_type(document, stack);
+			type = type_node->validate(args);
 
 			if(has_value)
-				type->compatible(document, stack, value);
+				type->compatible(args, value);
 		}
 
 		return type;

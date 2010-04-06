@@ -37,7 +37,7 @@ namespace Legion
 		Range range;
 
 		bool find_declarations(Document *document);
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 
 		Node::NodeType node_type()
 		{
@@ -57,7 +57,7 @@ namespace Legion
 
 		ExpressionNode *condition;
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 		virtual bool use_semi()
 		{
 			return false;
@@ -198,6 +198,6 @@ namespace Legion
 
 		StatementNode *get_declaration(Document &document);
 
-		Type *get_type(Document &document, SymbolList &stack);
+		Type *validate(ValidationArgs &args);
 	};
 };

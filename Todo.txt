@@ -1,5 +1,6 @@
 [ ] Store grouped expressions in the AST.
 [X] Use a own scope for parameters
 [ ] Implement array types
-[ ] Catch recursive definitions of symbols[ ] Catch symbols used before they are declared
-[ ] Use a structure to pass arguments for verification
+[ ] Catch recursive definitions of symbols
+[ ] Catch symbols used before they are declared
+[X] Use a structure to pass arguments for verification
