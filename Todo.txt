@@ -1,7 +1,8 @@
-[ ] Store grouped expressions in the AST.
+[X] Store grouped expressions in the AST.
 [X] Use a own scope for parameters
 [ ] Implement array types
 [ ] Catch recursive definitions of symbols
 [ ] Catch symbols used before they are declared
 [X] Use a structure to pass arguments for verification
 [ ] Implement typechecking for all operators
+[ ] Allow multiple defined symbols

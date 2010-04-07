@@ -388,4 +388,29 @@ namespace Legion
 
 		Type *validate(ValidationArgs &args);
 	};
+
+	struct GroupedExpressionNode:
+		public ExpressionNode
+	{
+		Range range;
+		ExpressionNode *value;
+
+		NodeType node_type()
+		{
+			return Node::GROUPED_EXPRESSION_NODE;
+		}
+
+		Range get_range()
+		{
+			return range;
+		}
+
+		Type *validate(ValidationArgs &args)
+		{
+			if(value)
+				return value->validate(args);
+			else
+				return 0;
+		}
+	};
 };

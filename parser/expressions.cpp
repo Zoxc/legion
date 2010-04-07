@@ -341,13 +341,17 @@ namespace Legion
 
 	ExpressionNode *Parser::parse_grouped_expression()
 	{
-		ExpressionNode *result;
+		GroupedExpressionNode *node = new (memory_pool) GroupedExpressionNode;
+
+		node->range.capture(lexer.lexeme);
 
 		match(Lexeme::PARENT_OPEN);
-		result = parse_expression();
+		node->value = parse_expression();
 		match(Lexeme::PARENT_CLOSE);
 
-		return result;
+		node->range.expand(lexer.lexeme);
+
+		return node;
 	}
 
 	static const Lexeme::Type binary_operator_start = Lexeme::LOGICAL_OR;

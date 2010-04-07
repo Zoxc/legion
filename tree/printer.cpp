@@ -389,6 +389,13 @@ namespace Legion
 				return print_node(target->ident) + "(" + join(&target->arguments, ", ") + ")";
 			}
 
+			case Node::GROUPED_EXPRESSION_NODE:
+			{
+				GroupedExpressionNode *target = (GroupedExpressionNode *)node;
+
+				return "(" + print_node(target->value) + ")";
+			}
+
 			/*
 			 * Types
 			 */
