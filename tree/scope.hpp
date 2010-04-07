@@ -28,12 +28,12 @@ namespace Legion
 
 			static Symbol *get_value_next(Symbol *value)
 			{
-				return value->next;
+				return value->next_match;
 			}
 
 			static void set_value_next(Symbol *value, Symbol *next)
 			{
-				value->next = next;
+				value->next_match = next;
 			}
 	};
 

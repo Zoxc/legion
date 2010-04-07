@@ -32,7 +32,9 @@ namespace Legion
 		Range *range;
 		String *name;
 		Node *node;
+		Document *document; // The document this symbol belongs to, if any
 		Symbol *next_match; // Next for chained symbols in a Scope
+		Symbol *next_name; // Next symbol that shares it's name
 		Symbol *next; // Next for symbols in a NodeList
 	};
 
