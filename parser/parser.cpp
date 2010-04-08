@@ -32,12 +32,25 @@ namespace Legion
 			step();
 	}
 	
+	void Parser::expected_prev(Lexeme::Type what)
+	{
+		lexer.lexeme.get_prev().report(document, "Expected " + Lexeme::describe_type(what));
+	}
+
 	void Parser::unexpected(bool skip)
 	{
 		lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.describe());
 
 		if(skip)
 			step();
+	}
+
+	void Parser::parse_terminator()
+	{
+		if(lexeme() == Lexeme::SEMICOLON)
+			step();
+		else
+			expected_prev(Lexeme::SEMICOLON);
 	}
 	
 	TypeNode *Parser::parse_type()

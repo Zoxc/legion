@@ -10,7 +10,7 @@ namespace Legion
 		while(input.in(1, 9) || input.in(11, 12) || input.in(14, 32))
 			input++;
 
-		step();
+		restep();
 	}
 
 	void Lexer::unknown()
@@ -28,7 +28,7 @@ namespace Legion
 		else
 			lexeme.report(&document, "Invalid characters '" + lexeme.string() + "'");
 
-		step();
+		restep();
 	}
 	
 	void Lexer::sub()
@@ -83,7 +83,7 @@ namespace Legion
 		lexeme.line++;
 		lexeme.line_start = &input;
 		
-		step();
+		restep();
 	}
 
 	void Lexer::carrige_return()
@@ -96,7 +96,7 @@ namespace Legion
 
 		lexeme.line_start = &input;
 
-		step();
+		restep();
 	}
 
 	void Lexer::eol()
@@ -119,7 +119,7 @@ namespace Legion
 				
 			case '/': // C++ comment
 				eol();
-				step();
+				restep();
 				break;
 				
 			case '*': // C comment
@@ -163,7 +163,7 @@ namespace Legion
 					}
 				}
 				done:
-				step(); 		
+				restep(); 		
 				break;
 				
 			default:

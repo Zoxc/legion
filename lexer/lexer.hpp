@@ -21,9 +21,7 @@ namespace Legion
 	class Lexer
 	{
 		private:
-			const char_t *input_str;
 			Input input;
-			size_t length;
 			
 			StringPool *string_pool;
 			MemoryPool *memory_pool;
@@ -35,6 +33,8 @@ namespace Legion
 
 			bool process_null(const char_t *input, bool expected = false);
 			void build_string(const char_t *start, char_t *str);
+
+			void restep();
 			
 			void report_null();
 			
@@ -64,6 +64,9 @@ namespace Legion
 			
 			Lexeme lexeme;
 			Keywords keywords;
+
+			const char_t *input_str;
+			size_t length;
 			
 			void load(const char_t *input, size_t length);
 			void step();

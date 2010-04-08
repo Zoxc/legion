@@ -29,6 +29,7 @@ namespace Legion
 
 			void unexpected(bool skip = true);
 			void expected(Lexeme::Type what, bool skip = false);
+			void expected_prev(Lexeme::Type what);
 		private:
 			Document *document;
 			MemoryPool *memory_pool;
@@ -149,6 +150,8 @@ namespace Legion
 			
 			Scope *push_scope(Scope::Type type);
 			void pop_scope();
+
+			void parse_terminator();
 			
 			TypeNode *parse_type();	
 

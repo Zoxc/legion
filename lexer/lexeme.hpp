@@ -5,6 +5,8 @@
 
 namespace Legion
 {
+	class Lexer;
+
 	class Lexeme:
 		public Range
 	{
@@ -98,12 +100,18 @@ namespace Legion
 				TYPES
 			};
 
+			Lexeme(Lexer &lexer) : lexer(lexer) {}
+
+			Lexer &lexer;
 			Type type;
+			const char_t *prev;
 			
 			union
 			{
 				String *value;
 			};
+
+			Range get_prev();
 			
 			static std::string names[TYPES];
 			

@@ -151,28 +151,28 @@ namespace Legion
 				
 			case Lexeme::KW_DO:
 				parse_do(list);
-				match(Lexeme::SEMICOLON);
+				parse_terminator();
 				break;
 
 			case Lexeme::KW_RETURN:
 				parse_return(list);
-				match(Lexeme::SEMICOLON);
+				parse_terminator();
 				break;
 			
 			case Lexeme::KW_BREAK:
 				parse_break(list);
-				match(Lexeme::SEMICOLON);
+				parse_terminator();
 				break;
 			
 			case Lexeme::KW_CONTINUE:
 				parse_continue(list);
-				match(Lexeme::SEMICOLON);
+				parse_terminator();
 				break;
 			
 			case Lexeme::KW_CONST:
 				step();
 				parse_local(true, parse_expression(), list);
-				match(Lexeme::SEMICOLON);
+				parse_terminator();
 				break;
 			
 			case Lexeme::BRACET_OPEN:
@@ -197,7 +197,7 @@ namespace Legion
 					else
 						list->append(node);
 
-					match(Lexeme::SEMICOLON);
+					parse_terminator();
 				}
 				else
 					return false;

@@ -52,13 +52,13 @@ namespace Legion
 				FieldNode *field = node->fields.add<FieldNode>(memory_pool);
 				
 				if(parse_pair(&field->pair))
-					match(Lexeme::SEMICOLON);
+					parse_terminator();
 			}
 			
 			match(Lexeme::BRACET_CLOSE);
 		}
 		
-		match(Lexeme::SEMICOLON);
+		parse_terminator();
 	}
 	
 	void Parser::parse_typedef(NamespaceList *list)
@@ -75,7 +75,7 @@ namespace Legion
 			type_def->symbol->node = type_def;
 			type_def->pair = pair;
 			
-			match(Lexeme::SEMICOLON);
+			parse_terminator();
 		}
 	}
 	
@@ -104,7 +104,7 @@ namespace Legion
 		else
 			global->has_value = false;
 		
-		match(Lexeme::SEMICOLON);
+		parse_terminator();
 	}
 	
 	void Parser::parse_function(NamespaceList *list, bool is_static, bool is_const, bool is_native, PairNode *pair)
@@ -175,7 +175,7 @@ namespace Legion
 
 			head->symbol = declare<PrototypeSymbol>(pair, prev);
 
-			match(Lexeme::SEMICOLON);
+			parse_terminator();
 		}
 	}
 	

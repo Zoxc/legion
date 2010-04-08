@@ -163,7 +163,7 @@ namespace Legion
 		lexeme.start = start;
 	}
 
-	Lexer::Lexer(StringPool *string_pool, MemoryPool *memory_pool, Document *document) : string_pool(string_pool), memory_pool(memory_pool), document(*document), keywords(string_pool)
+	Lexer::Lexer(StringPool *string_pool, MemoryPool *memory_pool, Document *document) : string_pool(string_pool), memory_pool(memory_pool), document(*document), lexeme(*this), keywords(string_pool)
 	{
 		setup_jump_table();
 	}
@@ -193,6 +193,12 @@ namespace Legion
 	}
 	
 	void Lexer::step()
+	{
+		lexeme.prev = lexeme.stop;
+		restep();
+	}
+
+	void Lexer::restep()
 	{
 		lexeme.start = &input;
 		lexeme.error = false;
