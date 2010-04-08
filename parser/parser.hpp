@@ -27,7 +27,7 @@ namespace Legion
 			
 			void parse(NamespaceList *list);
 
-			void unexpected(bool skip = true);	
+			void unexpected(bool skip = true);
 			void expected(Lexeme::Type what, bool skip = false);
 		private:
 			Document *document;
@@ -152,7 +152,7 @@ namespace Legion
 			
 			TypeNode *parse_type();	
 
-			template<class T>  T *declare(T *type, Symbol **prev)
+			template<class T>  T *declare(T *type, bool &prev)
 			{
 				T *result = type;
 				
@@ -161,7 +161,7 @@ namespace Legion
 					result->range = new (scope->memory_pool) Range(lexer.lexeme);
 					result->name = lexer.lexeme.value;
 					
-					*prev = scope->declare_symbol(result);
+					prev = scope->declare_symbol(result);
 
 					step();
 				}
@@ -171,9 +171,9 @@ namespace Legion
 
 			template<class T>  T *declare(T *type)
 			{
-				Symbol *prev;
+				bool prev;
 
-				T *result = declare<T>(type, &prev);
+				T *result = declare<T>(type, prev);
 
 				if(prev)
 					result->redeclared(*document);
@@ -186,23 +186,23 @@ namespace Legion
 				return declare<T>(new (scope->memory_pool) T);
 			}
 			
-			template<class T>  T *declare(PairNode *pair, Symbol **prev)
+			template<class T>  T *declare(PairNode *pair, bool &prev)
 			{
 				T *result = new (scope->memory_pool) T;
 				
 				result->range = new (scope->memory_pool) Range(pair->range);
 				result->name = pair->name;
 				
-				*prev = scope->declare_symbol(result);
+				prev = scope->declare_symbol(result);
 				
 				return result;
 			}
 
 			template<class T>  T *declare(PairNode *pair)
 			{
-				Symbol *prev;
+				bool prev;
 
-				T *result = declare<T>(pair, &prev);
+				T *result = declare<T>(pair, prev);
 
 				if(prev)
 					result->redeclared(*document);

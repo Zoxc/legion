@@ -18,6 +18,7 @@ namespace Legion
 			NONE,
 			TYPE,
 			FUNCTION,
+			PROTOTYPE,
 			VARIABLE,
 			TYPES
 		};
@@ -59,8 +60,10 @@ namespace Legion
 	struct FuncSymbol:
 		public SymbolType<Symbol::FUNCTION>
 	{
-		FuncSymbol() : defined(false) {}
-
-		bool defined;
+	};
+	
+	struct PrototypeSymbol:
+		public SymbolType<Symbol::PROTOTYPE>
+	{
 	};
 };

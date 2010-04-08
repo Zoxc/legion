@@ -91,6 +91,14 @@ namespace Legion
 			{
 				return this == other || this == resolve(other);
 			}
+
+			virtual bool exact(Type *other)
+			{
+				if(!this || !other)
+					return true;
+
+				return this == other;
+			}
 	};
 
 	class NativeType:
@@ -188,6 +196,31 @@ namespace Legion
 				}
 
 				return result + ")";
+			}
+
+			bool exact(Type *other)
+			{
+				if(!this || !other)
+					return true;
+
+				if(other->kind != Type::FUNCTION_TYPE)
+					return false;
+
+				FunctionType *other_func = (FunctionType *)other;
+
+				if(other_func->params.size != params.size)
+					return false;
+
+				if(!other_func->returns->exact(returns))
+					return false;
+
+				List<Parameter>::Iterator j = params.begin();
+
+				for(List<Parameter>::Iterator i = other_func->params.begin(); i; i++, j++)
+					if(!i().type->exact(j().type))
+						return false;
+
+				return true;
 			}
 	};
 

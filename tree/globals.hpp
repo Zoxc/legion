@@ -135,7 +135,7 @@ namespace Legion
 		PairNode *pair;
 		bool is_native;
 		bool is_static;
-		FuncSymbol *symbol;
+		Symbol *symbol;
 		List<ParamNode> params;
 		FunctionType *type;
 

@@ -87,26 +87,42 @@ namespace Legion
 				return symbol->type;
 			}
 
-			Symbol *declare_symbol(Symbol *symbol)
+			bool declare_symbol(Symbol *symbol)
 			{
-				switch(type)
-				{
-					case LOOP:
-					case CONDITIONAL:
-					case EMPTY:
-						return parent->declare_symbol(symbol);
+				#ifdef GALAXY
+					switch(type)
+					{
+						case LOOP:
+						case CONDITIONAL:
+						case EMPTY:
+							return parent->declare_symbol(symbol);
 
-					default:
-						break;
-				}
+						default:
+							break;
+					}
+				#endif
 				
 				if(!symbol)
-					return 0;
+					return false;
 				
 				if(!symbol->name)
-					return 0;
+					return false;
 				
-				return set(symbol->name, symbol);
+				Symbol *prev = set(symbol->name, symbol);
+
+				if(prev)
+				{
+					symbol->next_name = prev->next_name;
+					prev->next_name = symbol;
+
+					return true;
+				}
+				else
+				{
+					symbol->next_name = symbol;
+
+					return false;
+				}
 			}
 	};
 };

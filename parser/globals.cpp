@@ -109,17 +109,13 @@ namespace Legion
 	
 	void Parser::parse_function(NamespaceList *list, bool is_static, bool is_const, bool is_native, PairNode *pair)
 	{
-		Symbol *prev;
+		bool prev;
 
 		FuncHeadNode *head = new (memory_pool) FuncHeadNode;
 		head->pair = pair;
 		head->is_native = is_native;
 		head->is_static = is_static;
-		head->symbol = declare<FuncSymbol>(pair, &prev);
 
-		if(prev && prev->type != Symbol::FUNCTION)
-			head->symbol->redeclared(*document);
-		
 		if(is_const)
 			pair->range.report(document, "Functions can not be declared constant");
 
@@ -140,29 +136,24 @@ namespace Legion
 		if(lexeme() == Lexeme::BRACET_OPEN)
 		{
 			FuncNode *func = list->add<FuncNode>(memory_pool);
+
 			func->head = head;
+			
+			head->symbol = declare<FuncSymbol>(pair, prev);
 
-			if(prev && prev->type == Symbol::FUNCTION)
+			Symbol *symbol = head->symbol;
+
+			symbol = symbol->next_name;
+
+			while(symbol->next_name != head->symbol)
 			{
-				FuncSymbol *prev_func = (FuncSymbol *)prev;
-
-				if(prev_func->defined)
+				if(symbol->type != Symbol::PROTOTYPE)
 				{
 					head->symbol->redeclared(*document);
-					head->symbol = 0;
+					break;
 				}
-				else
-				{
-					prev_func->node = func;
-					prev_func->defined = true;
 
-					head->symbol = prev_func;
-				}
-			}
-			else
-			{
-				head->symbol->defined = true;
-				head->symbol->node = func;
+				symbol = symbol->next_name;
 			}
 
 			func->scope = push_scope(Scope::FUNCTION);
@@ -181,6 +172,8 @@ namespace Legion
 		{
 			PrototypeNode *proto = list->add<PrototypeNode>(memory_pool);
 			proto->head = head;
+
+			head->symbol = declare<PrototypeSymbol>(pair, prev);
 
 			match(Lexeme::SEMICOLON);
 		}

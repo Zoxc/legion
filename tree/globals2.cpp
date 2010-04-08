@@ -71,8 +71,24 @@ namespace Legion
 				param->type = i().pair.validate(args);
 			}
 
-			if(symbol && !symbol->defined)
+			if(symbol->type == Symbol::PROTOTYPE)
+			{
+				Symbol *current = symbol;
+
+				current = current->next_name;
+
+				while(current->next_name != symbol)
+				{
+					if(current->type == Symbol::FUNCTION && type->exact(current->node->validate(args)))
+						goto end;
+
+					current = current->next_name;
+				}
+
 				pair->range.report(args.document, "Undefined prototype");
+
+				end:;
+			}
 		}
 
 		return type;
