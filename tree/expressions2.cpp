@@ -25,16 +25,21 @@ namespace Legion
 	
 	Type *IdentNode::validate(ValidationArgs &args)
 	{
-		Symbol *symbol = args.scope->lookup(ident);
+		bool found;
 
-		if(!symbol || symbol->type != Symbol::VARIABLE)
+		Symbol *symbol = args.scope->lookup(ident, Symbol::VARIABLE, found);
+
+		if(found)
 		{
-			range->report_expected_symbol(args.document, symbol, ident, Symbol::VARIABLE);
-
-			return 0;
+			if(symbol)
+				return symbol->node->validate(args);
+			else
+				return 0;
 		}
 
-		return symbol->node->validate(args);
+		range->report_expected_symbol(args.document, symbol, ident, Symbol::VARIABLE);
+
+		return 0;
 	}
 
 	void BinaryOpNode::setup_type(Document &document, LocalNode &local, bool name)
@@ -193,14 +198,24 @@ namespace Legion
 
 	Type *CallNode::validate(ValidationArgs &args)
 	{
-		Symbol *symbol = args.scope->lookup(ident->ident);
+		bool found;
 
-		if(!symbol || symbol->type != Symbol::FUNCTION)
+		Symbol *symbol = args.scope->lookup(ident->ident, Symbol::FUNCTION, found);
+
+		if(!found)
 		{
-			get_range().report_expected_symbol(args.document, symbol, ident->ident, Symbol::FUNCTION);
+			symbol = args.scope->lookup(ident->ident, Symbol::PROTOTYPE, found);
 
-			return 0;
+			if(!found)
+			{
+				get_range().report_expected_symbol(args.document, symbol, ident->ident, Symbol::FUNCTION);
+
+				return 0;
+			}
 		}
+
+		if(!symbol)
+			return 0;
 
 		FunctionType *type = 0;
 		

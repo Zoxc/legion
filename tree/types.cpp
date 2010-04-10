@@ -7,16 +7,21 @@ namespace Legion
 {
 	Type *lookup_type(ValidationArgs &args, String *name, Range *range)
 	{
-		Symbol *symbol = args.scope->lookup(name);
+		bool found;
 
-		if(!symbol || symbol->type != Symbol::TYPE)
+		Symbol *symbol = args.scope->lookup(name, Symbol::TYPE, found);
+
+		if(found)
 		{
-			range->report_expected_symbol(args.document, symbol, name, Symbol::TYPE);
-
-			return 0;
+			if(symbol)
+				return symbol->node->validate(args);
+			else
+				return 0;
 		}
 
-		return symbol->node->validate(args);
+		range->report_expected_symbol(args.document, symbol, name, Symbol::TYPE);
+
+		return 0;
 	}
 
 	Type *TypeNode::validate(ValidationArgs &args)

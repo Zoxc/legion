@@ -70,25 +70,35 @@ namespace Legion
 				FunctionType::Parameter *param = type->params.add<FunctionType::Parameter>(args.memory_pool);
 				param->type = i().pair.validate(args);
 			}
+		}
 
-			if(symbol->type == Symbol::PROTOTYPE)
+		return type;
+	}
+
+	
+
+	Type *PrototypeNode::validate(ValidationArgs &args)
+	{
+		Type *type = head->validate(args);
+		Symbol *symbol = head->symbol;
+
+		if(symbol->type == Symbol::PROTOTYPE)
+		{
+			Symbol *current = symbol;
+
+			current = current->next_name;
+
+			while(current->next_name != symbol)
 			{
-				Symbol *current = symbol;
+				if(current->type == Symbol::FUNCTION && type->exact(current->node->validate(args)))
+					goto end;
 
 				current = current->next_name;
-
-				while(current->next_name != symbol)
-				{
-					if(current->type == Symbol::FUNCTION && type->exact(current->node->validate(args)))
-						goto end;
-
-					current = current->next_name;
-				}
-
-				pair->range.report(args.document, "Undefined prototype");
-
-				end:;
 			}
+
+			head->pair->range.report(args.document, "Undefined prototype");
+
+			end:;
 		}
 
 		return type;

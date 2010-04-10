@@ -156,6 +156,8 @@ namespace Legion
 		{
 			return PROTOTYPE_NODE;
 		}
+
+		Type *validate(ValidationArgs &args);
 	};
 	
 	struct Block;

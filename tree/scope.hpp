@@ -68,6 +68,37 @@ namespace Legion
 				else
 					return 0;
 			}
+				
+			Symbol *lookup(String *name, Symbol::SymbolType type, bool &found)
+			{
+				Symbol *start = lookup(name);
+				Symbol *current = start;
+				Symbol *result = 0;
+
+				found = false;
+
+				if(!start)
+					return 0;
+
+				do
+				{
+					if(current->type == type)
+					{
+						if(found)
+							return 0;
+						else
+						{
+							found = true;
+							result = current;
+						}
+					}
+
+					current = current->next_name;
+				}
+				while(current != start);
+
+				return result;
+			}
 			
 			bool find_type(Type target)
 			{

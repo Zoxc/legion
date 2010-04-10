@@ -7,6 +7,7 @@ namespace Legion
 		"none",
 		"type",
 		"function",
+		"prototype",
 		"variable"
 	};
 
