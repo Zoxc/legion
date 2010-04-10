@@ -5,4 +5,6 @@
 [ ] Catch symbols used before they are declared
 [X] Use a structure to pass arguments for verification
 [ ] Implement typechecking for all operators
-[ ] Allow multiple defined symbols
+[X] Allow multiple defined symbols
+[ ] Sort symbols on insertion
+[ ] Have a proper error list
