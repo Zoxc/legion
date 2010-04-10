@@ -42,7 +42,7 @@ namespace Legion
 		
 		StructNode *node = list->add<StructNode>(memory_pool);
 		
-		node->symbol = declare<TypeSymbol>();
+		node->symbol = declare<TypeSymbol>(0);
 		node->symbol->node = node;
 		
 		if(match(Lexeme::BRACET_OPEN))
@@ -71,7 +71,7 @@ namespace Legion
 		{
 			TypedefNode *type_def = list->add<TypedefNode>(memory_pool);
 		
-			type_def->symbol = declare<TypeSymbol>(pair);
+			type_def->symbol = declare<TypeSymbol>(pair, 0);
 			type_def->symbol->node = type_def;
 			type_def->pair = pair;
 			
@@ -85,7 +85,7 @@ namespace Legion
 		global->pair = pair;
 		global->is_const = is_const;
 		global->is_static = is_static;
-		global->symbol = declare<VarSymbol>(pair);
+		global->symbol = declare<VarSymbol>(pair, is_static ? document : 0);
 		global->symbol->node = global;
 		
 		if(is_native)
@@ -139,7 +139,7 @@ namespace Legion
 
 			func->head = head;
 			
-			head->symbol = declare<FuncSymbol>(pair, prev);
+			head->symbol = declare<FuncSymbol>(pair, is_static ? document : 0, prev);
 
 			Symbol *symbol = head->symbol;
 
@@ -147,7 +147,7 @@ namespace Legion
 
 			while(symbol->next_name != head->symbol)
 			{
-				if(symbol->type != Symbol::PROTOTYPE)
+				if(symbol->type != Symbol::PROTOTYPE && symbol->document == head->symbol->document)
 				{
 					head->symbol->redeclared(*document);
 					break;
@@ -160,7 +160,7 @@ namespace Legion
 
 			for(List<ParamNode>::Iterator i = head->params.begin(); i; i++)
 			{
-				VarSymbol *symbol = declare<VarSymbol>(&(*i)->pair);
+				VarSymbol *symbol = declare<VarSymbol>(&(*i)->pair, 0);
 				symbol->node = *i;
 			}
 			
@@ -173,7 +173,7 @@ namespace Legion
 			PrototypeNode *proto = list->add<PrototypeNode>(memory_pool);
 			proto->head = head;
 
-			head->symbol = declare<PrototypeSymbol>(pair, prev);
+			head->symbol = declare<PrototypeSymbol>(pair, is_static ? document : 0, prev);
 
 			parse_terminator();
 		}

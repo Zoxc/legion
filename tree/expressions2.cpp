@@ -27,7 +27,7 @@ namespace Legion
 	{
 		bool found;
 
-		Symbol *symbol = args.scope->lookup(ident, Symbol::VARIABLE, found);
+		Symbol *symbol = args.scope->lookup(ident, &args.document, Symbol::VARIABLE, found);
 
 		if(found)
 		{
@@ -200,11 +200,11 @@ namespace Legion
 	{
 		bool found;
 
-		Symbol *symbol = args.scope->lookup(ident->ident, Symbol::FUNCTION, found);
+		Symbol *symbol = args.scope->lookup(ident->ident, &args.document, Symbol::FUNCTION, found);
 
 		if(!found)
 		{
-			symbol = args.scope->lookup(ident->ident, Symbol::PROTOTYPE, found);
+			symbol = args.scope->lookup(ident->ident, &args.document, Symbol::PROTOTYPE, found);
 
 			if(!found)
 			{

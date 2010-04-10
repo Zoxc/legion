@@ -9,7 +9,7 @@ namespace Legion
 	{
 		bool found;
 
-		Symbol *symbol = args.scope->lookup(name, Symbol::TYPE, found);
+		Symbol *symbol = args.scope->lookup(name, &args.document, Symbol::TYPE, found);
 
 		if(found)
 		{

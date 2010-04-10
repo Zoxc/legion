@@ -69,11 +69,13 @@ namespace Legion
 					return 0;
 			}
 				
-			Symbol *lookup(String *name, Symbol::SymbolType type, bool &found)
+			Symbol *lookup(String *name, Document *document, Symbol::SymbolType type, bool &found)
 			{
 				Symbol *start = lookup(name);
 				Symbol *current = start;
 				Symbol *result = 0;
+
+				bool found_document = false;
 
 				found = false;
 
@@ -84,18 +86,34 @@ namespace Legion
 				{
 					if(current->type == type)
 					{
-						if(found)
-							return 0;
+						if(current->document == document)
+						{
+							if(found_document)
+								return 0;
+							else
+							{
+								found_document = true;
+								result = current;
+							}
+						}
 						else
 						{
-							found = true;
-							result = current;
+							if(found && !found_document)
+								return 0;
+							else
+							{
+								found = true;
+								result = current;
+							}
 						}
 					}
 
 					current = current->next_name;
 				}
 				while(current != start);
+
+				if(found_document)
+					found = true;
 
 				return result;
 			}

@@ -184,28 +184,33 @@ namespace Legion
 				return result;
 			}
 			
-			template<class T>  T *declare()
+			template<class T>  T *declare(Document *document)
 			{
-				return declare<T>(new (scope->memory_pool) T);
+				T *result = new (scope->memory_pool) T;
+
+				result->document = document;
+
+				return declare<T>(result);
 			}
 			
-			template<class T>  T *declare(PairNode *pair, bool &prev)
+			template<class T>  T *declare(PairNode *pair, Document *document, bool &prev)
 			{
 				T *result = new (scope->memory_pool) T;
 				
 				result->range = new (scope->memory_pool) Range(pair->range);
 				result->name = pair->name;
+				result->document = document;
 				
 				prev = scope->declare_symbol(result);
 				
 				return result;
 			}
 
-			template<class T>  T *declare(PairNode *pair)
+			template<class T>  T *declare(PairNode *pair, Document *document)
 			{
 				bool prev;
 
-				T *result = declare<T>(pair, prev);
+				T *result = declare<T>(pair, document, prev);
 
 				if(prev)
 					result->redeclared(*document);

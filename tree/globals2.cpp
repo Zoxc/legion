@@ -75,8 +75,6 @@ namespace Legion
 		return type;
 	}
 
-	
-
 	Type *PrototypeNode::validate(ValidationArgs &args)
 	{
 		Type *type = head->validate(args);
