@@ -82,21 +82,26 @@ namespace Legion
 
 		if(symbol->type == Symbol::PROTOTYPE)
 		{
-			Symbol *current = symbol;
+			PrototypeNode *prototype = (PrototypeNode *)symbol->node;
 
-			current = current->next_name;
-
-			while(current->next_name != symbol)
+			if(!prototype->head->is_native)
 			{
-				if(current->type == Symbol::FUNCTION && type->exact(current->node->validate(args)))
-					goto end;
+				Symbol *current = symbol;
 
 				current = current->next_name;
+
+				while(current->next_name != symbol)
+				{
+					if(current->type == Symbol::FUNCTION && type->exact(current->node->validate(args)))
+						goto end;
+
+					current = current->next_name;
+				}
+
+				head->pair->range.report(args.document, "Undefined prototype");
+
+				end:;
 			}
-
-			head->pair->range.report(args.document, "Undefined prototype");
-
-			end:;
 		}
 
 		return type;

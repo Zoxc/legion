@@ -135,11 +135,15 @@ namespace Legion
 
 		if(lexeme() == Lexeme::BRACET_OPEN)
 		{
+			if(is_native)
+				pair->range.report(document, "You cannot provide an implementation of natives");
+
 			FuncNode *func = list->add<FuncNode>(memory_pool);
 
 			func->head = head;
 			
 			head->symbol = declare<FuncSymbol>(pair, is_static ? document : 0, prev);
+			head->symbol->node = func;
 
 			Symbol *symbol = head->symbol;
 
@@ -174,6 +178,7 @@ namespace Legion
 			proto->head = head;
 
 			head->symbol = declare<PrototypeSymbol>(pair, is_static ? document : 0, prev);
+			head->symbol->node = proto;
 
 			parse_terminator();
 		}

@@ -6,9 +6,6 @@ namespace Legion
 	Document::Document(Compiler &compiler, std::string filename) : input(0), compiler(compiler), parser(&compiler.string_pool, &memory_pool, this, &compiler.scope), scope(0)
 	{
 		this->filename = filename;
-
-		if(map())
-			parser.lexer.load(input, length);
 	}
 
 	Document::~Document()
@@ -20,11 +17,23 @@ namespace Legion
 	{
 		if(input)
 		{
+			parser.lexer.load(input, length);
 			parser.parse(&tree);
 			return true;
 		}
 		else
 			return false;
+	}
+
+	void Document::load(std::string filename)
+	{
+		map(filename);
+	}
+
+	void Document::load(const char_t *input, size_t length)
+	{
+		this->input = input;
+		this->length = length;
 	}
 
 	void Document::find_declarations()
@@ -45,13 +54,13 @@ namespace Legion
 			(*i)->validate(args);
 	}
 	
-	bool Document::map()
+	bool Document::map(std::string filename)
 	{
 		FILE* file = fopen(filename.c_str(), "rb");
 
 		if(!file)
 		{
-			std::cerr << "Unable to open file '" << filename << "'." << std::endl;
+			std::cout << "Unable to open file '" << filename << "'." << std::endl;
 			return false;
 		}
 		
@@ -68,7 +77,7 @@ namespace Legion
 			free(data);
 			fclose(file);
 			
-			std::cerr << "Unable to read file '" << filename << "'." << std::endl;
+			std::cout << "Unable to read file '" << filename << "'." << std::endl;
 			return false;
 		}
 

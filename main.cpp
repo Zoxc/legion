@@ -57,11 +57,11 @@ void print_ast(std::string name)
 
 int main(int argc, char *argv[])
 {
-	std::cout << "Legion - a compiler that targets Galaxy" << std::endl;
-
 	for(int i = 1; i < argc; i++)
 	{
 		Document *document = new Document(compiler, argv[i]);
+
+		document->load(argv[i]);
 
 		queue.push_back(document);
 		documents.push_back(document);

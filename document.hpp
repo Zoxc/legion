@@ -11,7 +11,7 @@ namespace Legion
 	class Document
 	{
 		private:
-			bool map();
+			bool map(std::string filename);
 			const char_t *input;
 			size_t length;
 		public:
@@ -26,6 +26,8 @@ namespace Legion
 			bool parse();
 			void find_declarations();
 			void validate();
+			void load(std::string filename);
+			void load(const char_t *input, size_t length);
 			
 			Document(Compiler &compiler, std::string filename);
 			~Document();
