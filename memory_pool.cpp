@@ -6,12 +6,13 @@
 
 namespace Legion
 {
-	const unsigned int page_size = 0x1000 * 4;
-
 	MemoryPool::MemoryPool()
 	{
 		current = current_page = allocate_page();
-		max = current + page_size;
+
+		assert(current_page);
+
+		max = current + max_alloc;
 	}
 
 	MemoryPool::~MemoryPool()
@@ -22,12 +23,12 @@ namespace Legion
 		free_page(current_page);
 	}
 
-	char_t *MemoryPool::allocate_page()
+	char_t *MemoryPool::allocate_page(size_t bytes)
 	{
 		#ifdef WIN32
-			return (char_t *)VirtualAlloc(0, page_size, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
+			return (char_t *)VirtualAlloc(0, bytes, MEM_RESERVE | MEM_COMMIT, PAGE_READWRITE);
 		#else	
-			return (char_t *)malloc(page_size);
+			return (char_t *)malloc(bytes);
 		#endif
 	}
 
@@ -42,13 +43,26 @@ namespace Legion
 
 	void *MemoryPool::get_page(size_t bytes)
 	{
+		if(bytes > max_alloc)
+		{
+			char_t *result = allocate_page(bytes);
+
+			assert(result);
+
+			pages.push_back(result);
+
+			return result;
+		}
+
 		pages.push_back(current_page);
 		
 		char_t *result = allocate_page();
+
+		assert(result);
 		
 		current_page = result;
 		current = result + bytes;
-		max = result + page_size;
+		max = result + max_alloc;
 		
 		return result;
 	}

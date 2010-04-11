@@ -28,8 +28,8 @@ namespace Legion
 
 		for(char_t *c = string; c != end; c++, i++)
 		{
-			if(*i == '/')
-				*c = '\\';
+			if(*i == '\\')
+				*c = '/';
 			else
 				*c = *i;
 		}

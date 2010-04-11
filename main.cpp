@@ -47,10 +47,10 @@ void print_ast(std::string name)
 	#ifdef AST_DEBUG
 		DebugPrinter printer;
 
-		for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
+		for(List<Document>::Iterator i = compiler.documents.begin(); i; i++)
 		{
-			std::cout << std::endl << "Printing " + name + " for " + (*i)->filename << std::endl;
-			std::cout << printer.print(&(*i)->tree) << std::endl;
+			std::cout << std::endl << "Printing " + name + " for " + i().filename->string() << std::endl;
+			std::cout << printer.print(&i().tree) << std::endl;
 		}
 	#endif
 }
@@ -62,7 +62,8 @@ int main(int argc, char *argv[])
 	BENCHMARK_START;
 
 	for(int i = 1; i < argc; i++)
-		include(compiler.string_pool.get(argv[i]));
+		if(!include(compiler.string_pool.get(argv[i])))
+			std::cout << "Unable to open file '" << argv[i] << "'" << std::endl;
 
 	BENCHMARK_END("Parsed files");
 

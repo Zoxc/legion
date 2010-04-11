@@ -5,6 +5,8 @@ namespace Legion
 {
 	class MemoryPool
 	{
+		static const unsigned int max_alloc = 0x1000 * 4;
+
 		private:
 			std::vector<char_t *> pages;
 			
@@ -12,7 +14,7 @@ namespace Legion
 			char_t *current;
 			char_t *max;
 
-			char_t *allocate_page();
+			char_t *allocate_page(size_t bytes = max_alloc);
 			void free_page(char_t *page);
 			
 			void *get_page(size_t bytes);

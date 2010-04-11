@@ -23,7 +23,7 @@ namespace Legion
 			TYPES
 		};
 		
-		Symbol(SymbolType type) : type(type), name(0), node(0) {}
+		Symbol(SymbolType type) : type(type), name(0), node(0), document(0) {}
 
 		void redeclared(Document &document);
 

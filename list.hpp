@@ -19,7 +19,7 @@ namespace Legion
 
 	template<class T, class F> struct ListBase
 	{
-		ListBase() : first(0), last(0) {}
+		ListBase() : first(0), last(0), size(0) {}
 		
 		T *first;
 		T *last;
