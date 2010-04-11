@@ -36,7 +36,7 @@ namespace Legion
 			{
 				stop = range.stop;
 			}
-			
+
 			Range &dup(MemoryPool &memory_pool)
 			{
 				return *new (memory_pool) Range(*this);

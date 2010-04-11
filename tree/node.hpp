@@ -90,6 +90,11 @@ namespace Legion
 		{
 			return 0;
 		}
+		
+		virtual Type *get_type(ValidationArgs &args)
+		{
+			return validate(args);
+		}
 	};
 	
 	struct ListNode:

@@ -14,7 +14,6 @@ namespace Legion
 
 		node->range.capture(type->get_range(memory_pool));
 		node->type_expression = type;
-		node->type = 0;
 
 		node->symbol = new (memory_pool) VarSymbol;
 		node->symbol->node = node;

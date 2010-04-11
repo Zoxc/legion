@@ -98,8 +98,9 @@ namespace Legion
 
 	Type *LocalNode::validate(ValidationArgs &args)
 	{
-		if(!type)
+		if(!has_type)
 		{
+			has_type = true;
 			type = type_node->validate(args);
 
 			if(has_value)

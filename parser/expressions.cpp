@@ -70,7 +70,7 @@ namespace Legion
 
 					match(Lexeme::PARENT_CLOSE);
 
-					ident->range->expand(lexer.lexeme);
+					ident->range->stop = lexer.lexeme.prev;
 
 					return node;
 				}

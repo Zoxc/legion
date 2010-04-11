@@ -6,8 +6,9 @@ namespace Legion
 {
 	Type *StructNode::validate(ValidationArgs &args)
 	{
-		if(!type)
+		if(!has_type)
 		{
+			has_type = true;
 			type = new (args.memory_pool) CompositeType();
 			type->name = symbol->name;
 
@@ -24,8 +25,9 @@ namespace Legion
 
 	Type *TypedefNode::validate(ValidationArgs &args)
 	{
-		if(!type)
+		if(!has_type)
 		{
+			has_type = true;
 			type = new (args.memory_pool) TypedefType(pair->validate(args));
 			type->name = pair->name;
 		}
@@ -35,12 +37,20 @@ namespace Legion
 
 	Type *GlobalNode::validate(ValidationArgs &args)
 	{
-		if(!type)
-		{
-			type = pair->validate(args);
+		Type *type = get_type(args);
 
-			if(has_value)
-				type->compatible(args, value);
+		if(has_value)
+			type->compatible(args, value);
+
+		return type;
+	}
+
+	Type *GlobalNode::get_type(ValidationArgs &args)
+	{
+		if(!has_type)
+		{
+			has_type = true;
+			type = pair->validate(args);
 		}
 
 		return type;
@@ -48,16 +58,20 @@ namespace Legion
 
 	Type *ParamNode::validate(ValidationArgs &args)
 	{
-		if(!type)
+		if(!has_type)
+		{
+			has_type = true;
 			type = pair.validate(args);
+		}
 
 		return type;
 	}
 
 	Type *FuncHeadNode::validate(ValidationArgs &args)
 	{
-		if(!type)
+		if(!has_type)
 		{
+			has_type = true;
 			type = new (args.memory_pool) FunctionType();
 
 			if(pair->type && !pair->type->modifiers.first && pair->type->name == args.types.type_void.type.name)
@@ -78,10 +92,10 @@ namespace Legion
 	Type *PrototypeNode::validate(ValidationArgs &args)
 	{
 		Symbol *symbol = head->symbol;
+		Type *type = head->validate(args);
 
-		if(!head->type && symbol->type == Symbol::PROTOTYPE)
+		if(symbol->type == Symbol::PROTOTYPE)
 		{
-			Type *type = head->validate(args);
 			PrototypeNode *prototype = (PrototypeNode *)symbol->node;
 
 			if(!prototype->head->is_native)
@@ -102,10 +116,8 @@ namespace Legion
 
 				end:;
 			}
-
-			return type;
 		}
-		else
-			return head->validate(args);
+		
+		return type;
 	}
 };

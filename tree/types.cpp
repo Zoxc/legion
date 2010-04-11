@@ -14,7 +14,7 @@ namespace Legion
 		if(found)
 		{
 			if(symbol)
-				return symbol->node->validate(args);
+				return symbol->node->get_type(args);
 			else
 				return 0;
 		}

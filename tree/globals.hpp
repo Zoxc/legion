@@ -59,10 +59,11 @@ namespace Legion
 	struct StructNode:
 		public NamespaceNode
 	{
-		StructNode() : type(0) {}
+		StructNode() : has_type(false) {}
 
 		TypeSymbol *symbol;
 		List<FieldNode> fields;
+		bool has_type;
 		CompositeType *type;
 
 		Node::NodeType node_type()
@@ -76,10 +77,11 @@ namespace Legion
 	struct TypedefNode:
 		public NamespaceNode
 	{
-		TypedefNode() : type(0) {}
+		TypedefNode() : has_type(false) {}
 
 		PairNode *pair;
 		TypeSymbol *symbol;
+		bool has_type;
 		TypedefType *type;
 
 		Node::NodeType node_type()
@@ -93,7 +95,7 @@ namespace Legion
 	struct GlobalNode:
 		public NamespaceNode
 	{
-		GlobalNode() : symbol(0), type(0) {}
+		GlobalNode() : symbol(0), has_type(false) {}
 		
 		PairNode *pair;
 		bool is_const;
@@ -101,6 +103,7 @@ namespace Legion
 		VarSymbol *symbol;
 		ExpressionNode *value;
 		bool has_value;
+		bool has_type;
 		Type *type;
 
 		Node::NodeType node_type()
@@ -109,14 +112,16 @@ namespace Legion
 		}
 
 		Type *validate(ValidationArgs &args);
+		Type *get_type(ValidationArgs &args);
 	};
 	
 	struct ParamNode:
 		public ListNode
 	{
-		ParamNode() : type(0) {}
+		ParamNode() : has_type(false) {}
 
 		PairNode pair;
+		bool has_type;
 		Type *type;
 
 		Node::NodeType node_type()
@@ -130,13 +135,14 @@ namespace Legion
 	struct FuncHeadNode:
 		public Node
 	{
-		FuncHeadNode() : symbol(0), type(0) {}
+		FuncHeadNode() : symbol(0), has_type(false) {}
 		
 		PairNode *pair;
 		bool is_native;
 		bool is_static;
 		Symbol *symbol;
 		List<ParamNode> params;
+		bool has_type;
 		FunctionType *type;
 
 		Node::NodeType node_type()
@@ -158,6 +164,11 @@ namespace Legion
 		}
 
 		Type *validate(ValidationArgs &args);
+
+		Type *get_type(ValidationArgs &args)
+		{
+			return head->validate(args);
+		}
 	};
 	
 	struct Block;
@@ -189,10 +200,15 @@ namespace Legion
 
 		Type *validate(ValidationArgs &args)
 		{
-			head->validate(args);
+			Type *type = head->validate(args);
 			body->validate(args);
 
-			return 0;
+			return type;
+		}
+		
+		Type *get_type(ValidationArgs &args)
+		{
+			return head->validate(args);
 		}
 	};
 };
