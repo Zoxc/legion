@@ -9,12 +9,17 @@ Compiler compiler;
 
 bool include(String *filename)
 {
-	std::string file = filename->string() + ".galaxy";
+	std::string file = filename->string() + "_beta.galaxy";
 
 	Document &document = *new Document(compiler, filename);
 
 	if(!document.load(file))
-		return false;
+	{
+		file = filename->string() + ".galaxy";
+
+		if(!document.load(file))
+			return false;
+	}
 
 	document.parse();
 

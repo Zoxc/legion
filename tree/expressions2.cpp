@@ -103,7 +103,7 @@ namespace Legion
 			case Lexeme::LOGICAL_AND:
 			case Lexeme::LOGICAL_OR:
 				left_type->compatible(args, right_type, right);
-				return &args.types.type_bool.type;
+				return args.types.type_bool.type;
 
 			default:
 				return 0;
@@ -147,8 +147,8 @@ namespace Legion
 		switch(op)
 		{
 			case Lexeme::NOT_EQUAL:
-				args.types.type_bool.type.Type::compatible(args, type, value);
-				return &args.types.type_bool.type;
+				args.types.type_bool.type->Type::compatible(args, type, value);
+				return args.types.type_bool.type;
 
 			default:
 				return 0;
@@ -157,7 +157,7 @@ namespace Legion
 
 	Type *ArraySubscriptNode::validate(ValidationArgs &args)
 	{
-		args.types.type_int.type.Type::compatible(args, index);
+		args.types.type_int.type->Type::compatible(args, index);
 		
 		return 0;
 	}
@@ -196,27 +196,27 @@ namespace Legion
 
 	Type *IntegerNode::validate(ValidationArgs &args)
 	{
-		return &args.types.type_int.type;
+		return args.types.type_int.type;
 	}
 
 	Type *StringNode::validate(ValidationArgs &args)
 	{
-		return &args.types.type_string.type;
+		return args.types.type_string.type;
 	}
 
 	Type *FixedNode::validate(ValidationArgs &args)
 	{
-		return &args.types.type_fixed.type;
+		return args.types.type_fixed.type;
 	}
 
 	Type *BooleanNode::validate(ValidationArgs &args)
 	{
-		return &args.types.type_bool.type;
+		return args.types.type_bool.type;
 	}
 
 	Type *NullNode::validate(ValidationArgs &args)
 	{
-		return &args.types.type_null.type;
+		return args.types.type_null.type;
 	}
 
 	Type *CallNode::validate(ValidationArgs &args)

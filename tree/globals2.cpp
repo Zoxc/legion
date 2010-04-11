@@ -104,8 +104,8 @@ namespace Legion
 			has_type = true;
 			type = new (args.memory_pool) FunctionType();
 
-			if(pair->type && !pair->type->modifiers.first && pair->type->name == args.types.type_void.type.name)
-				type->returns = &args.types.type_void.type;
+			if(pair->type && !pair->type->modifiers.first && pair->type->name == args.types.type_void.type->name)
+				type->returns = args.types.type_void.type;
 			else
 				type->returns = pair->validate(args);
 

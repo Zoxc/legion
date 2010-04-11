@@ -93,7 +93,7 @@ namespace Legion
 
 			virtual std::string string(bool show_typedef = true) = 0;
 
-			virtual bool compatible(ValidationArgs &args, Type *other)
+			virtual bool compatible(ValidationArgs &args, Type *other, bool weak)
 			{
 				return this == other || this == resolve(other);
 			}
@@ -107,36 +107,84 @@ namespace Legion
 			}
 	};
 
+	struct ImplicitConversion
+	{
+		Type *type;
+		bool weak;
+		ImplicitConversion *next;
+	};
+
+	class TypeFunctions:
+		public HashTableFunctions<Type *, ImplicitConversion *>
+	{
+		public:
+			static bool compare_key_value(Type *key, ImplicitConversion *value)
+			{
+				return value->type == key;
+			}
+
+			static Type *get_key(ImplicitConversion *value)
+			{
+				return value->type;
+			}
+
+			static ImplicitConversion *get_value_next(ImplicitConversion *value)
+			{
+				return value->next;
+			}
+
+			static void set_value_next(ImplicitConversion *value, ImplicitConversion *next)
+			{
+				value->next = next;
+			}
+	};
+
 	class NativeType:
 		public Type
 	{
 		public:
 			String *name;
+			NativeType *base;
 
-			std::set<Type *> implicit_conversions; //TODO: Remove usage of set
+			HashTable<Type *, ImplicitConversion *, TypeFunctions> implicit_conversions;
+
+			void add_conversion(Type *type, bool weak = false)
+			{
+				ImplicitConversion *conversion = new (implicit_conversions.memory_pool) ImplicitConversion;
+
+				conversion->type = type;
+				conversion->weak = weak;
+
+				implicit_conversions.set(type, conversion);
+			}
 
 			std::string string(bool show_typedef)
 			{
 				return name->string();
 			}
 
-			bool compatible(ValidationArgs &args, Type *other)
+			bool compatible(ValidationArgs &args, Type *other, bool weak)
 			{
 				Type *type = resolve(other);
 
 				if(this == type)
 					return true;
 
-				return implicit_conversions.find(type) != implicit_conversions.end();
+				ImplicitConversion *conversion = implicit_conversions.get(type);
+
+				if(conversion && (weak || !conversion->weak))
+					return true;
+
+				return base->compatible(args, other, weak);
 			}
 
-			NativeType() : Type(Type::NATIVE_TYPE) {}
+			NativeType(MemoryPool &memory_pool, NativeType *base) : Type(Type::NATIVE_TYPE), base(base), implicit_conversions(memory_pool, 1) {}
 	};
 
 	struct TypeNativeNode:
 		public Node
 	{
-		NativeType type;
+		NativeType *type;
 
 		NodeType node_type()
 		{
@@ -145,7 +193,7 @@ namespace Legion
 
 		Type *get_type(Document &document, SymbolList &stack)
 		{
-			return &type;
+			return type;
 		}
 	};
 
@@ -248,12 +296,12 @@ namespace Legion
 					return base->string(false);
 			}
 
-			bool compatible(ValidationArgs &args, Type *other)
+			bool compatible(ValidationArgs &args, Type *other, bool weak)
 			{
 				if(!base)
 					return true;
 
-				return this == other || base->compatible(args, other);
+				return this == other || base->compatible(args, other, weak);
 			}
 	};
 
@@ -290,7 +338,7 @@ namespace Legion
 				return base->string(show_typedef) + "*";
 			}
 
-			bool compatible(ValidationArgs &args, Type *other);
+			bool compatible(ValidationArgs &args, Type *other, bool weak);
 	};
 
 	class Compiler;
@@ -298,7 +346,9 @@ namespace Legion
 	class Types
 	{
 		private:
-			void declare(Compiler &compiler, const char *name, TypeNativeNode &type, bool declare);
+			Compiler &compiler;
+
+			void declare(TypeNativeNode *parent, const char *name, TypeNativeNode &type, bool declare);
 
 		public:
 			TypeNativeNode type_null;
