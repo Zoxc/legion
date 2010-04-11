@@ -28,11 +28,7 @@ namespace Legion
 			return false;
 		}
 
-		virtual void setup_type(Document &document, LocalNode &local, bool name)
-		{
-			get_range().report_type_modifier(document);
-		}
-
+		virtual void setup_type(Document &document, LocalNode &local, bool name);
 	};
 
 	typedef List<ExpressionNode> ExpressionList;
@@ -57,7 +53,7 @@ namespace Legion
 		
 		void setup_type(Document &document, LocalNode &local, bool name);
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return *range;
 		}
@@ -75,10 +71,10 @@ namespace Legion
 
 		StatementNode *get_declaration(Document &document);
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
-			Range range = left->get_range();
-			Range end = right->get_range();
+			Range &range = left->get_range(memory_pool).dup(memory_pool);
+			Range &end = right->get_range(memory_pool);
 			range.expand(end);
 			return range;
 		}
@@ -106,23 +102,7 @@ namespace Legion
 	struct AssignNode:
 		public BinaryOpNode
 	{
-		StatementNode *get_declaration(Document &document)
-		{
-			LocalNode *local = (LocalNode *)left->get_declaration(document);
-
-			if(local)
-			{
-				local->value = right;
-				local->has_value = true;
-
-				if(op != Lexeme::ASSIGN)
-					range->report(document, "Unexpected assignment with operator " + Lexeme::describe(range, op));
-
-				return local;
-			}
-			else
-				return 0;
-		}
+		StatementNode *get_declaration(Document &document);
 
 		Type *validate(ValidationArgs &args)
 		{
@@ -164,10 +144,10 @@ namespace Legion
 		void setup_type(Document &document, LocalNode &local, bool name);
 		Type *validate(ValidationArgs &args);
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
-			Range range = *this->range;
-			Range end = value->get_range();
+			Range &range = this->range->dup(memory_pool);
+			Range &end = value->get_range(memory_pool);
 			range.expand(end);
 			return range;
 		}
@@ -184,7 +164,7 @@ namespace Legion
 			return Node::ARRAY_SUBSCRIPT_NODE;
 		}
 		
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return *range;
 		}
@@ -209,9 +189,9 @@ namespace Legion
 
 		void setup_type(Document &document, LocalNode &local, bool name);
 		
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
-			Range range;
+			Range &range = *new (memory_pool) Range;
 
 			assert(0);
 
@@ -231,7 +211,7 @@ namespace Legion
 			return Node::MEMBER_REF_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return *range;
 		}
@@ -248,13 +228,12 @@ namespace Legion
 			return Node::FACTOR_CHAIN_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
-			Range range = factor->get_range();
-			Range end = chain.last->get_range();
-
+			
+			Range &range = factor->get_range(memory_pool).dup(memory_pool);
+			Range &end = chain.last->get_range(memory_pool);
 			range.expand(end);
-
 			return range;
 		}
 
@@ -287,7 +266,7 @@ namespace Legion
 			return Node::INT_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return *range;
 		}
@@ -306,7 +285,7 @@ namespace Legion
 			return Node::STRING_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return *range;
 		}
@@ -325,7 +304,7 @@ namespace Legion
 			return Node::FIXED_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return *range;
 		}
@@ -344,7 +323,7 @@ namespace Legion
 			return Node::BOOL_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return *range;
 		}
@@ -362,7 +341,7 @@ namespace Legion
 			return Node::NULL_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return *range;
 		}
@@ -381,7 +360,7 @@ namespace Legion
 			return Node::CALL_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return *ident->range;
 		}
@@ -400,7 +379,7 @@ namespace Legion
 			return Node::GROUPED_EXPRESSION_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return range;
 		}

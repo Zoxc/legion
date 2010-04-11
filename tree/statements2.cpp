@@ -35,13 +35,13 @@ namespace Legion
 			i().validate(args);
 
 			if(saw_return)
-				i().get_range().report(args.document, "Statement after a return statement");
+				args.document.report(i().get_range(args.memory_pool), "Statement after a return statement");
 
 			switch(i().node_type())
 			{
 				case LOCAL_NODE:
 					if(!allow_locals)
-						i().get_range().report(args.document, "Local variables must be declared at the start of a function");
+						args.document.report(i().get_range(args.memory_pool), "Local variables must be declared at the start of a function");
 					break;
 	
 				case RETURN_NODE:
@@ -60,7 +60,7 @@ namespace Legion
 
 				default:
 					allow_locals = false;
-					i().get_range().report(args.document, "Unexpected expresssion");
+					args.document.report(i().get_range(args.memory_pool), "Unexpected expresssion");
 			}
 
 		}
@@ -80,7 +80,7 @@ namespace Legion
 		if(args.types.type_bool.type.compatible(args, type) || type->compatible(args, &args.types.type_null.type))
 			return 0;
 
-		condition->get_range().report_types(args.document, type, &args.types.type_bool.type);
+		new IncompatableTypesError(args.document, condition->get_range(args.memory_pool), type, &args.types.type_bool.type);
 
 		return 0;
 	}

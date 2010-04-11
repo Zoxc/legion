@@ -3,7 +3,7 @@
 
 namespace Legion
 {
-	Document::Document(Compiler &compiler, std::string filename) : input(0), compiler(compiler), parser(&compiler.string_pool, &memory_pool, this, &compiler.scope), scope(0)
+	Document::Document(Compiler &compiler, std::string filename) : input(0), compiler(compiler), parser(compiler.string_pool, memory_pool, *this, &compiler.scope), scope(0)
 	{
 		this->filename = filename;
 	}
@@ -23,6 +23,16 @@ namespace Legion
 		}
 		else
 			return false;
+	}
+
+	void Document::report(Range &range, std::string text, Message::Severity severity)
+	{
+		new StringMessage(*this, range, severity, text);
+	}
+
+	void Document::report_type_modifier(Range &range)
+	{
+		new StringMessage(*this, range, Message::LEGION_ERROR, "Unknown type modifier '" + range.string() + "'");
 	}
 
 	void Document::load(std::string filename)

@@ -339,7 +339,11 @@
 			>
 		</File>
 		<File
-			RelativePath=".\range.cpp"
+			RelativePath=".\message.cpp"
+			>
+		</File>
+		<File
+			RelativePath=".\message.hpp"
 			>
 		</File>
 		<File

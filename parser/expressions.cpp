@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "../document.hpp"
 #include "../tree/scope.hpp"
 #include "../tree/types.hpp"
 #include "../tree/symbols.hpp"
@@ -140,7 +141,7 @@ namespace Legion
 			}
 
 			default:
-				lexer.lexeme.report(document, "Expected expression");
+				document.report(lexer.lexeme.dup(memory_pool), "Expected expression");
 				return 0;
 		}
 	}

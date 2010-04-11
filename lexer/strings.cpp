@@ -1,5 +1,6 @@
 #include "lexer.hpp"
 #include "../string_pool.hpp"
+#include "../document.hpp"
 
 namespace Legion
 {
@@ -140,7 +141,8 @@ namespace Legion
 							if(process_null(&input))
 							{
 								lexeme.stop = &input;
-								lexeme.report(document, "Unterminated string");
+
+								document.report(lexeme.dup(memory_pool), "Unterminated string");
 								goto done;
 							}
 							else
@@ -151,7 +153,7 @@ namespace Legion
 							const char_t *start = lexeme.start;
 							lexeme.start = &input - 1;
 							lexeme.stop = &input + 1;
-							lexeme.report(document, "Invalid escape string");
+							document.report(lexeme.dup(memory_pool), "Invalid escape string");
 							lexeme.start = start;
 					}
 					break;
@@ -160,7 +162,7 @@ namespace Legion
 					if(process_null(&input))
 					{
 						lexeme.stop = &input;
-						lexeme.report(document, "Unterminated string");
+						document.report(lexeme.dup(memory_pool), "Unterminated string");
 						goto done;
 					}
 					else
@@ -178,6 +180,6 @@ namespace Legion
 		
 		build_string(lexeme.start + 1, str);
 		
-		lexeme.value = string_pool->get(str, str_length);
+		lexeme.value = string_pool.get(str, str_length);
 	}
 };

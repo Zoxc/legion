@@ -7,4 +7,4 @@
 [ ] Implement typechecking for all operators
 [X] Allow multiple defined symbols
 [ ] Sort symbols on insertion
-[ ] Have a proper error list
+[X] Have a proper error list

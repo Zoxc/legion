@@ -19,7 +19,7 @@ namespace Legion
 	struct StatementNode:
 		public ListNode
 	{
-		virtual Range get_range() = 0;
+		virtual Range &get_range(MemoryPool &memory_pool) = 0;
 
 		virtual StatementNode *get_declaration(Document &document)
 		{
@@ -44,7 +44,7 @@ namespace Legion
 			return BLOCK_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return range;
 		}
@@ -78,7 +78,7 @@ namespace Legion
 			return IF_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return range;
 		}
@@ -97,7 +97,7 @@ namespace Legion
 			return WHILE_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return range;
 		}
@@ -116,7 +116,7 @@ namespace Legion
 			return DO_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return range;
 		}
@@ -134,7 +134,7 @@ namespace Legion
 			return RETURN_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return range;
 		}
@@ -150,7 +150,7 @@ namespace Legion
 			return BREAK_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return range;
 		}
@@ -166,7 +166,7 @@ namespace Legion
 			return CONTINUE_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return range;
 		}
@@ -191,7 +191,7 @@ namespace Legion
 			return LOCAL_NODE;
 		}
 
-		Range get_range()
+		Range &get_range(MemoryPool &memory_pool)
 		{
 			return range;
 		}

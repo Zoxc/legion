@@ -14,7 +14,7 @@ namespace Legion
 	class Parser
 	{
 		public:
-			Parser(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope);
+			Parser(StringPool &string_pool, MemoryPool &memory_pool, Document &document, Scope *scope);
 			~Parser();
 			
 			Lexer lexer;
@@ -31,8 +31,8 @@ namespace Legion
 			void expected(Lexeme::Type what, bool skip = false);
 			void expected_prev(Lexeme::Type what);
 		private:
-			Document *document;
-			MemoryPool *memory_pool;
+			Document &document;
+			MemoryPool &memory_pool;
 			
 			Lexeme::Type lexeme()
 			{
@@ -179,7 +179,7 @@ namespace Legion
 				T *result = declare<T>(type, prev);
 
 				if(prev)
-					result->redeclared(*document);
+					result->redeclared(document);
 
 				return result;
 			}

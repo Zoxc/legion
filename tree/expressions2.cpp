@@ -4,6 +4,11 @@
 
 namespace Legion
 {
+	void ExpressionNode::setup_type(Document &document, LocalNode &local, bool name)
+	{
+		document.report_type_modifier(get_range(document.memory_pool));
+	}
+
 	bool IdentNode::is_type_name(Document &document, bool lookup)
 	{
 		return !lookup || document.scope->lookup_type(ident) == Symbol::TYPE;
@@ -37,7 +42,7 @@ namespace Legion
 				return 0;
 		}
 
-		range->report_expected_symbol(args.document, symbol, ident, Symbol::VARIABLE);
+		new WrongSymbolError(args.document, *range, symbol, ident, Symbol::VARIABLE);
 
 		return 0;
 	}
@@ -45,7 +50,7 @@ namespace Legion
 	void BinaryOpNode::setup_type(Document &document, LocalNode &local, bool name)
 	{
 		if(op != Lexeme::MUL)
-			range->report_type_modifier(document);
+			document.report_type_modifier(*range);
 
 		left->setup_type(document, local, name);
 		
@@ -69,7 +74,7 @@ namespace Legion
 			local->symbol->node = local;
 
 			if(op != Lexeme::MUL)
-				range->report_type_modifier(document);
+				document.report_type_modifier(*range);
 
 			left->setup_type(document, *local, false);
 
@@ -107,10 +112,28 @@ namespace Legion
 		return left_type;
 	}
 
+	StatementNode *AssignNode::get_declaration(Document &document)
+	{
+		LocalNode *local = (LocalNode *)left->get_declaration(document);
+
+		if(local)
+		{
+			local->value = right;
+			local->has_value = true;
+
+			if(op != Lexeme::ASSIGN)
+				document.report(*range, "Unexpected assignment with operator " + Lexeme::describe(range, op));
+
+			return local;
+		}
+		else
+			return 0;
+	}
+
 	void UnaryOpNode::setup_type(Document &document, LocalNode &local, bool name)
 	{
 		if(op != Lexeme::MUL)
-			range->report_type_modifier(document);
+			document.report_type_modifier(*range);
 		
 		value->setup_type(document, local, name);
 		
@@ -153,8 +176,8 @@ namespace Legion
 	{
 		for(ExpressionList::Iterator i = chain.begin(); i; i++)
 		{
-			if((*i)->node_type() != Node::ARRAY_SUBSCRIPT_NODE)
-				(*i)->get_range().report_type_modifier(document);
+			if(i().node_type() != Node::ARRAY_SUBSCRIPT_NODE)
+				document.report_type_modifier(i().get_range(document.memory_pool));
 			else
 			{
 				TypeArrayNode *node = local.type_node->modifiers.add<TypeArrayNode>(document.memory_pool);
@@ -208,7 +231,7 @@ namespace Legion
 
 			if(!found)
 			{
-				get_range().report_expected_symbol(args.document, symbol, ident->ident, Symbol::FUNCTION);
+				new WrongSymbolError(args.document, get_range(args.memory_pool), symbol, ident->ident, Symbol::FUNCTION);
 
 				return 0;
 			}
@@ -236,7 +259,7 @@ namespace Legion
 			if(arguments.size != 1)
 				message << "s";
 
-			get_range().report(args.document, message.str());
+			args.document.report(get_range(args.memory_pool), message.str());
 
 			for(ExpressionList::Iterator i = arguments.begin(); i; i++)
 				i().validate(args);

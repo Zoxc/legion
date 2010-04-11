@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "../document.hpp"
 #include "../tree/scope.hpp"
 #include "../tree/types.hpp"
 #include "../tree/symbols.hpp"
@@ -6,7 +7,7 @@
 
 namespace Legion
 {
-	Parser::Parser(StringPool *string_pool, MemoryPool *memory_pool, Document *document, Scope *scope) : lexer(string_pool, memory_pool, document), scope(scope), document(document), memory_pool(memory_pool)
+	Parser::Parser(StringPool &string_pool, MemoryPool &memory_pool, Document &document, Scope *scope) : lexer(string_pool, memory_pool, document), scope(scope), document(document), memory_pool(memory_pool)
 	{
 	}
 
@@ -16,7 +17,7 @@ namespace Legion
 	
 	Scope *Parser::push_scope(Scope::Type type)
 	{
-		return scope = new Scope(scope, type, *memory_pool);
+		return scope = new Scope(scope, type, memory_pool);
 	}
 	
 	void Parser::pop_scope()
@@ -26,7 +27,7 @@ namespace Legion
 	
 	void Parser::expected(Lexeme::Type what, bool skip)
 	{
-		lexer.lexeme.report(document, "Expected " + Lexeme::describe_type(what) + ", but found " + lexer.lexeme.describe());
+		document.report(lexer.lexeme.dup(memory_pool), "Expected " + Lexeme::describe_type(what) + ", but found " + lexer.lexeme.describe());
 		
 		if(skip)
 			step();
@@ -34,12 +35,12 @@ namespace Legion
 	
 	void Parser::expected_prev(Lexeme::Type what)
 	{
-		lexer.lexeme.get_prev().report(document, "Expected " + Lexeme::describe_type(what));
+		document.report(lexer.lexeme.dup(memory_pool), "Expected " + Lexeme::describe_type(what));
 	}
 
 	void Parser::unexpected(bool skip)
 	{
-		lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.describe());
+		document.report(lexer.lexeme.dup(memory_pool), "Unexpected " + lexer.lexeme.describe());
 
 		if(skip)
 			step();

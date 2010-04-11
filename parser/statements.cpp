@@ -1,4 +1,5 @@
 #include "parser.hpp"
+#include "../document.hpp"
 #include "../tree/scope.hpp"
 #include "../tree/types.hpp"
 #include "../tree/symbols.hpp"
@@ -11,7 +12,7 @@ namespace Legion
 	{
 		LocalNode *node = list->add<LocalNode>(memory_pool);
 
-		node->range.capture(type->get_range());
+		node->range.capture(type->get_range(memory_pool));
 		node->type_expression = type;
 		node->type = 0;
 
@@ -31,7 +32,7 @@ namespace Legion
 		if(is_assign_operator(lexeme()))
 		{
 			if(lexeme() != Lexeme::ASSIGN)
-				lexer.lexeme.report(document, "Unexpected assignment with operator " + lexer.lexeme.describe());
+				document.report(lexer.lexeme.dup(memory_pool), "Unexpected assignment with operator " + lexer.lexeme.describe());
 
 			step();
 
@@ -115,7 +116,7 @@ namespace Legion
 		if(scope->find_type(Scope::LOOP))
 			list->add<BreakNode>(memory_pool)->range.capture(lexer.lexeme);
 		else
-			lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.describe() + " outside of loop");
+			document.report(lexer.lexeme.dup(memory_pool), "Unexpected " + lexer.lexeme.describe() + " outside of loop");
 		
 		step();
 	}
@@ -125,7 +126,7 @@ namespace Legion
 		if(scope->find_type(Scope::LOOP))
 			list->add<ContinueNode>(memory_pool)->range.capture(lexer.lexeme);
 		else
-			lexer.lexeme.report(document, "Unexpected " + lexer.lexeme.describe() + " outside of loop");
+			document.report(lexer.lexeme.dup(memory_pool), "Unexpected " + lexer.lexeme.describe() + " outside of loop");
 		
 		step();
 	}
@@ -192,7 +193,7 @@ namespace Legion
 				{
 					ExpressionNode *node = parse_expression();
 
-					if(lexeme() == Lexeme::IDENT && node->is_type_name(*document, false))
+					if(lexeme() == Lexeme::IDENT && node->is_type_name(document, false))
 						parse_local(false, node, list);
 					else
 						list->append(node);

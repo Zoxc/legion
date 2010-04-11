@@ -36,6 +36,11 @@ namespace Legion
 			{
 				stop = range.stop;
 			}
+			
+			Range &dup(MemoryPool &memory_pool)
+			{
+				return *new (memory_pool) Range(*this);
+			}
 
 			std::string string()
 			{
@@ -48,7 +53,7 @@ namespace Legion
 			{
 				const char_t *input = line_start;
 				
-				while(true)
+				while(input)
 					switch(*input)
 					{
 						case 0:
@@ -71,27 +76,5 @@ namespace Legion
 			{
 				return stop - start;
 			}
-
-			void report(Document *document, const std::string& error);
-			
-			void report(Document &document, const std::string& error)
-			{
-				report(&document, error);
-			}
-
-			void report_type_modifier(Document &document)
-			{
-				report(&document, "Unknown type modifier '" + string() + "'");
-			}
-			
-			void report_expected_symbol(Document &document, Symbol *symbol, String *name, Symbol::SymbolType type)
-			{
-				if(symbol)
-					report(document, "Expected " + Symbol::names[type] + ", but found '" + name->string() + "' (" + Symbol::names[symbol->type] + ")");
-				else
-					report(document, "Undeclared " + Symbol::names[type] + " '" + name->string() + "'");
-			}
-
-			void report_types(Document &document, Type *from, Type *to);
 	};
 };

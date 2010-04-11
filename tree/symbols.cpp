@@ -1,5 +1,6 @@
 #include "symbols.hpp"
 #include "../range.hpp"
+#include "../message.hpp"
 
 namespace Legion
 {
@@ -13,6 +14,6 @@ namespace Legion
 
 	void Symbol::redeclared(Document &document)
 	{
-		range->report(document, "Redeclared identifier '" + name->string() + "'");
+		new RedeclaredSymbolError(document, this);
 	}
 };

@@ -19,7 +19,7 @@ namespace Legion
 				return 0;
 		}
 
-		range->report_expected_symbol(args.document, symbol, name, Symbol::TYPE);
+		new WrongSymbolError(args.document, *range, symbol, name, Symbol::TYPE);
 
 		return 0;
 	}
@@ -75,7 +75,7 @@ namespace Legion
 			return;
 
 		if(!compatible(args, type))
-			node->get_range().report_types(args.document, type, this);
+			new IncompatableTypesError(args.document, node->get_range(args.memory_pool), type, this);
 	}
 
 	void Type::compatible(ValidationArgs &args, ExpressionNode *node)

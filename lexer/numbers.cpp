@@ -1,4 +1,5 @@
 #include "lexer.hpp"
+#include "../document.hpp"
 
 namespace Legion
 {
@@ -39,7 +40,7 @@ namespace Legion
 						lexeme.type = Lexeme::INTEGER;
 						lexeme.stop = &input;
 
-						lexeme.report(document, "Invalid octal number '" + lexeme.string() + "'");
+						document.report(lexeme.dup(memory_pool), "Invalid octal number '" + lexeme.string() + "'");
 					}
 					else
 					{
@@ -108,7 +109,7 @@ namespace Legion
 			lexeme.stop = &input;
 			lexeme.type = Lexeme::HEX;
 
-			lexeme.report(document, "Invalid hex number: '" + lexeme.string() + "'");
+			document.report(lexeme.dup(memory_pool), "Invalid hex number: '" + lexeme.string() + "'");
 		}
 	}
 };

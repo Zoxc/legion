@@ -1,5 +1,6 @@
 #include "lexer.hpp"
 #include "../string_pool.hpp"
+#include "../document.hpp"
 
 namespace Legion
 {
@@ -24,9 +25,9 @@ namespace Legion
 		lexeme.type = Lexeme::NONE;
 
 		if (lexeme.length() == 1)
-			lexeme.report(&document, "Invalid character '" + lexeme.string() + "'");
+			document.report(lexeme.dup(memory_pool), "Invalid character '" + lexeme.string() + "'");
 		else
-			lexeme.report(&document, "Invalid characters '" + lexeme.string() + "'");
+			document.report(lexeme.dup(memory_pool), "Invalid characters '" + lexeme.string() + "'");
 
 		restep();
 	}
@@ -124,7 +125,7 @@ namespace Legion
 				
 			case '*': // C comment
 				input++;
-				
+
 				while(true)
 				{
 					switch(input)
@@ -163,6 +164,12 @@ namespace Legion
 					}
 				}
 				done:
+
+				#ifdef GALAXY
+					lexeme.stop = &input;
+					document.report(lexeme.dup(memory_pool), "C comments are not supported in Galaxy");
+				#endif
+
 				restep(); 		
 				break;
 				
@@ -181,6 +188,6 @@ namespace Legion
 
 		lexeme.stop = &input;
 		lexeme.type = Lexeme::IDENT;
-		lexeme.value = string_pool->get(&lexeme);
+		lexeme.value = string_pool.get(&lexeme);
 	}
 };

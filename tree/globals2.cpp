@@ -77,11 +77,11 @@ namespace Legion
 
 	Type *PrototypeNode::validate(ValidationArgs &args)
 	{
-		Type *type = head->validate(args);
 		Symbol *symbol = head->symbol;
 
-		if(symbol->type == Symbol::PROTOTYPE)
+		if(!head->type && symbol->type == Symbol::PROTOTYPE)
 		{
+			Type *type = head->validate(args);
 			PrototypeNode *prototype = (PrototypeNode *)symbol->node;
 
 			if(!prototype->head->is_native)
@@ -98,12 +98,14 @@ namespace Legion
 					current = current->next_name;
 				}
 
-				head->pair->range.report(args.document, "Undefined prototype");
+				args.document.report(head->pair->range, "Undefined prototype");
 
 				end:;
 			}
-		}
 
-		return type;
+			return type;
+		}
+		else
+			return head->validate(args);
 	}
 };

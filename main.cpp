@@ -103,6 +103,11 @@ int main(int argc, char *argv[])
 	BENCHMARK_END("Typechecked");
 
 	print_ast("post-typechecking-AST");
-	
+
+
+	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
+		for(List<Message>::Iterator j = (*i)->messages.begin(); j; j++)
+			std::cout << j().format() << std::endl;
+
 	return 0;
 }

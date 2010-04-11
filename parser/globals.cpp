@@ -29,7 +29,7 @@ namespace Legion
 		
 		if(expect(Lexeme::STRING))
 		{
-			document->includes.push_back(lexer.lexeme.value->string());
+			document.includes.push_back(lexer.lexeme.value->string());
 			step();
 		}
 		
@@ -85,16 +85,16 @@ namespace Legion
 		global->pair = pair;
 		global->is_const = is_const;
 		global->is_static = is_static;
-		global->symbol = declare<VarSymbol>(pair, is_static ? document : 0);
+		global->symbol = declare<VarSymbol>(pair, is_static ? &document : 0);
 		global->symbol->node = global;
 		
 		if(is_native)
-			pair->range.report(document, "Global can not be natives");
+			document.report(pair->range, "Global can not be natives");
 		
 		if(is_assign_operator(lexeme()))
 		{
 			if(lexeme() != Lexeme::ASSIGN)
-				lexer.lexeme.report(document, "Unexpected assignment with operator " + lexer.lexeme.describe());
+				document.report(lexer.lexeme.dup(memory_pool), "Unexpected assignment with operator " + lexer.lexeme.describe());
 
 			step();
 
@@ -117,7 +117,7 @@ namespace Legion
 		head->is_static = is_static;
 
 		if(is_const)
-			pair->range.report(document, "Functions can not be declared constant");
+			document.report(pair->range, "Functions can not be declared constant");
 
 		step();
 		
@@ -136,13 +136,13 @@ namespace Legion
 		if(lexeme() == Lexeme::BRACET_OPEN)
 		{
 			if(is_native)
-				pair->range.report(document, "You cannot provide an implementation of natives");
+				document.report(pair->range, "You cannot provide an implementation of natives");
 
 			FuncNode *func = list->add<FuncNode>(memory_pool);
 
 			func->head = head;
 			
-			head->symbol = declare<FuncSymbol>(pair, is_static ? document : 0, prev);
+			head->symbol = declare<FuncSymbol>(pair, is_static ? &document : 0, prev);
 			head->symbol->node = func;
 
 			Symbol *symbol = head->symbol;
@@ -153,7 +153,7 @@ namespace Legion
 			{
 				if(symbol->type != Symbol::PROTOTYPE && symbol->document == head->symbol->document)
 				{
-					head->symbol->redeclared(*document);
+					head->symbol->redeclared(document);
 					break;
 				}
 
@@ -177,7 +177,7 @@ namespace Legion
 			PrototypeNode *proto = list->add<PrototypeNode>(memory_pool);
 			proto->head = head;
 
-			head->symbol = declare<PrototypeSymbol>(pair, is_static ? document : 0, prev);
+			head->symbol = declare<PrototypeSymbol>(pair, is_static ? &document : 0, prev);
 			head->symbol->node = proto;
 
 			parse_terminator();
