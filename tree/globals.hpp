@@ -24,6 +24,28 @@ namespace Legion
 
 	typedef List<NamespaceNode> NamespaceList;
 
+	struct IncludeNode:
+		public ListNode
+	{
+		IncludeNode(Document &document, String *filename);
+		
+		String *filename;
+		Range range;
+		bool found;
+
+		Node::NodeType node_type()
+		{
+			return PAIR_NODE;
+		}
+
+		Type *validate(ValidationArgs &args)
+		{
+			return 0;
+		}
+
+		void report(Document &document);
+	};
+
 	struct PairNode:
 		public Node
 	{
@@ -44,7 +66,6 @@ namespace Legion
 		}
 	};
 
-	
 	struct FieldNode:
 		public ListNode
 	{

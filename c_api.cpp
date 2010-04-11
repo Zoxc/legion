@@ -24,9 +24,9 @@ LEGION_API void legion_document_destroy(struct legion_document *document)
 	delete (Document *)document;
 }
 
-LEGION_API const char *legion_document_filename(struct legion_document *document)
+LEGION_API struct legion_string *legion_document_filename(struct legion_document *document)
 {
-	return ((Document *)document)->filename.c_str();
+	return (struct legion_string *)((Document *)document)->filename;
 }
 
 LEGION_API void legion_document_load_data(struct legion_document *document, void *data, size_t length)
@@ -34,19 +34,9 @@ LEGION_API void legion_document_load_data(struct legion_document *document, void
 	((Document *)document)->load((const char_t *)data, length);
 }
 
-LEGION_API void legion_document_load_file(struct legion_document *document, const char *filename)
+LEGION_API bool legion_document_load_file(struct legion_document *document, const char *filename)
 {
-	((Document *)document)->load(filename);
-}
-
-LEGION_API size_t legion_document_include_count(struct legion_document *document)
-{
-	return ((Document *)document)->includes.size();
-}
-
-LEGION_API const char *legion_document_include_get(struct legion_document *document, size_t index)
-{
-	return ((Document *)document)->includes.at(index).c_str();
+	return ((Document *)document)->load(filename);
 }
 
 LEGION_API void legion_document_execute(struct legion_document *document, enum legion_stages stage)
@@ -68,6 +58,28 @@ LEGION_API void legion_document_execute(struct legion_document *document, enum l
 			break;
 	}
 }
+
+
+LEGION_API struct legion_include *legion_include_first(struct legion_document *document)
+{
+	return (struct legion_include *)((Document *)document)->includes.first;
+}
+
+LEGION_API struct legion_include *legion_include_next(struct legion_include *include)
+{
+	return (struct legion_include *)((IncludeNode *)include)->next;
+}
+
+LEGION_API struct legion_string *legion_include_filename(struct legion_include *include)
+{
+	return (struct legion_string *)((IncludeNode *)include)->filename;
+}
+
+LEGION_API bool legion_include_included(struct legion_include *include)
+{
+	return ((IncludeNode *)include)->found;
+}
+
 
 LEGION_API struct legion_message *legion_message_first(struct legion_document *document)
 {

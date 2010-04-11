@@ -12,14 +12,20 @@ namespace Legion
 
 	Message::Message(Document &document, Range &range, Severity severity) : document(document), range(range), severity(severity)
 	{
-		document.messages.append(this);
+		List<Message>::Iterator i = document.messages.begin();
+
+		for(; i; i++)
+			if(i().range.start > range.start)
+				break;
+
+		i.insert(this);
 	}
 
 	std::string Message::format()
 	{
 		std::stringstream result;
 
-		result << "[" + severity_names[severity] << "] " << document.filename << "[" << range.line + 1 << "]: " << string() << std::endl << range.get_line() << std::endl;
+		result << document.filename->string() << "[" << range.line + 1 << "]: " << severity_names[severity] << ": " << string() << std::endl << range.get_line() << std::endl;
 		
 		for(const char_t *i = range.line_start; i < range.start; i++)
 		{

@@ -4,6 +4,7 @@
 #include "string_pool.hpp"
 #include "parser/parser.hpp"
 #include "tree/node.hpp"
+#include "tree/globals.hpp"
 
 namespace Legion
 {
@@ -19,22 +20,26 @@ namespace Legion
 			MemoryPool memory_pool;
 			Compiler &compiler;
 			Parser parser;
-			std::string filename;
+			String *filename;
 			NamespaceList tree;
-			std::vector<std::string> includes;
+			List<IncludeNode> includes;
 			Scope *scope;
 			List<Message> messages;
+			Document *next;
+
+			String *normalize(String *filename);
 
 			bool parse();
 			void find_declarations();
 			void validate();
-			void load(std::string filename);
+			bool load(std::string filename);
 			void load(const char_t *input, size_t length);
 
 			void report(Range &range, std::string text, Message::Severity severity = Message::LEGION_ERROR);
 			void report_type_modifier(Range &range);
 			
 			Document(Compiler &compiler, std::string filename);
+			Document(Compiler &compiler, String *string);
 			~Document();
 	};
 };

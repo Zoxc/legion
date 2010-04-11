@@ -15,6 +15,13 @@ extern "C" {
 struct legion_compiler;
 struct legion_document;
 struct legion_message;
+struct legion_include;
+
+struct legion_string
+{
+	const char *c_str;
+	size_t length;
+};
 
 LEGION_API struct legion_compiler *legion_compiler_create();
 LEGION_API void legion_compiler_destroy(struct legion_compiler *compiler);
@@ -29,12 +36,15 @@ enum legion_stages
 
 LEGION_API struct legion_document *legion_document_create(struct legion_compiler *compiler, const char *name);
 LEGION_API void legion_document_destroy(struct legion_document *document);
-LEGION_API const char *legion_document_filename(struct legion_document *document);
+LEGION_API struct legion_string *legion_document_filename(struct legion_document *document);
 LEGION_API void legion_document_load_data(struct legion_document *document, void *data, size_t length);
-LEGION_API void legion_document_load_file(struct legion_document *document, const char *filename);
-LEGION_API size_t legion_document_include_count(struct legion_document *document);
-LEGION_API const char *legion_document_include_get(struct legion_document *document, size_t index);
+LEGION_API bool legion_document_load_file(struct legion_document *document, const char *filename);
 LEGION_API void legion_document_execute(struct legion_document *document, enum legion_stages stage);
+
+LEGION_API struct legion_include *legion_include_first(struct legion_document *document);
+LEGION_API struct legion_include *legion_include_next(struct legion_include *include);
+LEGION_API struct legion_string *legion_include_filename(struct legion_include *include);
+LEGION_API bool legion_include_included(struct legion_include *include);
 
 enum legion_severity
 {

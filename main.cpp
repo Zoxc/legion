@@ -7,23 +7,23 @@ using namespace Legion;
 
 Compiler compiler;
 
-std::vector<Document *> documents;
-std::vector<Document *> queue;
-
-void include(std::string file)
+bool include(String *filename)
 {
-	file = file + ".galaxy";
+	std::string file = filename->string() + ".galaxy";
 
-	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
-	{
-		if((*i)->filename == file)
-			return;
-	}
-	
-	Document *document = new Document(compiler, file);
+	Document &document = *new Document(compiler, filename);
 
-	queue.push_back(document);
-	documents.push_back(document);
+	if(!document.load(file))
+		return false;
+
+	document.parse();
+
+	for(List<IncludeNode>::Iterator i = document.includes.begin(); i; i++)
+		if(!i().found)
+			if(!include(i().filename))
+				i().report(document);
+
+	return true;
 }
 
 #ifdef WIN32
@@ -57,30 +57,12 @@ void print_ast(std::string name)
 
 int main(int argc, char *argv[])
 {
-	for(int i = 1; i < argc; i++)
-	{
-		Document *document = new Document(compiler, argv[i]);
-
-		document->load(argv[i]);
-
-		queue.push_back(document);
-		documents.push_back(document);
-	}
-
 	BENCHMARK_VARS;
 
 	BENCHMARK_START;
 
-	while(queue.size() > 0)
-	{
-		Document *document = queue.back();
-		queue.pop_back();
-
-		document->parse();
-
-		for(std::vector<std::string>::iterator i = document->includes.begin(); i != document->includes.end(); ++i)
-			include(*i);
-	}
+	for(int i = 1; i < argc; i++)
+		include(compiler.string_pool.get(argv[i]));
 
 	BENCHMARK_END("Parsed files");
 
@@ -88,8 +70,8 @@ int main(int argc, char *argv[])
 
 	BENCHMARK_START;
 
-	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
-		(*i)->find_declarations();
+	for(List<Document>::Iterator i = compiler.documents.begin(); i; i++)
+		i().find_declarations();
 
 	BENCHMARK_END("Found declarations");
 
@@ -97,16 +79,15 @@ int main(int argc, char *argv[])
 
 	BENCHMARK_START;
 
-	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
-		(*i)->validate();
+	for(List<Document>::Iterator i = compiler.documents.begin(); i; i++)
+		i().validate();
 
 	BENCHMARK_END("Typechecked");
 
 	print_ast("post-typechecking-AST");
 
-
-	for(std::vector<Document *>::iterator i = documents.begin(); i != documents.end(); i++)
-		for(List<Message>::Iterator j = (*i)->messages.begin(); j; j++)
+	for(List<Document>::Iterator i = compiler.documents.begin(); i; i++)
+		for(List<Message>::Iterator j = i().messages.begin(); j; j++)
 			std::cout << j().format() << std::endl;
 
 	return 0;

@@ -29,7 +29,12 @@ namespace Legion
 		
 		if(expect(Lexeme::STRING))
 		{
-			document.includes.push_back(lexer.lexeme.value->string());
+			IncludeNode *node = new (memory_pool) IncludeNode(document, document.normalize(lexer.lexeme.value));
+
+			node->range.capture(lexer.lexeme);
+			
+			document.includes.append(node);
+
 			step();
 		}
 		
@@ -147,17 +152,15 @@ namespace Legion
 
 			Symbol *symbol = head->symbol;
 
-			symbol = symbol->next_name;
-
 			while(symbol->next_name != head->symbol)
 			{
+				symbol = symbol->next_name;
+
 				if(symbol->type != Symbol::PROTOTYPE && symbol->document == head->symbol->document)
 				{
 					head->symbol->redeclared(document);
 					break;
 				}
-
-				symbol = symbol->next_name;
 			}
 
 			func->scope = push_scope(Scope::FUNCTION);

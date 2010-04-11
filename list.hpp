@@ -91,6 +91,19 @@ namespace Legion
 					current = node;
 				}
 
+				void insert(T *node)
+				{
+					if(prev)
+						F::set_next(prev, node);
+					else
+						list.first = node;
+
+					F::set_next(node, current);
+
+					if(current == 0)
+						list.last = node;
+				}
+
 				operator bool()
 				{
 					return current != 0;

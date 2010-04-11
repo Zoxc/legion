@@ -213,7 +213,7 @@ namespace Legion
 				T *result = declare<T>(pair, document, prev);
 
 				if(prev)
-					result->redeclared(*document);
+					result->redeclared(this->document);
 
 				return result;
 			}

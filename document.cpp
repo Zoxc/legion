@@ -5,12 +5,36 @@ namespace Legion
 {
 	Document::Document(Compiler &compiler, std::string filename) : input(0), compiler(compiler), parser(compiler.string_pool, memory_pool, *this, &compiler.scope), scope(0)
 	{
-		this->filename = filename;
+		this->filename = normalize(compiler.string_pool.get(filename));
+		compiler.documents.append(this);
+	}
+
+	Document::Document(Compiler &compiler, String *filename) : input(0), compiler(compiler), parser(compiler.string_pool, memory_pool, *this, &compiler.scope), scope(0)
+	{
+		this->filename = normalize(filename);
+		compiler.documents.append(this);
 	}
 
 	Document::~Document()
 	{
 		free((void *)input);
+	}
+
+	String *Document::normalize(String *filename)
+	{
+		char_t *string = new (memory_pool) char_t[filename->length];
+		char_t *end = string + filename->length;
+		const char_t *i = filename->c_str;
+
+		for(char_t *c = string; c != end; c++, i++)
+		{
+			if(*i == '/')
+				*c = '\\';
+			else
+				*c = *i;
+		}
+
+		return compiler.string_pool.get(string, end);
 	}
 
 	bool Document::parse()
@@ -35,9 +59,9 @@ namespace Legion
 		new StringMessage(*this, range, Message::LEGION_ERROR, "Unknown type modifier '" + range.string() + "'");
 	}
 
-	void Document::load(std::string filename)
+	bool Document::load(std::string filename)
 	{
-		map(filename);
+		return map(filename);
 	}
 
 	void Document::load(const char_t *input, size_t length)
@@ -69,11 +93,8 @@ namespace Legion
 		FILE* file = fopen(filename.c_str(), "rb");
 
 		if(!file)
-		{
-			std::cout << "Unable to open file '" << filename << "'." << std::endl;
 			return false;
-		}
-		
+
 		fseek(file, 0, SEEK_END);
 
 		size_t length = ftell(file);
@@ -87,7 +108,6 @@ namespace Legion
 			free(data);
 			fclose(file);
 			
-			std::cout << "Unable to read file '" << filename << "'." << std::endl;
 			return false;
 		}
 

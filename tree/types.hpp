@@ -63,6 +63,12 @@ namespace Legion
 			PointerType *indirect;
 			ArrayType *first_array;
 
+		protected:
+			virtual bool is_exact(Type *other)
+			{
+				return this == other;
+			}
+
 		public:
 			enum Kind
 			{
@@ -92,12 +98,12 @@ namespace Legion
 				return this == other || this == resolve(other);
 			}
 
-			virtual bool exact(Type *other)
+			bool exact(Type *other)
 			{
 				if(!this || !other)
 					return true;
 
-				return this == other;
+				return is_exact(other);
 			}
 	};
 
@@ -198,11 +204,9 @@ namespace Legion
 				return result + ")";
 			}
 
-			bool exact(Type *other)
+		protected:
+			bool is_exact(Type *other)
 			{
-				if(!this || !other)
-					return true;
-
 				if(other->kind != Type::FUNCTION_TYPE)
 					return false;
 

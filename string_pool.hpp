@@ -118,6 +118,16 @@ namespace Legion
 				return StringPoolHashTable::get(key);
 			}
 
+			String *get(const std::string &string)
+			{
+				StringKey key;
+
+				key.c_str = (const char_t *)string.c_str();
+				key.length = string.length();
+
+				return StringPoolHashTable::get(key);
+			}
+
 			String *get(const char_t *string, size_t length)
 			{
 				StringKey key;

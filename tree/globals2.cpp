@@ -4,6 +4,36 @@
 
 namespace Legion
 {
+	IncludeNode::IncludeNode(Document &document, String *filename) : filename(filename)
+	{
+		for(List<Document>::Iterator i = document.compiler.documents.begin(); i; i++)
+		{
+			if((*i)->filename == filename)
+			{
+				found = true;
+
+				return;
+			}
+		}
+		
+		for(List<IncludeNode>::Iterator i = document.includes.begin(); i; i++)
+		{
+			if((*i)->filename == filename)
+			{
+				found = true;
+
+				return;
+			}
+		}
+
+		found = false;
+	}
+
+	void IncludeNode::report(Document &document)
+	{
+		document.report(range, "Unable to open file " + filename->string());
+	}
+
 	Type *StructNode::validate(ValidationArgs &args)
 	{
 		if(!has_type)
@@ -94,28 +124,23 @@ namespace Legion
 		Symbol *symbol = head->symbol;
 		Type *type = head->validate(args);
 
-		if(symbol->type == Symbol::PROTOTYPE)
+		PrototypeNode *prototype = (PrototypeNode *)symbol->node;
+
+		if(!prototype->head->is_native)
 		{
-			PrototypeNode *prototype = (PrototypeNode *)symbol->node;
+			Symbol *current = symbol;
 
-			if(!prototype->head->is_native)
+			while(current->next_name != symbol)
 			{
-				Symbol *current = symbol;
-
 				current = current->next_name;
 
-				while(current->next_name != symbol)
-				{
-					if(current->type == Symbol::FUNCTION && type->exact(current->node->validate(args)))
-						goto end;
-
-					current = current->next_name;
-				}
-
-				args.document.report(head->pair->range, "Undefined prototype");
-
-				end:;
+				if(current->type == Symbol::FUNCTION && type->exact(current->node->validate(args)))
+					goto end;
 			}
+
+			args.document.report(head->pair->range, "Undefined prototype");
+
+			end:;
 		}
 		
 		return type;
