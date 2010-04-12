@@ -55,7 +55,7 @@ namespace Legion
 
 	Type *Type::resolve(Type *type)
 	{
-		while(type->kind == Type::TYPEDEF_TYPE)
+		while(type && type->kind == Type::TYPEDEF_TYPE)
 			type = ((TypedefType *)type)->base;
 
 		return type;
@@ -118,12 +118,56 @@ namespace Legion
 		declare(0, "char", type_char, true);
 		declare(0, "fixed", type_fixed, true);
 		declare(0, "int", type_int, true);
+		
+		type_bool.type->unary_operators.add(Lexeme::LOGICAL_NOT, type_bool.type);
+
+		type_bool.type->binary_operators.add(Lexeme::LOGICAL_AND, type_bool.type);
+		type_bool.type->binary_operators.add(Lexeme::LOGICAL_OR, type_bool.type);
+
+		type_int.type->unary_operators.add(Lexeme::ADD, type_int.type);
+		type_int.type->unary_operators.add(Lexeme::SUB, type_int.type);
+		type_int.type->unary_operators.add(Lexeme::BITWISE_NOT, type_int.type);
+
+		type_int.type->binary_operators.add(Lexeme::ADD, type_int.type);
+		type_int.type->binary_operators.add(Lexeme::SUB, type_int.type);
+		type_int.type->binary_operators.add(Lexeme::MUL, type_int.type);
+		type_int.type->binary_operators.add(Lexeme::DIV, type_int.type);
+		type_int.type->binary_operators.add(Lexeme::MOD, type_int.type);
+
+		type_int.type->binary_operators.add(Lexeme::BITWISE_AND, type_int.type);
+		type_int.type->binary_operators.add(Lexeme::BITWISE_OR, type_int.type);
+		type_int.type->binary_operators.add(Lexeme::BITWISE_XOR, type_int.type);
+		type_int.type->binary_operators.add(Lexeme::LEFT_SHIFT, type_int.type);
+		type_int.type->binary_operators.add(Lexeme::RIGHT_SHIFT, type_int.type);
+
+		type_int.type->binary_operators.add(Lexeme::GREATER, type_bool.type);
+		type_int.type->binary_operators.add(Lexeme::GREATER_OR_EQUAL, type_bool.type);
+		type_int.type->binary_operators.add(Lexeme::LESS, type_bool.type);
+		type_int.type->binary_operators.add(Lexeme::LESS_OR_EQUAL, type_bool.type);
+
+		type_fixed.type->unary_operators.add(Lexeme::ADD, type_fixed.type);
+		type_fixed.type->unary_operators.add(Lexeme::SUB, type_fixed.type);
+
+		type_fixed.type->binary_operators.add(Lexeme::ADD, type_fixed.type);
+		type_fixed.type->binary_operators.add(Lexeme::SUB, type_fixed.type);
+		type_fixed.type->binary_operators.add(Lexeme::MUL, type_fixed.type);
+		type_fixed.type->binary_operators.add(Lexeme::DIV, type_fixed.type);
+		type_fixed.type->binary_operators.add(Lexeme::MOD, type_fixed.type);
+		
+		type_fixed.type->binary_operators.add(Lexeme::GREATER, type_bool.type);
+		type_fixed.type->binary_operators.add(Lexeme::GREATER_OR_EQUAL, type_bool.type);
+		type_fixed.type->binary_operators.add(Lexeme::LESS, type_bool.type);
+		type_fixed.type->binary_operators.add(Lexeme::LESS_OR_EQUAL, type_bool.type);
 
 		type_fixed.type->add_conversion(type_int.type, false);
 
 		type_handle.type->add_conversion(type_null.type, true);
+
 		type_string.type->add_conversion(type_null.type, true);
+		type_string.type->binary_operators.add(Lexeme::ADD, type_string.type);
+
 		type_text.type->add_conversion(type_null.type, true);
+		type_text.type->binary_operators.add(Lexeme::ADD, type_text.type);
 
 		declare(&type_handle, "abilcmd", type_abilcmd, true);
 		declare(&type_handle, "actor", type_actor, true);

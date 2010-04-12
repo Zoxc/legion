@@ -96,17 +96,50 @@ namespace Legion
 		Type *left_type = left->validate(args);
 		Type *right_type = right->validate(args);
 
+		if(!left_type || !right_type)
+			return 0;
+
 		switch(op)
 		{
 			case Lexeme::EQUAL:
 			case Lexeme::NOT_EQUAL:
-			case Lexeme::LOGICAL_AND:
-			case Lexeme::LOGICAL_OR:
 				left_type->compatible(args, right_type, right);
 				return args.types.type_bool.type;
 
 			default:
-				return 0;
+			{
+				Type *type;
+
+				if(left_type->compatible(args, right_type, false))
+					type = left_type;
+				else if(right_type->compatible(args, left_type, false))
+					type = right_type;
+				else
+				{
+					args.document.report(get_range(args.memory_pool), "Binary operator '" + Lexeme::names[op] + "' is incompatible with types '" + left_type->string() + "' and '" + right_type->string() + "'");
+
+					return 0;
+				}
+
+				Type *result = Type::resolve(type);
+				
+				if(!result)
+					return 0;
+
+				bool compatible = false;
+
+				result = result->compatible_binary_op(args, op, compatible);
+
+				if(!compatible)
+				{
+					args.document.report(get_range(args.memory_pool), "Binary operator '" + Lexeme::names[op] + "' is incompatible with types '" + left_type->string() + "' and '" + right_type->string() + "'");
+
+					return 0;
+				}
+				else
+					return result;
+			}
+			
 		}
 
 		return left_type;
@@ -144,15 +177,26 @@ namespace Legion
 	{
 		Type *type = value->validate(args);
 
-		switch(op)
-		{
-			case Lexeme::NOT_EQUAL:
-				args.types.type_bool.type->Type::compatible(args, type, value);
-				return args.types.type_bool.type;
+		if(!type)
+			return 0;
 
-			default:
-				return 0;
+		Type *result = Type::resolve(type);
+		
+		if(!result)
+			return 0;
+
+		bool compatible = false;
+
+		result = result->compatible_unary_op(args, op, compatible);
+
+		if(!compatible)
+		{
+			args.document.report(get_range(args.memory_pool), "Unary operator '" + Lexeme::names[op] + "' is incompatible with type '" + type->string() + "'");
+
+			return 0;
 		}
+		else
+			return result;
 	}
 
 	Type *ArraySubscriptNode::validate(ValidationArgs &args)

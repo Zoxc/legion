@@ -1,5 +1,6 @@
 #pragma once
 #include "../common.hpp"
+#include "../lexer/lexeme.hpp"
 #include "node.hpp"
 
 namespace Legion
@@ -98,6 +99,16 @@ namespace Legion
 				return this == other || this == resolve(other);
 			}
 
+			virtual Type *compatible_unary_op(ValidationArgs &args, Lexeme::Type lexeme, bool &compatible) 
+			{
+				return 0;
+			}
+
+			virtual Type *compatible_binary_op(ValidationArgs &args, Lexeme::Type lexeme, bool &compatible) 
+			{
+				return 0;
+			}
+
 			bool exact(Type *other)
 			{
 				if(!this || !other)
@@ -114,7 +125,7 @@ namespace Legion
 		ImplicitConversion *next;
 	};
 
-	class TypeFunctions:
+	class ImplicitConversionFunctions:
 		public HashTableFunctions<Type *, ImplicitConversion *>
 	{
 		public:
@@ -139,6 +150,55 @@ namespace Legion
 			}
 	};
 
+	struct Operator
+	{
+		Lexeme::Type lexeme;
+		Type *returns;
+		Operator *next;
+	};
+
+	class OperatorFunctions:
+		public HashTableFunctions<Lexeme::Type, Operator *>
+	{
+		public:
+			static bool compare_key_value(Lexeme::Type key, Operator *value)
+			{
+				return value->lexeme == key;
+			}
+
+			static Lexeme::Type get_key(Operator *value)
+			{
+				return value->lexeme;
+			}
+
+			static Operator *get_value_next(Operator *value)
+			{
+				return value->next;
+			}
+
+			static void set_value_next(Operator *value, Operator *next)
+			{
+				value->next = next;
+			}
+	};
+
+	class Operators:
+		public HashTable<Lexeme::Type, Operator *, OperatorFunctions>
+	{
+		public:
+			Operators(MemoryPool &memory_pool) : HashTable<Lexeme::Type, Operator *, OperatorFunctions>(memory_pool, 1) {}
+
+			void add(Lexeme::Type lexeme, Type *returns)
+			{
+				Operator *op = new (memory_pool) Operator;
+
+				op->lexeme = lexeme;
+				op->returns = returns;
+
+				set(lexeme, op);
+			}
+	};
+
 	class NativeType:
 		public Type
 	{
@@ -146,7 +206,10 @@ namespace Legion
 			String *name;
 			NativeType *base;
 
-			HashTable<Type *, ImplicitConversion *, TypeFunctions> implicit_conversions;
+			HashTable<Type *, ImplicitConversion *, ImplicitConversionFunctions> implicit_conversions;
+
+			Operators unary_operators;
+			Operators binary_operators;
 
 			void add_conversion(Type *type, bool weak = false)
 			{
@@ -163,6 +226,34 @@ namespace Legion
 				return name->string();
 			}
 
+			Type *compatible_unary_op(ValidationArgs &args, Lexeme::Type lexeme, bool &compatible) 
+			{
+				Operator *op = unary_operators.get(lexeme);
+
+				if(op)
+				{
+					compatible = true;
+
+					return op->returns;
+				}
+				else
+					return 0;
+			}
+
+			Type *compatible_binary_op(ValidationArgs &args, Lexeme::Type lexeme, bool &compatible) 
+			{
+				Operator *op = binary_operators.get(lexeme);
+
+				if(op)
+				{
+					compatible = true;
+
+					return op->returns;
+				}
+				else
+					return 0;
+			}
+
 			bool compatible(ValidationArgs &args, Type *other, bool weak)
 			{
 				Type *type = resolve(other);
@@ -175,10 +266,13 @@ namespace Legion
 				if(conversion && (weak || !conversion->weak))
 					return true;
 
-				return base->compatible(args, other, weak);
+				if(base)
+					return base->compatible(args, other, weak);
+				else
+					return false;
 			}
 
-			NativeType(MemoryPool &memory_pool, NativeType *base) : Type(Type::NATIVE_TYPE), base(base), implicit_conversions(memory_pool, 1) {}
+			NativeType(MemoryPool &memory_pool, NativeType *base) : Type(Type::NATIVE_TYPE), base(base), implicit_conversions(memory_pool, 1), unary_operators(memory_pool), binary_operators(memory_pool) {}
 	};
 
 	struct TypeNativeNode:
@@ -191,7 +285,7 @@ namespace Legion
 			return Node::TYPE_NATIVE_NODE;
 		}
 
-		Type *get_type(Document &document, SymbolList &stack)
+		Type *get_type(ValidationArgs &args)
 		{
 			return type;
 		}
@@ -338,6 +432,18 @@ namespace Legion
 				return base->string(show_typedef) + "*";
 			}
 
+			Type *compatible_unary_op(ValidationArgs &args, Lexeme::Type lexeme, bool &compatible) 
+			{
+				if(lexeme == Lexeme::MUL)
+				{
+					compatible = true;
+
+					return base;
+				}
+				else
+					return 0;
+			}
+
 			bool compatible(ValidationArgs &args, Type *other, bool weak);
 	};
 
@@ -392,6 +498,4 @@ namespace Legion
 
 			Types(Compiler &compiler);
 	};
-
-	Type *lookup_type(Document &document, SymbolList &stack, String *name, Range *range);
 };
