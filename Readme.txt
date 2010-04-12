@@ -1,5 +1,5 @@
-Legion 0.0.4
-� Zoxc 2010
+﻿Legion 0.0.4
+© Zoxc 2010
 
 Legion is a parser that will validate the syntactic structure of a Galaxy script.
 You simply pass the Galaxy scripts (without file extensions) to the program and
