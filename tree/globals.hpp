@@ -29,6 +29,7 @@ namespace Legion
 	{
 		IncludeNode(Document &document, String *filename);
 		
+		Document &document;
 		String *filename;
 		Range range;
 		bool found;
@@ -43,7 +44,7 @@ namespace Legion
 			return 0;
 		}
 
-		void report(Document &document);
+		void report();
 	};
 
 	struct PairNode:

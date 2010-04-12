@@ -4,7 +4,7 @@
 
 namespace Legion
 {
-	IncludeNode::IncludeNode(Document &document, String *filename) : filename(filename)
+	IncludeNode::IncludeNode(Document &document, String *filename) : document(document), filename(filename)
 	{
 		for(List<Document>::Iterator i = document.compiler.documents.begin(); i; i++)
 		{
@@ -29,7 +29,7 @@ namespace Legion
 		found = false;
 	}
 
-	void IncludeNode::report(Document &document)
+	void IncludeNode::report()
 	{
 		document.report(range, "Unable to open file " + filename->string());
 	}

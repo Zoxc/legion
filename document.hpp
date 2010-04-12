@@ -14,9 +14,10 @@ namespace Legion
 	{
 		private:
 			bool map(std::string filename);
+		public:
 			const char_t *input;
 			size_t length;
-		public:
+
 			MemoryPool memory_pool;
 			Compiler &compiler;
 			Parser parser;

@@ -45,6 +45,7 @@ LEGION_API struct legion_include *legion_include_first(struct legion_document *d
 LEGION_API struct legion_include *legion_include_next(struct legion_include *include);
 LEGION_API struct legion_string *legion_include_filename(struct legion_include *include);
 LEGION_API bool legion_include_included(struct legion_include *include);
+LEGION_API void legion_include_report(struct legion_include *include);
 
 enum legion_severity
 {
@@ -58,8 +59,8 @@ LEGION_API struct legion_message *legion_message_first(struct legion_document *d
 LEGION_API struct legion_message *legion_message_next(struct legion_message *message);
 LEGION_API const char *legion_message_string(struct legion_message *message);
 LEGION_API enum legion_severity legion_message_severity(struct legion_message *message);
-LEGION_API const char *legion_message_start(struct legion_message *message);
-LEGION_API const char *legion_message_stop(struct legion_message *message);
+LEGION_API size_t legion_message_start(struct legion_message *message);
+LEGION_API size_t legion_message_stop(struct legion_message *message);
 LEGION_API size_t legion_message_line(struct legion_message *message);
 
 #ifdef __cplusplus

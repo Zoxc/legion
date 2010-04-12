@@ -80,6 +80,11 @@ LEGION_API bool legion_include_included(struct legion_include *include)
 	return ((IncludeNode *)include)->found;
 }
 
+LEGION_API void legion_include_report(struct legion_include *include)
+{
+	return ((IncludeNode *)include)->report();
+}
+
 
 LEGION_API struct legion_message *legion_message_first(struct legion_document *document)
 {
@@ -101,14 +106,18 @@ LEGION_API enum legion_severity legion_message_severity(struct legion_message *m
 	return (enum legion_severity)((Message *)message)->severity;
 }
 
-LEGION_API const char *legion_message_start(struct legion_message *message)
+LEGION_API size_t legion_message_start(struct legion_message *message)
 {
-	return (const char *)((Message *)message)->range.start;
+	Message *msg = (Message *)message;
+
+	return msg->range.start - msg->document.input;
 }
 
-LEGION_API const char *legion_message_stop(struct legion_message *message)
+LEGION_API size_t legion_message_stop(struct legion_message *message)
 {
-	return (const char *)((Message *)message)->range.stop;
+	Message *msg = (Message *)message;
+
+	return msg->range.stop - msg->document.input;
 }
 
 LEGION_API size_t legion_message_line(struct legion_message *message)

@@ -26,7 +26,7 @@ bool include(String *filename)
 	for(List<IncludeNode>::Iterator i = document.includes.begin(); i; i++)
 		if(!i().found)
 			if(!include(i().filename))
-				i().report(document);
+				i().report();
 
 	return true;
 }
