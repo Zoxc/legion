@@ -75,4 +75,9 @@ namespace Legion
 	{
 		return "Unable to convert type '" + from->string() + "' to type '" + to->string() + "'";
 	}
+	
+	std::string ExpectedError::string()
+	{
+		return "Expected " + Lexeme::describe_type(what);
+	}
 };

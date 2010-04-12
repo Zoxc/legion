@@ -1,6 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include "list.hpp"
+#include "lexer/lexeme.hpp"
 #include "tree/symbols.hpp"
 
 namespace Legion
@@ -83,6 +84,17 @@ namespace Legion
 			Type *to;
 		public:
 			IncompatableTypesError(Document &document, Range &range, Type *from, Type *to) : Message(document, range, LEGION_ERROR), from(from), to(to) {}
+
+			std::string string();
+	};
+
+	class ExpectedError:
+		public Message
+	{
+		private:
+			Lexeme::Type what;
+		public:
+			ExpectedError(Document &document, Range &range, Lexeme::Type what) : Message(document, range, LEGION_ERROR), what(what) {}
 
 			std::string string();
 	};

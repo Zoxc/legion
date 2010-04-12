@@ -2,7 +2,6 @@
 #include "../common.hpp"
 #include "../range.hpp"
 #include "../string_pool.hpp"
-#include "../message.hpp"
 
 namespace Legion
 {

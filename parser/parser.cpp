@@ -33,11 +33,6 @@ namespace Legion
 			step();
 	}
 	
-	void Parser::expected_prev(Lexeme::Type what)
-	{
-		document.report(lexer.lexeme.get_prev(), "Expected " + Lexeme::describe_type(what));
-	}
-
 	void Parser::unexpected(bool skip)
 	{
 		document.report(lexer.lexeme.dup(memory_pool), "Unexpected " + lexer.lexeme.describe());
@@ -51,7 +46,7 @@ namespace Legion
 		if(lexeme() == Lexeme::SEMICOLON)
 			step();
 		else
-			expected_prev(Lexeme::SEMICOLON);
+			new ExpectedError(document, lexer.lexeme.get_prev(), Lexeme::SEMICOLON);
 	}
 	
 	TypeNode *Parser::parse_type()

@@ -29,7 +29,6 @@ namespace Legion
 
 			void unexpected(bool skip = true);
 			void expected(Lexeme::Type what, bool skip = false);
-			void expected_prev(Lexeme::Type what);
 		private:
 			Document &document;
 			MemoryPool &memory_pool;
@@ -104,7 +103,7 @@ namespace Legion
 			bool parse_statement(StatementList *list);
 			void parse_statements(StatementList *list);	
 
-			template<bool bracets_required> Block *parse_block(Scope::Type type)
+			template<bool bracets_required, bool is_else> Block *parse_block(Scope::Type type)
 			{
 				Block *block = new (memory_pool) Block;
 
@@ -130,10 +129,24 @@ namespace Legion
 					else
 					{
 						#ifdef GALAXY
-							expected_prev(Lexeme::BRACET_OPEN);
-						#endif	
+							Range &range = lexer.lexeme.get_prev();
 
-						parse_statements(&block->statements);
+							if(is_else)
+							{
+								parse_statements(&block->statements);
+
+								if(!block->statements.first || block->statements.first->node_type() != Node::IF_NODE)
+									new ExpectedError(document, range, Lexeme::BRACET_OPEN);
+							}
+							else
+							{
+								new ExpectedError(document, range, Lexeme::BRACET_OPEN);
+
+								parse_statements(&block->statements);
+							}
+						#else
+							parse_statements(&block->statements);
+						#endif
 					}
 				}
 

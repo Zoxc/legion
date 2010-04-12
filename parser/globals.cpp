@@ -171,7 +171,7 @@ namespace Legion
 				symbol->node = *i;
 			}
 			
-			func->body = parse_block<true>(Scope::EMPTY);
+			func->body = parse_block<true, false>(Scope::EMPTY);
 
 			pop_scope();
 		}
