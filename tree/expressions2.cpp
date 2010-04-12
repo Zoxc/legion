@@ -91,6 +91,40 @@ namespace Legion
 			return 0;
 	}
 
+	Type *BinaryOpNode::validate_op(ValidationArgs &args, ExpressionNode *node, Lexeme::Type op, Type *left_type, Type *right_type)
+	{
+		Type *type;
+
+		if(left_type->compatible(args, right_type, false))
+			type = left_type;
+		else if(right_type->compatible(args, left_type, false))
+			type = right_type;
+		else
+		{
+			args.document.report(node->get_range(args.memory_pool), "Binary operator '" + Lexeme::names[op] + "' is incompatible with types '" + left_type->string() + "' and '" + right_type->string() + "'");
+
+			return 0;
+		}
+
+		Type *result = Type::resolve(type);
+		
+		if(!result)
+			return 0;
+
+		bool compatible = false;
+
+		result = result->compatible_binary_op(args, op, compatible);
+
+		if(!compatible)
+		{
+			args.document.report(node->get_range(args.memory_pool), "Binary operator '" + Lexeme::names[op] + "' is incompatible with types '" + left_type->string() + "' and '" + right_type->string() + "'");
+
+			return 0;
+		}
+		else
+			return result;
+	}
+
 	Type *BinaryOpNode::validate(ValidationArgs &args)
 	{
 		Type *left_type = left->validate(args);
@@ -107,39 +141,79 @@ namespace Legion
 				return args.types.type_bool.type;
 
 			default:
-			{
-				Type *type;
+				return validate_op(args, this, op, left_type, right_type);			
+		}
+	}
 
-				if(left_type->compatible(args, right_type, false))
-					type = left_type;
-				else if(right_type->compatible(args, left_type, false))
-					type = right_type;
-				else
-				{
-					args.document.report(get_range(args.memory_pool), "Binary operator '" + Lexeme::names[op] + "' is incompatible with types '" + left_type->string() + "' and '" + right_type->string() + "'");
+	Type *AssignNode::validate(ValidationArgs &args)
+	{
+		Type *left_type = left->validate(args);
+		Type *right_type = right->validate(args);
 
-					return 0;
-				}
+		if(!left_type || !right_type)
+			return 0;
 
-				Type *result = Type::resolve(type);
-				
-				if(!result)
-					return 0;
+		switch(op)
+		{
+			case Lexeme::ASSIGN:
+				left_type->compatible(args, right_type, right);
+				break;
 
-				bool compatible = false;
+			case Lexeme::ASSIGN_ADD:
+				left_type->compatible(args, validate_op(args, this, Lexeme::ADD, left_type, right_type), right);	
+				break;
 
-				result = result->compatible_binary_op(args, op, compatible);
+			case Lexeme::ASSIGN_SUB:
+				left_type->compatible(args, validate_op(args, this, Lexeme::SUB, left_type, right_type), right);		
+				break;
 
-				if(!compatible)
-				{
-					args.document.report(get_range(args.memory_pool), "Binary operator '" + Lexeme::names[op] + "' is incompatible with types '" + left_type->string() + "' and '" + right_type->string() + "'");
+			case Lexeme::ASSIGN_MUL:
+				left_type->compatible(args, validate_op(args, this, Lexeme::MUL, left_type, right_type), right);		
+				break;
 
-					return 0;
-				}
-				else
-					return result;
-			}
-			
+			case Lexeme::ASSIGN_DIV:
+				left_type->compatible(args, validate_op(args, this, Lexeme::DIV, left_type, right_type), right);		
+				break;
+
+			case Lexeme::ASSIGN_MOD:
+				left_type->compatible(args, validate_op(args, this, Lexeme::MOD, left_type, right_type), right);		
+				break;
+
+			case Lexeme::ASSIGN_BITWISE_OR:
+				left_type->compatible(args, validate_op(args, this, Lexeme::BITWISE_OR, left_type, right_type), right);		
+				break;
+
+			case Lexeme::ASSIGN_BITWISE_XOR:
+				left_type->compatible(args, validate_op(args, this, Lexeme::BITWISE_XOR, left_type, right_type), right);		
+				break;
+
+			case Lexeme::ASSIGN_BITWISE_AND:
+				left_type->compatible(args, validate_op(args, this, Lexeme::BITWISE_AND, left_type, right_type), right);		
+				break;
+
+			case Lexeme::ASSIGN_BITWISE_NOT:
+				left_type->compatible(args, validate_op(args, this, Lexeme::BITWISE_NOT, left_type, right_type), right);		
+				break;
+
+			case Lexeme::ASSIGN_LEFT_SHIFT:
+				left_type->compatible(args, validate_op(args, this, Lexeme::LEFT_SHIFT, left_type, right_type), right);		
+				break;
+
+			case Lexeme::ASSIGN_RIGHT_SHIFT:
+				left_type->compatible(args, validate_op(args, this, Lexeme::RIGHT_SHIFT, left_type, right_type), right);		
+				break;
+
+			case Lexeme::ASSIGN_LOGICAL_OR:
+				left_type->compatible(args, validate_op(args, this, Lexeme::LOGICAL_OR, left_type, right_type), right);		
+				break;
+
+			case Lexeme::ASSIGN_LOGICAL_AND:
+				left_type->compatible(args, validate_op(args, this, Lexeme::LOGICAL_AND, left_type, right_type), right);		
+				break;
+
+			default:
+				assert(0);	
+				return 0;
 		}
 
 		return left_type;

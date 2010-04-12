@@ -89,6 +89,7 @@ namespace Legion
 			return op == Lexeme::MUL && right->is_declaration_name();
 		};
 
+		Type *validate_op(ValidationArgs &args, ExpressionNode *node, Lexeme::Type op, Type *left_type, Type *right_type);
 		Type *validate(ValidationArgs &args);
 
 		void setup_type(Document &document, LocalNode &local, bool name);
@@ -104,14 +105,7 @@ namespace Legion
 	{
 		StatementNode *get_declaration(Document &document);
 
-		Type *validate(ValidationArgs &args)
-		{
-			Type *left_type = left->validate(args);
-
-			left_type->compatible(args, right);
-
-			return left_type;
-		}
+		Type *validate(ValidationArgs &args);
 
 		NodeType node_type()
 		{
