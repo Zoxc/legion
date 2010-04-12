@@ -2,9 +2,11 @@
 [X] Use a own scope for parameters
 [ ] Implement array types
 [ ] Catch recursive definitions of symbols
-[ ] Catch symbols used before they are declared
+[ ] Catch symbols used before they are declared in Galaxy
 [X] Use a structure to pass arguments for verification
 [ ] Implement typechecking for all operators
 [X] Allow multiple defined symbols
 [ ] Sort symbols on insertion
 [X] Have a proper error list
+[ ] Detect blocks without curly brackets in Galaxy
+[ ] Make sure local are declared at the start of a function in Galaxy
