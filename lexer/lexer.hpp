@@ -24,7 +24,6 @@ namespace Legion
 			Input input;
 			
 			StringPool &string_pool;
-			MemoryPool &memory_pool;
 			Document &document;
 			
 			static bool jump_table_ready;
@@ -62,6 +61,7 @@ namespace Legion
 		public:
 			Lexer(StringPool &string_pool, MemoryPool &memory_pool, Document &document);
 			
+			MemoryPool &memory_pool;
 			Lexeme lexeme;
 			Keywords keywords;
 

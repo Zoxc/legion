@@ -112,7 +112,7 @@ namespace Legion
 				String *value;
 			};
 
-			Range get_prev();
+			Range &get_prev();
 			
 			static std::string names[TYPES];
 			

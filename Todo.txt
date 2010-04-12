@@ -8,5 +8,5 @@
 [X] Allow multiple defined symbols
 [ ] Sort symbols on insertion
 [X] Have a proper error list
-[ ] Detect blocks without curly brackets in Galaxy
+[X] Detect blocks without curly brackets in Galaxy
 [ ] Make sure local are declared at the start of a function in Galaxy

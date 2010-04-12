@@ -35,7 +35,7 @@ namespace Legion
 	
 	void Parser::expected_prev(Lexeme::Type what)
 	{
-		document.report(lexer.lexeme.dup(memory_pool), "Expected " + Lexeme::describe_type(what));
+		document.report(lexer.lexeme.get_prev(), "Expected " + Lexeme::describe_type(what));
 	}
 
 	void Parser::unexpected(bool skip)

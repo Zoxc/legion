@@ -88,9 +88,9 @@ namespace Legion
 		"end of file"
 	};
 
-	Range Lexeme::get_prev()
+	Range &Lexeme::get_prev()
 	{
-		Range result;
+		Range &result = *new (lexer.memory_pool) Range;
 		result.start = prev;
 		result.stop = prev + 1;
 		result.line = line;

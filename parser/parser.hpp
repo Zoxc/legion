@@ -128,7 +128,13 @@ namespace Legion
 						match(Lexeme::BRACET_CLOSE);
 					}
 					else
+					{
+						#ifdef GALAXY
+							expected_prev(Lexeme::BRACET_OPEN);
+						#endif	
+
 						parse_statements(&block->statements);
+					}
 				}
 
 				block->range.expand(lexer.lexeme);
