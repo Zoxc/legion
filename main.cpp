@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
 
 	BENCHMARK_START;
 
-	for(List<Document>::Iterator i = compiler.documents.begin(); i; i++)
+	for(auto i = compiler.documents.begin(); i; i++)
 		i().find_declarations();
 
 	BENCHMARK_END("Found declarations");
@@ -85,14 +85,14 @@ int main(int argc, char *argv[])
 
 	BENCHMARK_START;
 
-	for(List<Document>::Iterator i = compiler.documents.begin(); i; i++)
+	for(auto i = compiler.documents.begin(); i; i++)
 		i().validate();
 
 	BENCHMARK_END("Typechecked");
 
 	print_ast("post-typechecking-AST");
 
-	for(List<Document>::Iterator i = compiler.documents.begin(); i; i++)
+	for(auto i = compiler.documents.begin(); i; i++)
 		for(List<Message>::Iterator j = i().messages.begin(); j; j++)
 			std::cout << j().format() << std::endl;
 

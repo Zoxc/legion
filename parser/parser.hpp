@@ -1,5 +1,6 @@
 #pragma once
 #include "../common.hpp"
+#include "../message.hpp"
 #include "../lexer/lexer.hpp"
 #include "../tree/node.hpp"
 #include "../tree/globals.hpp"
