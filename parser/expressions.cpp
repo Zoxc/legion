@@ -157,7 +157,7 @@ namespace Legion
 
 		match(Lexeme::SQR_BRACET_CLOSE);
 
-		node->range->expand(lexer.lexeme);
+		node->range->stop = lexer.lexeme.prev;
 
 		return node;
 	}

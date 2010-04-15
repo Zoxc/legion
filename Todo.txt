@@ -10,3 +10,4 @@
 [X] Have a proper error list
 [X] Detect blocks without curly brackets in Galaxy
 [ ] Make sure local are declared at the start of a function in Galaxy
+[ ] Turn FactorChain into seperate nodes

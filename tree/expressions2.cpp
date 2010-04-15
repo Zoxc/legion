@@ -249,8 +249,17 @@ namespace Legion
 
 	Type *UnaryOpNode::validate(ValidationArgs &args)
 	{
-		if(op == Lexeme::LOGICAL_NOT) //TODO: Figure out how ! works
-			return 0;
+		switch(op)
+		{
+			case Lexeme::LOGICAL_NOT: //TODO: Figure out how ! works
+				return 0;
+
+			case Lexeme::BITWISE_AND: //TODO: Implement this
+				return 0;
+
+			default:
+				break;
+		}
 
 		Type *type = value->validate(args);
 
@@ -278,9 +287,9 @@ namespace Legion
 
 	Type *ArraySubscriptNode::validate(ValidationArgs &args)
 	{
-		args.types.type_int.type->Type::compatible(args, index);
-
 		Type *type = args.parent_type;
+
+		args.types.type_int.type->Type::compatible(args, index);
 
 		if(type == 0)
 			return 0;

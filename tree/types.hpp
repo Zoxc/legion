@@ -86,8 +86,9 @@ namespace Legion
 			Type(Kind kind) : indirect(0), kind(kind)
 			{
 			}
-
+			
 			Type *get_indirect(ValidationArgs &args);
+			Type *get_array(ValidationArgs &args, size_t size);
 			static Type *resolve(Type *type);
 			void compatible(ValidationArgs &args, ExpressionNode *node);
 			void compatible(ValidationArgs &args, Type *type, ExpressionNode *node);
@@ -407,7 +408,7 @@ namespace Legion
 
 			Type *base;
 			size_t size;
-			ArrayType *next_array;
+			ArrayType *next;
 
 			std::string string(bool show_typedef)
 			{

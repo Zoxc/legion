@@ -41,6 +41,11 @@ namespace Legion
 				{
 					case TYPE_POINTER_NODE:
 						result = result->get_indirect(args);
+						break;
+
+					case TYPE_ARRAY_NODE:
+						result = result->get_array(args, 0); //TODO: Get the real size
+						break;
 
 					default:
 						break;
@@ -67,6 +72,19 @@ namespace Legion
 			indirect = new (args.memory_pool) PointerType(this); 
 
 		return indirect;
+	}
+	
+	Type *Type::get_array(ValidationArgs &args, size_t size)
+	{
+		for(auto i = arrays.begin(); i; i++)
+			if(i().size == size)
+				return *i;
+
+		ArrayType *array_type = new (args.memory_pool) ArrayType(this, size); 
+
+		arrays.append(array_type);
+
+		return array_type;
 	}
 
 	void Type::compatible(ValidationArgs &args, Type *type, ExpressionNode *node)

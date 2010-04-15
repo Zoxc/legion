@@ -88,7 +88,9 @@ namespace Legion
 			ControlFlowNode::validate(args);
 			
 			do_true->validate(args);
-			do_false->validate(args);
+
+			if(do_false)
+				do_false->validate(args);
 
 			return 0;
 		}
