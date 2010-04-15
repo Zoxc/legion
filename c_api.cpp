@@ -98,7 +98,14 @@ LEGION_API struct legion_message *legion_message_next(struct legion_message *mes
 
 LEGION_API const char *legion_message_string(struct legion_message *message)
 {
-	return ((Message *)message)->string().c_str();
+	Message *msg = (Message *)message;
+	std::string string = msg->string();
+
+	char *result = new (msg->document.memory_pool) char[string.length() + 1];
+
+	strcpy(result, string.c_str());
+
+	return result;
 }
 
 LEGION_API enum legion_severity legion_message_severity(struct legion_message *message)

@@ -155,7 +155,11 @@ namespace Legion
 					return false;
 				
 				if(!symbol->name)
+				{
+					symbol->next_name = symbol;
+
 					return false;
+				}
 				
 				Symbol *prev = set(symbol->name, symbol);
 
