@@ -249,6 +249,9 @@ namespace Legion
 
 	Type *UnaryOpNode::validate(ValidationArgs &args)
 	{
+		if(op == Lexeme::LOGICAL_NOT) //TODO: Figure out how ! works
+			return 0;
+
 		Type *type = value->validate(args);
 
 		if(!type)
@@ -276,8 +279,24 @@ namespace Legion
 	Type *ArraySubscriptNode::validate(ValidationArgs &args)
 	{
 		args.types.type_int.type->Type::compatible(args, index);
-		
-		return 0;
+
+		Type *type = args.parent_type;
+
+		if(type == 0)
+			return 0;
+
+		if(type->kind == Type::ARRAY_TYPE)
+			return ((ArrayType *)type)->base;
+		else
+		{
+			Range &span = args.parent_node->get_range(args.memory_pool);
+			span.expand(*range);
+
+			args.document.report(span, "Cannot get subscript of type '" +  type->string() + "'");
+			type = 0;
+
+			return 0;
+		}
 	}
 
 	void ArrayDefNode::setup_type(Document &document, LocalNode &local, bool name)
@@ -308,6 +327,13 @@ namespace Legion
 	Type *FactorChainNode::validate(ValidationArgs &args)
 	{
 		Type *type = factor->validate(args);
+
+		for(ExpressionList::Iterator i = chain.begin(); i; i++)
+		{
+			args.parent_type = type;
+			args.parent_node = factor;
+			type = i().validate(args);
+		}
 
 		return 0;
 	}

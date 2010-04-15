@@ -62,7 +62,7 @@ namespace Legion
 	{
 		private:
 			PointerType *indirect;
-			ArrayType *first_array;
+			List<ArrayType> arrays;
 
 		protected:
 			virtual bool is_exact(Type *other)
@@ -83,7 +83,7 @@ namespace Legion
 
 			Kind kind;
 
-			Type(Kind kind) : indirect(0), first_array(0), kind(kind)
+			Type(Kind kind) : indirect(0), kind(kind)
 			{
 			}
 

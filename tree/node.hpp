@@ -10,8 +10,9 @@ namespace Legion
 	class Types;
 	class Type;
 	class Scope;
-
+	
 	struct ExpressionNode;
+	struct StatementNode;
 
 	struct ValidationArgs
 	{
@@ -22,6 +23,8 @@ namespace Legion
 		Scope *scope;
 		MemoryPool &memory_pool;
 		SymbolList stack;
+		Type *parent_type;
+		StatementNode *parent_node;
 	};
 
 	struct Node

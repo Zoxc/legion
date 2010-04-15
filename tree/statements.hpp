@@ -82,6 +82,16 @@ namespace Legion
 		{
 			return range;
 		}
+
+		Type *validate(ValidationArgs &args)
+		{
+			ControlFlowNode::validate(args);
+			
+			do_true->validate(args);
+			do_false->validate(args);
+
+			return 0;
+		}
 	};
 	
 	struct WhileNode:
@@ -101,6 +111,15 @@ namespace Legion
 		{
 			return range;
 		}
+
+		Type *validate(ValidationArgs &args)
+		{
+			ControlFlowNode::validate(args);
+			
+			body->validate(args);
+
+			return 0;
+		}
 	};
 	
 	struct DoNode:
@@ -119,6 +138,15 @@ namespace Legion
 		Range &get_range(MemoryPool &memory_pool)
 		{
 			return range;
+		}
+
+		Type *validate(ValidationArgs &args)
+		{
+			ControlFlowNode::validate(args);
+			
+			body->validate(args);
+
+			return 0;
 		}
 	};
 

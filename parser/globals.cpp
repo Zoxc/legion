@@ -141,7 +141,7 @@ namespace Legion
 		if(lexeme() == Lexeme::BRACET_OPEN)
 		{
 			if(is_native)
-				document.report(pair->range, "You cannot provide an implementation of natives");
+				document.report(pair->range, "You cannot provide an implementation of a native function");
 
 			FuncNode *func = list->add<FuncNode>(memory_pool);
 
