@@ -209,6 +209,8 @@ namespace Legion
 		{
 			return *range;
 		}
+
+		Type *validate(ValidationArgs &args);
 	};
 
 	struct FactorChainNode:

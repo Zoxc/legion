@@ -101,6 +101,19 @@ namespace Legion
 		compatible(args, node->validate(args), node);
 	}
 
+	Type *CompositeType::get_member(ValidationArgs &args, String *name, Range &range)
+	{
+		for(auto i = fields.begin(); i; i++)
+		{
+			if(i().name == name)
+				return i().type;
+		}
+
+		args.document.report(range, "Unable to find member '" + name->string() + "' in type '" +  string() + "'");
+		
+		return 0;
+	}
+
 	bool PointerType::compatible(ValidationArgs &args, Type *other, bool weak)
 	{
 		if(!base)

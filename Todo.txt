@@ -11,3 +11,4 @@
 [X] Detect blocks without curly brackets in Galaxy
 [ ] Make sure local are declared at the start of a function in Galaxy
 [ ] Turn FactorChain into seperate nodes
+[ ] Check for lvalues where expected

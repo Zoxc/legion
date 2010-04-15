@@ -310,7 +310,9 @@ namespace Legion
 			String *name;
 			List<Field> fields;
 
-			std::string string(bool show_typedef)
+			Type *get_member(ValidationArgs &args, String *name, Range &range);
+
+			std::string string(bool show_typedef = true)
 			{
 				return name->string();
 			}

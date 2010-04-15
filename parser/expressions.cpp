@@ -223,7 +223,7 @@ namespace Legion
 							else
 								node->name = 0;
 
-							node->range->expand(lexer.lexeme);
+							node->range->stop = lexer.lexeme.prev;
 							node->by_ptr = false;
 
 							break;
@@ -242,7 +242,7 @@ namespace Legion
 							else
 								node->name = 0;
 
-							node->range->expand(lexer.lexeme);
+							node->range->stop = lexer.lexeme.prev;
 							node->by_ptr = true;
 
 							break;

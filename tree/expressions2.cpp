@@ -308,6 +308,49 @@ namespace Legion
 		}
 	}
 
+	Type *MemberRefNode::validate(ValidationArgs &args)
+	{
+		Type *type = args.parent_type;
+
+		if(type == 0)
+			return 0;
+
+		if(by_ptr)
+		{
+			if(type->kind == Type::POINTER_TYPE)
+			{
+				Type *base = ((PointerType *)type)->base;
+
+				if(base->kind == Type::COMPOSITE_TYPE)
+					return ((CompositeType *)base)->get_member(args, name, *range);
+				else
+					args.document.report(*range, "Cannot get member '" + name->string() + "' by pointer in type '" +  type->string() + "'");
+			}
+			else if(type->kind == Type::COMPOSITE_TYPE)
+				args.document.report(*range, "Cannot get member '" + name->string() + "' by pointer in type '" +  type->string() + "', did you mean to use '.' instead?");
+			else
+				args.document.report(*range, "Cannot get member '" + name->string() + "' by pointer in type '" +  type->string() + "'");
+		}
+		else
+		{
+			if(type->kind == Type::POINTER_TYPE)
+			{
+				Type *base = ((PointerType *)type)->base;
+
+				if(base->kind == Type::COMPOSITE_TYPE)
+					args.document.report(*range, "Cannot get member '" + name->string() + "' in type '" +  type->string() + "', did you mean to use '->' instead?");
+				else
+					args.document.report(*range, "Cannot get member '" + name->string() + "' in type '" +  type->string() + "'");
+			}
+			else if(type->kind == Type::COMPOSITE_TYPE)
+				return ((CompositeType *)type)->get_member(args, name, *range);
+			else
+				args.document.report(*range, "Cannot get member '" + name->string() + "' in type '" +  type->string() + "'");
+		}
+
+		return 0;
+	}
+	
 	void ArrayDefNode::setup_type(Document &document, LocalNode &local, bool name)
 	{
 		for(ExpressionList::Iterator i = sizes.begin(); i; i++)
@@ -344,7 +387,7 @@ namespace Legion
 			type = i().validate(args);
 		}
 
-		return 0;
+		return type;
 	}
 
 	Type *IntegerNode::validate(ValidationArgs &args)
