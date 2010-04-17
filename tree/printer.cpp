@@ -175,9 +175,9 @@ namespace Legion
 				return print_node(target->head);
 			}
 
-			case Node::FUNC_NODE:
+			case Node::FUNCTION_NODE:
 			{
-				FuncNode *target = (FuncNode *)node;
+				FunctionNode *target = (FunctionNode *)node;
 
 				return print_node(target->head) + "\n" + print_node(target->body);
 			}

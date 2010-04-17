@@ -195,7 +195,7 @@ namespace Legion
 	
 	struct Block;
 	
-	struct FuncNode:
+	struct FunctionNode:
 		public NamespaceNode
 	{
 		FuncHeadNode *head;
@@ -217,12 +217,13 @@ namespace Legion
 
 		Node::NodeType node_type()
 		{
-			return FUNC_NODE;
+			return FUNCTION_NODE;
 		}
 
 		Type *validate(ValidationArgs &args)
 		{
-			Type *type = head->validate(args);
+			FunctionType *type = (FunctionType *)head->validate(args);
+			args.func = this;
 			body->validate(args);
 
 			return type;

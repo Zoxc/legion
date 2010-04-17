@@ -84,6 +84,42 @@ namespace Legion
 
 		return 0;
 	}
+	
+	Type *ReturnNode::validate(ValidationArgs &args)
+	{
+		if(!args.func)
+			return 0;
+
+		String *name = args.func->head->pair->name;
+
+		if(!name)
+			return 0;
+
+		FunctionType *type = (FunctionType *)args.func->get_type(args);
+
+		if(!type)
+			return 0;
+
+		Type *returns = type->returns;
+		
+		if(!returns)
+			return 0;
+
+		if(returns == args.types.type_void.type)
+		{
+			if(has_value)
+				args.document.report(range, "Cannot return a value from function '" + name->string() + "'");
+		}
+		else
+		{
+			if(!has_value)
+				args.document.report(range, "Cannot return without a value from function '" + name->string() + "'");
+			else
+				returns->compatible(args, value);
+		}
+
+		return 0;
+	}
 
 	StatementNode *LocalNode::get_declaration(Document &document)
 	{

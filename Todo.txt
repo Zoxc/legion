@@ -12,3 +12,7 @@
 [ ] Make sure local are declared at the start of a function in Galaxy
 [ ] Turn FactorChain into seperate nodes
 [ ] Check for lvalues where expected
+[ ] Create a class per error type
+[ ] Look over numbers ending in identifiers
+[ ] Allows messages to have children
+[ ] Make sure that functions returning a value, actually does

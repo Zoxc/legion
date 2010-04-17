@@ -143,7 +143,7 @@ namespace Legion
 			if(is_native)
 				document.report(pair->range, "You cannot provide an implementation of a native function");
 
-			FuncNode *func = list->add<FuncNode>(memory_pool);
+			FunctionNode *func = list->add<FunctionNode>(memory_pool);
 
 			func->head = head;
 			

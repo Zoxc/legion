@@ -105,6 +105,7 @@ namespace Legion
 		{
 			node->has_value = true;
 			node->value = parse_expression();
+			lexer.lexeme.prev_set(node->range);
 		}
 		else
 			node->has_value = false;

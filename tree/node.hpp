@@ -13,6 +13,7 @@ namespace Legion
 	
 	struct ExpressionNode;
 	struct StatementNode;
+	struct FunctionNode;
 
 	struct ValidationArgs
 	{
@@ -25,6 +26,7 @@ namespace Legion
 		SymbolList stack;
 		Type *parent_type;
 		StatementNode *parent_node;
+		FunctionNode *func;
 	};
 
 	struct Node
@@ -41,7 +43,7 @@ namespace Legion
 			PARAM_NODE,
 			FUNC_HEAD_NODE,
 			PROTOTYPE_NODE,
-			FUNC_NODE,
+			FUNCTION_NODE,
 
 			BLOCK_NODE,
 			IF_NODE,
