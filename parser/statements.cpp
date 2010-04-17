@@ -41,7 +41,7 @@ namespace Legion
 		else
 			node->has_value = false;
 
-		node->range.expand(lexer.lexeme);
+		lexer.lexeme.prev_set(node->range);
 	}
 
 	void Parser::parse_if(StatementList *list)

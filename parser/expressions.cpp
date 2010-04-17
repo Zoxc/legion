@@ -70,7 +70,7 @@ namespace Legion
 
 					match(Lexeme::PARENT_CLOSE);
 
-					ident->range->stop = lexer.lexeme.prev;
+					lexer.lexeme.prev_set(*ident->range);
 
 					return node;
 				}
@@ -157,7 +157,7 @@ namespace Legion
 
 		match(Lexeme::SQR_BRACET_CLOSE);
 
-		node->range->stop = lexer.lexeme.prev;
+		lexer.lexeme.prev_set(*node->range);
 
 		return node;
 	}
@@ -223,7 +223,7 @@ namespace Legion
 							else
 								node->name = 0;
 
-							node->range->stop = lexer.lexeme.prev;
+							lexer.lexeme.prev_set(*node->range);
 							node->by_ptr = false;
 
 							break;
@@ -242,7 +242,7 @@ namespace Legion
 							else
 								node->name = 0;
 
-							node->range->stop = lexer.lexeme.prev;
+							lexer.lexeme.prev_set(*node->range);
 							node->by_ptr = true;
 
 							break;

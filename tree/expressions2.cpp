@@ -72,6 +72,8 @@ namespace Legion
 			local->type_node = new (memory_pool) TypeNode;
 			local->symbol = new (memory_pool) VarSymbol;
 			local->symbol->node = local;
+			local->range = left->get_range(memory_pool);
+			local->range.expand(right->get_range(memory_pool));
 
 			if(op != Lexeme::MUL)
 				document.report_type_modifier(*range);
@@ -227,6 +229,7 @@ namespace Legion
 		{
 			local->value = right;
 			local->has_value = true;
+			local->range.expand(right->get_range(document.memory_pool));
 
 			if(op != Lexeme::ASSIGN)
 				document.report(*range, "Unexpected assignment with operator " + Lexeme::describe(range, op));

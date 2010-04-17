@@ -112,6 +112,11 @@ namespace Legion
 			};
 
 			Range &get_prev();
+
+			void prev_set(Range &range)
+			{
+				range.stop = prev;
+			}
 			
 			static std::string names[TYPES];
 			
