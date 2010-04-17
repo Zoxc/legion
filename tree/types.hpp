@@ -81,6 +81,14 @@ namespace Legion
 				POINTER_TYPE
 			};
 
+			enum Compatibility
+			{
+				EXACT,
+				TYPEDEF,
+				STRONG,
+				WEAK
+			};
+
 			Kind kind;
 
 			Type(Kind kind) : indirect(0), kind(kind)
@@ -89,15 +97,19 @@ namespace Legion
 			
 			Type *get_indirect(ValidationArgs &args);
 			Type *get_array(ValidationArgs &args, size_t size);
-			static Type *resolve(Type *type);
 			void compatible(ValidationArgs &args, ExpressionNode *node);
 			void compatible(ValidationArgs &args, Type *type, ExpressionNode *node);
 
 			virtual std::string string(bool show_typedef = true) = 0;
 
-			virtual bool compatible(ValidationArgs &args, Type *other, bool weak)
+			static Type *resolve(Type *type);
+
+			virtual bool compatible(ValidationArgs &args, Type *other, Compatibility compatibility)
 			{
-				return this == other || this == resolve(other);
+				if(compatibility == EXACT)
+					return this == other;
+				else
+					return this == other || this == resolve(other);
 			}
 
 			virtual Type *compatible_unary_op(ValidationArgs &args, Lexeme::Type lexeme, bool &compatible) 
@@ -108,14 +120,6 @@ namespace Legion
 			virtual Type *compatible_binary_op(ValidationArgs &args, Lexeme::Type lexeme, bool &compatible) 
 			{
 				return 0;
-			}
-
-			bool exact(Type *other)
-			{
-				if(!this || !other)
-					return true;
-
-				return is_exact(other);
 			}
 	};
 
@@ -255,20 +259,26 @@ namespace Legion
 					return 0;
 			}
 
-			bool compatible(ValidationArgs &args, Type *other, bool weak)
+			bool compatible(ValidationArgs &args, Type *other, Compatibility compatibility)
 			{
+				if(compatibility == EXACT)
+					return this == other;
+
 				Type *type = resolve(other);
 
 				if(this == type)
 					return true;
 
-				ImplicitConversion *conversion = implicit_conversions.get(type);
+				if(compatibility >= STRONG)
+				{
+					ImplicitConversion *conversion = implicit_conversions.get(type);
 
-				if(conversion && (weak || !conversion->weak))
-					return true;
+					if(conversion && (compatibility >= WEAK || !conversion->weak))
+						return true;
+				}
 
 				if(base)
-					return base->compatible(args, other, weak);
+					return base->compatible(args, other, compatibility);
 				else
 					return false;
 			}
@@ -311,7 +321,7 @@ namespace Legion
 			List<Field> fields;
 
 			Type *get_member(ValidationArgs &args, String *name, Range &range);
-
+			
 			std::string string(bool show_typedef = true)
 			{
 				return name->string();
@@ -333,7 +343,7 @@ namespace Legion
 
 			Type *returns;
 			List<Parameter> params;
-
+			
 			std::string string(bool show_typedef)
 			{
 				std::string result = returns->string() + "(";
@@ -350,23 +360,28 @@ namespace Legion
 			}
 
 		protected:
-			bool is_exact(Type *other)
+			bool compatible(ValidationArgs &args, Type *other, Compatibility compatibility)
 			{
+				Type *type = compatibility >= TYPEDEF ? resolve(other) : other;
+
 				if(other->kind != Type::FUNCTION_TYPE)
 					return false;
 
-				FunctionType *other_func = (FunctionType *)other;
+				if(this == other)
+					return true;
 
-				if(other_func->params.size != params.size)
+				FunctionType *func = (FunctionType *)type;
+
+				if(func->params.size != params.size)
 					return false;
 
-				if(!other_func->returns->exact(returns))
+				if(!func->returns->compatible(args, returns, compatibility))
 					return false;
 
 				List<Parameter>::Iterator j = params.begin();
 
-				for(List<Parameter>::Iterator i = other_func->params.begin(); i; i++, j++)
-					if(!i().type->exact(j().type))
+				for(List<Parameter>::Iterator i = func->params.begin(); i; i++, j++)
+					if(!i().type->compatible(args, j().type, compatibility))
 						return false;
 
 				return true;
@@ -393,12 +408,15 @@ namespace Legion
 					return base->string(false);
 			}
 
-			bool compatible(ValidationArgs &args, Type *other, bool weak)
+			bool compatible(ValidationArgs &args, Type *other, Compatibility compatibility)
 			{
 				if(!base)
 					return true;
 
-				return this == other || base->compatible(args, other, weak);
+				if(compatibility == EXACT)
+					return this == other;
+				else
+					return this == other || base->compatible(args, other, compatibility);
 			}
 	};
 
@@ -447,7 +465,7 @@ namespace Legion
 					return 0;
 			}
 
-			bool compatible(ValidationArgs &args, Type *other, bool weak);
+			bool compatible(ValidationArgs &args, Type *other, Compatibility compatibility);
 	};
 
 	class Compiler;

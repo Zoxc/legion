@@ -134,7 +134,7 @@ namespace Legion
 			{
 				current = current->next_name;
 
-				if(current->type == Symbol::FUNCTION && type->exact(current->node->validate(args)))
+				if(current->type == Symbol::FUNCTION && type->compatible(args, current->node->validate(args), Type::EXACT))
 					goto end;
 			}
 

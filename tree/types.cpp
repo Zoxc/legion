@@ -92,7 +92,7 @@ namespace Legion
 		if(!this || !type)
 			return;
 
-		if(!compatible(args, type, true))
+		if(!compatible(args, type, WEAK))
 			new IncompatableTypesError(args.document, node->get_range(args.memory_pool), type, this);
 	}
 
@@ -114,12 +114,23 @@ namespace Legion
 		return 0;
 	}
 
-	bool PointerType::compatible(ValidationArgs &args, Type *other, bool weak)
+	bool PointerType::compatible(ValidationArgs &args, Type *other, Compatibility compatibility)
 	{
 		if(!base)
 			return true;
 
-		return this == other || other == args.types.type_null.type || base->compatible(args, other, weak);
+		if(compatibility == EXACT)
+			return this == other;
+
+		Type *type = resolve(other);
+
+		if(this == type || type == args.types.type_null.type)
+			return true;
+		
+		if(type->kind != POINTER_TYPE)
+			return false;
+		
+		return base->compatible(args, ((PointerType *)type)->base, TYPEDEF);
 	}
 
 	void Types::declare(TypeNativeNode *base, const char *name, TypeNativeNode &type, bool declare)

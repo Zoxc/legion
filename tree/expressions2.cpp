@@ -97,9 +97,9 @@ namespace Legion
 	{
 		Type *type;
 
-		if(left_type->compatible(args, right_type, false))
+		if(left_type->compatible(args, right_type, Type::STRONG))
 			type = left_type;
-		else if(right_type->compatible(args, left_type, false))
+		else if(right_type->compatible(args, left_type, Type::STRONG))
 			type = right_type;
 		else
 		{
