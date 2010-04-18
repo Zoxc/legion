@@ -14,6 +14,7 @@ namespace Legion
         private static extern void legion_compiler_destroy(IntPtr compiler);
 
         public IntPtr _compiler;
+        public object Tag;
 
         public Compiler()
         {
@@ -55,9 +56,8 @@ namespace Legion
 
     public class Document
     {
-
         [DllImport("liblegion.dll")]
-        private static extern IntPtr legion_document_create(IntPtr compiler, String name);
+        private static extern IntPtr legion_document_create(IntPtr compiler, string name);
         
         [DllImport("liblegion.dll")]
         private static extern void legion_document_destroy(IntPtr document);
@@ -69,7 +69,7 @@ namespace Legion
         private static extern void legion_document_load_data(IntPtr document, byte[] data, uint length);
 
         [DllImport("liblegion.dll")]
-        private static extern bool legion_document_load_file(IntPtr document, String filename);
+        private static extern bool legion_document_load_file(IntPtr document, string filename);
 
         [DllImport("liblegion.dll")]
         private static extern void legion_document_execute(IntPtr document, Stage stage);
@@ -81,7 +81,7 @@ namespace Legion
         private static extern IntPtr legion_message_next(IntPtr message);
 
         [DllImport("liblegion.dll")]
-        private static extern String legion_message_string(IntPtr message);
+        private static extern string legion_message_string(IntPtr message);
 
         [DllImport("liblegion.dll")]
         private static extern Severity legion_message_severity(IntPtr message);
@@ -94,10 +94,18 @@ namespace Legion
 
         [DllImport("liblegion.dll")]
         private static extern uint legion_message_line(IntPtr message);
-        
+
+        [DllImport("liblegion.dll")]
+        private static extern IntPtr legion_include_first(IntPtr document);
+
+        [DllImport("liblegion.dll")]
+        private static extern IntPtr legion_include_next(IntPtr include);
+
         private IntPtr _document;
 
-        public Document(Compiler compiler, String name)
+        public object Tag;
+
+        public Document(Compiler compiler, string name)
         {
             _document = legion_document_create(compiler._compiler, name);
         }
@@ -112,7 +120,7 @@ namespace Legion
             _document = IntPtr.Zero;
         }
 
-        public bool LoadFile(String filename)
+        public bool LoadFile(string filename)
         {
             return legion_document_load_file(_document, filename);
         }
@@ -122,7 +130,7 @@ namespace Legion
             legion_document_load_data(_document, data, (uint)data.Length);
         }
 
-        public void Load(String data)
+        public void Load(string data)
         {
             Load(Encoding.UTF8.GetBytes(data));
         }
@@ -154,21 +162,81 @@ namespace Legion
             return result;
         }
 
+        public List<Include> GetIncludes()
+        {
+            List<Include> result = new List<Include>();
+            IntPtr include = legion_include_first(_document);
+
+            while (include != IntPtr.Zero)
+            {
+                result.Add(new Include(include));
+
+                include = legion_include_next(include);
+            }
+
+            return result;
+        }
         ~Document()
         {
             Free();
         }
     }
-    
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct String
+    {
+        IntPtr Bytes;
+        public uint Length;
+
+        public override string ToString()
+        {
+            byte[] data = new byte[Length];
+
+            Marshal.Copy(Bytes, data, 0, (int)Length);
+
+            return Encoding.UTF8.GetString(data);
+        }
+    }
+
+    public class Include
+    {
+        [DllImport("liblegion.dll")]
+        private static extern IntPtr legion_include_filename(IntPtr include);
+
+        [DllImport("liblegion.dll")]
+        private static extern bool legion_include_included(IntPtr include);
+
+        [DllImport("liblegion.dll")]
+        private static extern void legion_include_report(IntPtr include);
+
+        public string Path;
+        public bool Included;
+        private IntPtr include;
+
+        public Include(IntPtr include)
+        {
+            this.include = include;
+            Included = legion_include_included(include);
+            IntPtr path = legion_include_filename(include);
+            Path = Marshal.PtrToStructure(path, typeof(String)).ToString();
+        }
+
+        public void Report()
+        {
+            legion_include_report(include);
+        }
+    }
+
     public class Message
     {
-        private String _message;
+        private string _message;
         private Severity _severity;
         private uint _start;
         private uint _stop;
         private uint _line;
+        public object Tag;
 
-        public Message(String message, Severity severity, uint start, uint stop, uint line)
+        public Message(string message, Severity severity, uint start, uint stop, uint line)
         {
             _message = message;
             _severity = severity;
@@ -177,7 +245,7 @@ namespace Legion
             _line = line;
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             return _message;
         }

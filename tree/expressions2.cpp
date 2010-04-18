@@ -381,6 +381,9 @@ namespace Legion
 
 	Type *FactorChainNode::validate(ValidationArgs &args)
 	{
+		if(!factor)
+			return 0;
+
 		Type *type = factor->validate(args);
 
 		for(ExpressionList::Iterator i = chain.begin(); i; i++)

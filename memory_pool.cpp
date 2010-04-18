@@ -35,7 +35,7 @@ namespace Legion
 	void MemoryPool::free_page(char_t *page)
 	{
 		#ifdef WIN32
-			VirtualFree((void *)page, 0, 0);
+			VirtualFree((void *)page, 0, MEM_RELEASE);
 		#else
 			free(page);
 		#endif
