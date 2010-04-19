@@ -22,9 +22,16 @@ namespace Legion
 			
 			std::string string()
 			{
-				std::string result((const char *)c_str, length);
+				if(this == 0)
+				{
+					return "<null>";
+				}
+				else
+				{
+					std::string result((const char *)c_str, length);
 
-				return result;
+					return result;
+				}
 			}
 	};
 

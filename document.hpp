@@ -41,6 +41,5 @@ namespace Legion
 			
 			Document(Compiler &compiler, std::string filename);
 			Document(Compiler &compiler, String *string);
-			~Document();
 	};
 };

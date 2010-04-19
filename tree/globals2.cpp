@@ -6,7 +6,7 @@ namespace Legion
 {
 	IncludeNode::IncludeNode(Document &document, String *filename) : document(document), filename(filename)
 	{
-		for(List<Document>::Iterator i = document.compiler.documents.begin(); i; i++)
+		for(auto i = document.compiler.documents.begin(); i; i++)
 		{
 			if((*i)->filename == filename)
 			{
@@ -16,7 +16,7 @@ namespace Legion
 			}
 		}
 		
-		for(List<IncludeNode>::Iterator i = document.includes.begin(); i; i++)
+		for(auto i = document.includes.begin(); i; i++)
 		{
 			if((*i)->filename == filename)
 			{

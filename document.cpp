@@ -5,19 +5,18 @@ namespace Legion
 {
 	Document::Document(Compiler &compiler, std::string filename) : input(0), compiler(compiler), parser(compiler.string_pool, memory_pool, *this, &compiler.scope), scope(0)
 	{
-		this->filename = normalize(compiler.string_pool.get(filename));
+		String *interned_filename = filename.empty() ? 0 : compiler.string_pool.get(filename);
+
+		this->filename = interned_filename ? normalize(interned_filename) : 0;
+
 		compiler.documents.append(this);
 	}
 
 	Document::Document(Compiler &compiler, String *filename) : input(0), compiler(compiler), parser(compiler.string_pool, memory_pool, *this, &compiler.scope), scope(0)
 	{
-		this->filename = normalize(filename);
+		this->filename = filename ? normalize(filename) : 0;
+		
 		compiler.documents.append(this);
-	}
-
-	Document::~Document()
-	{
-		free((void *)input);
 	}
 
 	String *Document::normalize(String *filename)
@@ -101,7 +100,7 @@ namespace Legion
 
 		fseek(file, 0, SEEK_SET);
 
-		char_t *data = (char_t *)malloc(length + 1);
+		char_t *data = new (memory_pool) char_t[length + 1];
 
 		if(fread(data, 1, length, file) != length)
 		{

@@ -63,12 +63,13 @@ namespace Legion
         private static extern void legion_document_destroy(IntPtr document);
 
         [DllImport("liblegion.dll")]
-        private static extern String legion_document_filename(IntPtr document);
+        private static extern string legion_document_filename(IntPtr document);
 
         [DllImport("liblegion.dll")]
         private static extern void legion_document_load_data(IntPtr document, byte[] data, uint length);
 
         [DllImport("liblegion.dll")]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool legion_document_load_file(IntPtr document, string filename);
 
         [DllImport("liblegion.dll")]
@@ -81,27 +82,13 @@ namespace Legion
         private static extern IntPtr legion_message_next(IntPtr message);
 
         [DllImport("liblegion.dll")]
-        private static extern string legion_message_string(IntPtr message);
-
-        [DllImport("liblegion.dll")]
-        private static extern Severity legion_message_severity(IntPtr message);
-
-        [DllImport("liblegion.dll")]
-        private static extern uint legion_message_start(IntPtr message);
-
-        [DllImport("liblegion.dll")]
-        private static extern uint legion_message_stop(IntPtr message);
-
-        [DllImport("liblegion.dll")]
-        private static extern uint legion_message_line(IntPtr message);
-
-        [DllImport("liblegion.dll")]
         private static extern IntPtr legion_include_first(IntPtr document);
 
         [DllImport("liblegion.dll")]
         private static extern IntPtr legion_include_next(IntPtr include);
 
         private IntPtr _document;
+        private GCHandle pin;
 
         public object Tag;
 
@@ -112,12 +99,14 @@ namespace Legion
 
         public void Free()
         {
-            if (_document == IntPtr.Zero)
-                return;
+            if (_document != IntPtr.Zero)
+            {
+                legion_document_destroy(_document);
+                _document = IntPtr.Zero;
+            }
 
-            legion_document_destroy(_document);
-
-            _document = IntPtr.Zero;
+            if (pin.IsAllocated)
+                pin.Free();
         }
 
         public bool LoadFile(string filename)
@@ -127,6 +116,11 @@ namespace Legion
 
         public void Load(byte[] data)
         {
+            if(pin.IsAllocated)
+                pin.Free();
+
+            pin = GCHandle.Alloc(data, GCHandleType.Pinned);
+
             legion_document_load_data(_document, data, (uint)data.Length);
         }
 
@@ -154,7 +148,7 @@ namespace Legion
 
             while(message != IntPtr.Zero)
             {
-                result.Add(new Message(legion_message_string(message), legion_message_severity(message), legion_message_start(message), legion_message_stop(message), legion_message_line(message)));
+                result.Add(new Message(message));
 
                 message = legion_message_next(message);
             }
@@ -204,6 +198,7 @@ namespace Legion
         private static extern IntPtr legion_include_filename(IntPtr include);
 
         [DllImport("liblegion.dll")]
+        [return: MarshalAs(UnmanagedType.I1)]
         private static extern bool legion_include_included(IntPtr include);
 
         [DllImport("liblegion.dll")]
@@ -229,32 +224,47 @@ namespace Legion
 
     public class Message
     {
-        private string _message;
-        private Severity _severity;
-        private uint _start;
-        private uint _stop;
-        private uint _line;
+        [DllImport("liblegion.dll")]
+        private static extern string legion_message_string(IntPtr message);
+
+        [DllImport("liblegion.dll")]
+        private static extern Severity legion_message_severity(IntPtr message);
+
+        [DllImport("liblegion.dll")]
+        private static extern uint legion_message_start(IntPtr message);
+
+        [DllImport("liblegion.dll")]
+        private static extern uint legion_message_stop(IntPtr message);
+
+        [DllImport("liblegion.dll")]
+        private static extern uint legion_message_line(IntPtr message);
+
+        private string message;
+        private Severity severity;
+        private uint start;
+        private uint stop;
+        private uint line;
         public object Tag;
 
-        public Message(string message, Severity severity, uint start, uint stop, uint line)
+        public Message(IntPtr message)
         {
-            _message = message;
-            _severity = severity;
-            _start = start;
-            _stop = stop;
-            _line = line;
+            this.message = legion_message_string(message);
+            severity = legion_message_severity(message);
+            start = legion_message_start(message);
+            stop = legion_message_stop(message);
+            line = legion_message_line(message);
         }
 
         public override string ToString()
         {
-            return _message;
+            return message;
         }
 
         public Severity Severity
         {
             get
             {
-                return _severity;
+                return severity;
             }
         }
 
@@ -262,7 +272,7 @@ namespace Legion
         {
             get
             {
-                return _start;
+                return start;
             }
         }
 
@@ -270,7 +280,7 @@ namespace Legion
         {
             get
             {
-                return _stop;
+                return stop;
             }
         }
 
@@ -278,7 +288,7 @@ namespace Legion
         {
             get
             {
-                return _line;
+                return line;
             }
         }
 

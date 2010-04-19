@@ -6,6 +6,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Legion", "Legion.vcxproj", "{D9984D1B-5290-4CDB-80F8-84489DF0E674}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Legion.NET", "Legion.NET\Legion.NET.csproj", "{35246F97-D9B6-4A5B-9E50-4E0A17351D6A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{AD30A71F-E824-4E6A-81B1-885694566274} = {AD30A71F-E824-4E6A-81B1-885694566274}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
