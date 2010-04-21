@@ -14,9 +14,14 @@ LEGION_API void legion_compiler_destroy(struct legion_compiler *compiler)
 	delete (Compiler *)compiler;
 }
 
-LEGION_API struct legion_document *legion_document_create(struct legion_compiler *compiler, const char *name)
+LEGION_API struct legion_string *legion_compiler_string(struct legion_compiler *compiler, const char *string, size_t length)
 {
-	return (struct legion_document *)new Document(*(Compiler *)compiler, name);
+	return (struct legion_string *)((Compiler *)compiler)->string_pool.get((const char_t*)string, length);
+}
+
+LEGION_API struct legion_document *legion_document_create(struct legion_compiler *compiler, struct legion_string *name)
+{
+	return (struct legion_document *)new Document(*(Compiler *)compiler, (String *)name);
 }
 
 LEGION_API void legion_document_destroy(struct legion_document *document)
@@ -29,14 +34,14 @@ LEGION_API struct legion_string *legion_document_filename(struct legion_document
 	return (struct legion_string *)((Document *)document)->filename;
 }
 
-LEGION_API void legion_document_load_data(struct legion_document *document, void *data, size_t length)
+LEGION_API void legion_document_load_data(struct legion_document *document, const void *data, size_t length)
 {
 	((Document *)document)->load((const char_t *)data, length);
 }
 
-LEGION_API bool legion_document_load_file(struct legion_document *document, const char *filename)
+LEGION_API bool legion_document_load_file(struct legion_document *document, struct legion_string *filename)
 {
-	return ((Document *)document)->load(filename);
+	return ((Document *)document)->load(((String *)filename)->string());
 }
 
 LEGION_API void legion_document_execute(struct legion_document *document, enum legion_stages stage)
@@ -96,16 +101,13 @@ LEGION_API struct legion_message *legion_message_next(struct legion_message *mes
 	return (struct legion_message *)((Message *)message)->next;
 }
 
-LEGION_API const char *legion_message_string(struct legion_message *message)
+LEGION_API struct legion_string *legion_message_string(struct legion_message *message)
 {
 	Message *msg = (Message *)message;
+
 	std::string string = msg->string();
 
-	char *result = new (msg->document.memory_pool) char[string.length() + 1];
-
-	strcpy(result, string.c_str());
-
-	return result;
+	return (struct legion_string *)msg->document.compiler.string_pool.get(string);
 }
 
 LEGION_API enum legion_severity legion_message_severity(struct legion_message *message)

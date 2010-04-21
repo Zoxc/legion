@@ -13,22 +13,40 @@ namespace Legion
         [DllImport("liblegion.dll")]
         private static extern void legion_compiler_destroy(IntPtr compiler);
 
-        public IntPtr _compiler;
+        [DllImport("liblegion.dll")]
+        private static extern IntPtr legion_compiler_string(IntPtr compiler, IntPtr str, uint size);
+
+        public IntPtr compiler;
         public object Tag;
 
         public Compiler()
         {
-            _compiler = legion_compiler_create();
+            compiler = legion_compiler_create();
         }
 
         public void Free()
         {
-            if (_compiler == IntPtr.Zero)
+            if (compiler == IntPtr.Zero)
                 return;
 
-            legion_compiler_destroy(_compiler);
+            legion_compiler_destroy(compiler);
 
-            _compiler = IntPtr.Zero;
+            compiler = IntPtr.Zero;
+        }
+
+        public String GetString(string str)
+        {
+            byte[] data = Encoding.UTF8.GetBytes(str);
+
+            GCHandle pin = GCHandle.Alloc(data, GCHandleType.Pinned);
+            try
+            {
+                return new String(legion_compiler_string(compiler, pin.AddrOfPinnedObject(), (uint)data.Length));
+            }
+            finally
+            {
+                pin.Free();
+            }
         }
 
         ~Compiler()
@@ -57,20 +75,20 @@ namespace Legion
     public class Document
     {
         [DllImport("liblegion.dll")]
-        private static extern IntPtr legion_document_create(IntPtr compiler, string name);
+        private static extern IntPtr legion_document_create(IntPtr compiler, IntPtr name);
         
         [DllImport("liblegion.dll")]
         private static extern void legion_document_destroy(IntPtr document);
 
         [DllImport("liblegion.dll")]
-        private static extern string legion_document_filename(IntPtr document);
+        private static extern IntPtr legion_document_filename(IntPtr document);
 
         [DllImport("liblegion.dll")]
-        private static extern void legion_document_load_data(IntPtr document, byte[] data, uint length);
+        private static extern void legion_document_load_data(IntPtr document, IntPtr data, uint length);
 
         [DllImport("liblegion.dll")]
         [return: MarshalAs(UnmanagedType.I1)]
-        private static extern bool legion_document_load_file(IntPtr document, string filename);
+        private static extern bool legion_document_load_file(IntPtr document, IntPtr filename);
 
         [DllImport("liblegion.dll")]
         private static extern void legion_document_execute(IntPtr document, Stage stage);
@@ -87,31 +105,31 @@ namespace Legion
         [DllImport("liblegion.dll")]
         private static extern IntPtr legion_include_next(IntPtr include);
 
-        private IntPtr _document;
+        private IntPtr document;
         private GCHandle pin;
 
         public object Tag;
 
-        public Document(Compiler compiler, string name)
+        public Document(Compiler compiler, String name)
         {
-            _document = legion_document_create(compiler._compiler, name);
+            document = legion_document_create(compiler.compiler, name == null ? IntPtr.Zero : name.str);
         }
 
         public void Free()
         {
-            if (_document != IntPtr.Zero)
+            if (document != IntPtr.Zero)
             {
-                legion_document_destroy(_document);
-                _document = IntPtr.Zero;
+                legion_document_destroy(document);
+                document = IntPtr.Zero;
             }
 
             if (pin.IsAllocated)
                 pin.Free();
         }
 
-        public bool LoadFile(string filename)
+        public bool LoadFile(String filename)
         {
-            return legion_document_load_file(_document, filename);
+            return legion_document_load_file(document, filename.str);
         }
 
         public void Load(byte[] data)
@@ -121,12 +139,17 @@ namespace Legion
 
             pin = GCHandle.Alloc(data, GCHandleType.Pinned);
 
-            legion_document_load_data(_document, data, (uint)data.Length);
+            legion_document_load_data(document, pin.AddrOfPinnedObject(), (uint)data.Length);
         }
 
         public void Load(string data)
         {
             Load(Encoding.UTF8.GetBytes(data));
+        }
+
+        public void Load(IntPtr data, uint length)
+        {
+            legion_document_load_data(document, data, length);
         }
 
         public void Run()
@@ -138,13 +161,13 @@ namespace Legion
 
         public void Run(Stage stage)
         {
-            legion_document_execute(_document, stage);
+            legion_document_execute(document, stage);
         }
 
         public List<Message> GetMessages()
         {
             List<Message> result = new List<Message>();
-            IntPtr message = legion_message_first(_document);
+            IntPtr message = legion_message_first(document);
 
             while(message != IntPtr.Zero)
             {
@@ -159,7 +182,7 @@ namespace Legion
         public List<Include> GetIncludes()
         {
             List<Include> result = new List<Include>();
-            IntPtr include = legion_include_first(_document);
+            IntPtr include = legion_include_first(document);
 
             while (include != IntPtr.Zero)
             {
@@ -175,20 +198,35 @@ namespace Legion
             Free();
         }
     }
-
-    [StructLayout(LayoutKind.Sequential)]
-    public struct String
+    
+    public class String
     {
-        IntPtr Bytes;
-        public uint Length;
+        [StructLayout(LayoutKind.Sequential)]
+        public struct StringRecord
+        {
+            IntPtr Bytes;
+            public uint Length;
+
+            public override string ToString()
+            {
+                byte[] data = new byte[Length];
+
+                Marshal.Copy(Bytes, data, 0, (int)Length);
+
+                return Encoding.UTF8.GetString(data);
+            }
+        }
+
+        public IntPtr str;
+
+        public String(IntPtr str)
+        {
+            this.str = str;
+        }
 
         public override string ToString()
         {
-            byte[] data = new byte[Length];
-
-            Marshal.Copy(Bytes, data, 0, (int)Length);
-
-            return Encoding.UTF8.GetString(data);
+            return  Marshal.PtrToStructure(str, typeof(StringRecord)).ToString();
         }
     }
 
@@ -212,8 +250,7 @@ namespace Legion
         {
             this.include = include;
             Included = legion_include_included(include);
-            IntPtr path = legion_include_filename(include);
-            Path = Marshal.PtrToStructure(path, typeof(String)).ToString();
+            Path = new String(legion_include_filename(include)).ToString();
         }
 
         public void Report()
@@ -225,7 +262,7 @@ namespace Legion
     public class Message
     {
         [DllImport("liblegion.dll")]
-        private static extern string legion_message_string(IntPtr message);
+        private static extern IntPtr legion_message_string(IntPtr message);
 
         [DllImport("liblegion.dll")]
         private static extern Severity legion_message_severity(IntPtr message);
@@ -248,7 +285,7 @@ namespace Legion
 
         public Message(IntPtr message)
         {
-            this.message = legion_message_string(message);
+            this.message = new String(legion_message_string(message)).ToString();
             severity = legion_message_severity(message);
             start = legion_message_start(message);
             stop = legion_message_stop(message);
