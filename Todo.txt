@@ -14,5 +14,6 @@
 [ ] Check for lvalues where expected
 [ ] Create a class per error type
 [ ] Look over numbers ending in identifiers
-[ ] Allows messages to have children
+[ ] Allow messages to have children
 [ ] Make sure that functions returning a value, actually does
+[X] Check integers on conditionals and !

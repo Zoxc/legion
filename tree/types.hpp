@@ -476,10 +476,15 @@ namespace Legion
 			Compiler &compiler;
 
 			void declare(TypeNativeNode *parent, const char *name, TypeNativeNode &type, bool declare);
+			void declare_operators(TypeNativeNode &type, bool arithmetic = true, bool bitwise = true);
 
 		public:
+			/*
+			 * Internal types
+			 */
 			TypeNativeNode type_null;
 			TypeNativeNode type_void;
+			TypeNativeNode type_nullable;
 
 			TypeNativeNode type_abilcmd;
 			TypeNativeNode type_actor;

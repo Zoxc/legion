@@ -252,31 +252,35 @@ namespace Legion
 
 	Type *UnaryOpNode::validate(ValidationArgs &args)
 	{
+		Type *type = value->validate(args);
+		Type *result;
+
+		if(!type)
+			return 0;
+		
+		bool compatible = false;
+
 		switch(op)
 		{
-			case Lexeme::LOGICAL_NOT: //TODO: Figure out how ! works
-				return 0;
+			case Lexeme::LOGICAL_NOT:
+			{
+				if(type->compatible(args, args.types.type_bool.type, Type::WEAK) ||
+					type->compatible(args, args.types.type_int.type, Type::WEAK) ||
+					type->compatible(args, args.types.type_handle.type, Type::WEAK))
+					return 0;
+
+				compatible = false;
+				result = args.types.type_bool.type;
+
+				break;
+			}
 
 			case Lexeme::BITWISE_AND: //TODO: Implement this
 				return 0;
 
 			default:
-				break;
+				result = type->compatible_unary_op(args, op, compatible);
 		}
-
-		Type *type = value->validate(args);
-
-		if(!type)
-			return 0;
-
-		Type *result = Type::resolve(type);
-		
-		if(!result)
-			return 0;
-
-		bool compatible = false;
-
-		result = result->compatible_unary_op(args, op, compatible);
 
 		if(!compatible)
 		{

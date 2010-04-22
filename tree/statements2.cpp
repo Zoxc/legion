@@ -77,7 +77,10 @@ namespace Legion
 		if(!type)
 			return 0;
 
-		if(args.types.type_bool.type->compatible(args, type, Type::WEAK) || type->compatible(args, args.types.type_null.type, Type::WEAK))
+		if(type->compatible(args, args.types.type_bool.type, Type::WEAK) ||
+			type->compatible(args, args.types.type_color.type, Type::WEAK) ||
+			type->compatible(args, args.types.type_int.type, Type::WEAK) ||
+			type->compatible(args, args.types.type_null.type, Type::WEAK))
 			return 0;
 
 		new IncompatableTypesError(args.document, condition->get_range(args.memory_pool), type, args.types.type_bool.type);
