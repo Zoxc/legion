@@ -17,3 +17,4 @@
 [ ] Allow messages to have children
 [ ] Make sure that functions returning a value, actually does
 [X] Check integers on conditionals and !
+[ ] Rename 'compatible' functions to 'convert_to' 
