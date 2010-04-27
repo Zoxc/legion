@@ -9,7 +9,8 @@ Compiler compiler;
 
 bool include(String *filename)
 {
-	std::string file = filename->string() + "_beta.galaxy";
+	//TODO: Check include order
+	std::string file = filename->string();
 
 	Document &document = *new Document(compiler, filename);
 
