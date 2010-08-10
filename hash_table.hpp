@@ -161,6 +161,8 @@ namespace Legion
 					else
 						table[index] = value;
 
+					T::set_value_next(value, T::invalid_value());
+					
 					increase();
 
 					return value;
