@@ -7,30 +7,7 @@ using namespace Legion;
 
 Compiler compiler;
 
-bool include(String *filename)
-{
-	//TODO: Check include order
-	std::string file = filename->string();
-
-	Document &document = *new Document(compiler, filename);
-
-	if(!document.load(file))
-	{
-		file = filename->string() + ".galaxy";
-
-		if(!document.load(file))
-			return false;
-	}
-
-	document.parse();
-
-	for(List<IncludeNode>::Iterator i = document.includes.begin(); i; i++)
-		if(!i().found)
-			if(!include(i().filename))
-				i().report();
-
-	return true;
-}
+__int64 io_overhead;
 
 #ifdef WIN32
 	#define BENCHMARK_VARS __int64 _start, _stop, _freq
@@ -47,6 +24,39 @@ bool include(String *filename)
 	#define BENCHMARK_START
 	#define BENCHMARK_END(action)
 #endif
+
+bool include(String *filename)
+{
+	//TODO: Check include order
+	std::string file = filename->string();
+
+	Document &document = *new Document(compiler, filename);
+
+	BENCHMARK_VARS;
+	BENCHMARK_START;
+
+	if(!document.load(file))
+	{
+		file = filename->string() + ".galaxy";
+
+		if(!document.load(file))
+			return false;
+	}
+
+	#ifdef WIN32
+		QueryPerformanceCounter((LARGE_INTEGER *)&_stop);
+		io_overhead += _stop - _start;
+	#endif
+
+	document.parse();
+
+	for(List<IncludeNode>::Iterator i = document.includes.begin(); i; i++)
+		if(!i().found)
+			if(!include(i().filename))
+				i().report();
+
+	return true;
+}
 
 void print_ast(std::string name)
 {
@@ -92,6 +102,10 @@ int main(int argc, char *argv[])
 	BENCHMARK_END("Typechecked");
 
 	print_ast("post-typechecking-AST");
+
+	#ifdef WIN32
+		std::cout << "I/O overhead is " << (((double)1000 * io_overhead) / (double)_freq) << " ms." << std::endl;
+	#endif
 
 	for(auto i = compiler.documents.begin(); i; i++)
 		for(List<Message>::Iterator j = i().messages.begin(); j; j++)
