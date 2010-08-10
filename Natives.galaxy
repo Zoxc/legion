@@ -673,6 +673,8 @@ native void ConversationDataLineSetPickedCount(string p1, string p2, int p3);
 native int ConversationDataLineGetPickedCount(string p1, string p2);
 native void ConversationDataSaveStateValues(string p1, bank p2, string p3);
 native void ConversationDataLoadStateValues(string p1, bank p2, string p3);
+native void ConversationDataSaveStateValue(string p1, bank p2, string p3);
+native void ConversationDataLoadStateValue(string p1, bank p2, string p3);
 native void ConversationDataResetStateValues(string p1);
 native void ConversationDataSaveNodeState(string p1, bank p2, string p3);
 native void ConversationDataLoadNodeState(string p1, bank p2, string p3);
